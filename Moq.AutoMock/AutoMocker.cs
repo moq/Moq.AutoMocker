@@ -23,11 +23,11 @@ namespace Moq.AutoMock
             return typeMap.ContainsKey(type) ? typeMap[type] : CreateMockOf(type);
         }
 
-        private static object CreateMockOf(Type type)
+        private object CreateMockOf(Type type)
         {
             var mockType = typeof (Mock<>).MakeGenericType(type);
             var mock = (Mock)Activator.CreateInstance(mockType);
-            return mock.Object;
+            return (typeMap[type] = mock.Object);
         }
 
         public void Use<TService>(TService service)
