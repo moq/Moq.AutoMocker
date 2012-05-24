@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{F30C4A
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moq.AutoMock.Tests", "Moq.AutoMock.Tests\Moq.AutoMock.Tests.csproj", "{EE94D503-6880-44FF-B23A-B11D521BAB7A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +21,10 @@ Global
 		{EEEF1922-71E6-443B-A86B-14742AB8E9C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EEEF1922-71E6-443B-A86B-14742AB8E9C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EEEF1922-71E6-443B-A86B-14742AB8E9C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE94D503-6880-44FF-B23A-B11D521BAB7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE94D503-6880-44FF-B23A-B11D521BAB7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE94D503-6880-44FF-B23A-B11D521BAB7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE94D503-6880-44FF-B23A-B11D521BAB7A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
