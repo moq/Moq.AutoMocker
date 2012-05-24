@@ -48,5 +48,19 @@ namespace Moq.AutoMock.Tests
                 Mock.Get(instance.Empty).ShouldNotBeNull();
             }
         }
+
+        public class DescribeUsingExplicitObjects
+        {
+            private readonly AutoMocker mocker = new AutoMocker();
+
+            [Fact]
+            public void You_can_Use_an_instance_as_an_argument_to_GetInstance()
+            {
+                var empty = new Empty();
+                mocker.Use(empty);
+                var instance = mocker.GetInstance<OneConstructor>();
+                instance.Empty.ShouldBeSameAs(empty);
+            }
+        }
     }
 }
