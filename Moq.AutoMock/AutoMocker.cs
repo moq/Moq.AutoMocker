@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Moq.AutoMock
 {
@@ -7,7 +8,16 @@ namespace Moq.AutoMock
         public T GetInstance<T>()
             where T : class
         {
-            return Activator.CreateInstance<T>();
+            var ctor = typeof (T).GetConstructors()[0];
+            var arguments = ctor.GetParameters().Select(x => CreateMockOf(x.ParameterType)).ToArray();
+            return (T)Activator.CreateInstance(typeof(T), arguments);
+        }
+
+        private static object CreateMockOf(Type type)
+        {
+            var mockType = typeof (Mock<>).MakeGenericType(type);
+            var mock = (Mock)Activator.CreateInstance(mockType);
+            return mock.Object;
         }
     }
 }
