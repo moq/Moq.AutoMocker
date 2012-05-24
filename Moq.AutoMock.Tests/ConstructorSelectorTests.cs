@@ -3,9 +3,6 @@ using Xunit;
 
 namespace Moq.AutoMock.Tests
 {
-    public interface IService1 {}
-    public interface IService2 {}
-
     public class ConstructorSelectorTests
     {
         private readonly ConstructorSelector selector = new ConstructorSelector();

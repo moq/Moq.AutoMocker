@@ -54,6 +54,7 @@
     <Compile Include="AutoMockerTests.cs" />
     <Compile Include="ConstructorSelectorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Moq.AutoMock\Moq.AutoMock.csproj">

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Moq.AutoMock
 {
@@ -32,6 +33,12 @@ namespace Moq.AutoMock
         public void Use<TService>(TService service)
         {
             typeMap.Add(typeof(TService), service);
+        }
+
+        public void Use<TService>(Expression<Func<TService, bool>> setup) 
+            where TService : class
+        {
+            Use(Mock.Of(setup));
         }
     }
 }

@@ -21,6 +21,16 @@ namespace Moq.AutoMock.Tests
             }
         }
 
+        public class WithService
+        {
+            public IService2 Service { get; set; }
+
+            public WithService(IService2 service)
+            {
+                Service = service;
+            }
+        }
+
         #endregion
 
         public class DescribeGetInstance
@@ -60,6 +70,15 @@ namespace Moq.AutoMock.Tests
                 mocker.Use(empty);
                 var instance = mocker.GetInstance<OneConstructor>();
                 instance.Empty.ShouldBeSameAs(empty);
+            }
+
+            [Fact]
+            public void You_can_use_Use_as_an_alias_for_MockOf()
+            {
+                mocker.Use<IService2>(x => x.Other == Mock.Of<IService1>());
+                var instance = mocker.GetInstance<WithService>();
+                instance.Service.ShouldImplement<IService2>();
+                instance.Service.Other.ShouldImplement<IService1>();
             }
         }
     }
