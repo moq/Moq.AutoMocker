@@ -40,5 +40,10 @@ namespace Moq.AutoMock
         {
             Use(Mock.Of(setup));
         }
+
+        public TService Extract<TService>()
+        {
+            return (TService) typeMap[typeof (TService)];
+        }
     }
 }

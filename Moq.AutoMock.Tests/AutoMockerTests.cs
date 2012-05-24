@@ -81,5 +81,20 @@ namespace Moq.AutoMock.Tests
                 instance.Service.Other.ShouldImplement<IService1>();
             }
         }
+
+        public class DescribeExtractingObjects
+        {
+            private readonly AutoMocker mocker = new AutoMocker();
+
+            [Fact]
+            public void It_extracts_instances_that_were_placed_with_Use()
+            {
+                var setupInstance = Mock.Of<IService1>();
+                mocker.Use(setupInstance);
+
+                var actualInstance = mocker.Extract<IService1>();
+                actualInstance.ShouldBeSameAs(setupInstance);
+            }
+        }
     }
 }
