@@ -7,11 +7,12 @@ namespace Moq.AutoMock
     public class AutoMocker
     {
         private readonly Dictionary<Type, object> typeMap = new Dictionary<Type, object>();
+        private readonly ConstructorSelector constructorSelector = new ConstructorSelector();
 
         public T GetInstance<T>()
             where T : class
         {
-            var ctor = typeof (T).GetConstructors()[0];
+            var ctor = constructorSelector.SelectFor(typeof (T));
             var arguments = ctor.GetParameters().Select(x => GetObjectFor(x.ParameterType)).ToArray();
             return (T)Activator.CreateInstance(typeof(T), arguments);
         }
