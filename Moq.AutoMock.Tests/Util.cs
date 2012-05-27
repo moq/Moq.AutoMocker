@@ -5,4 +5,12 @@
     {
         IService1 Other { get; }
     }
+
+    public class Service2 : IService2
+    {
+        public IService1 Other
+        {
+            get { return null; }
+        }
+    }
 }

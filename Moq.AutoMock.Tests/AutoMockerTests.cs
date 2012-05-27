@@ -1,4 +1,5 @@
-﻿using Should;
+﻿using System;
+using Should;
 using Xunit;
 
 namespace Moq.AutoMock.Tests
@@ -28,6 +29,21 @@ namespace Moq.AutoMock.Tests
             public WithService(IService2 service)
             {
                 Service = service;
+            }
+        }
+
+        public class InsecureAboutSelf
+        {
+            public bool SelfDepricated { get; set; }
+
+            public void TellJoke()
+            {
+                
+            }
+
+            protected virtual void SelfDepricate()
+            {
+                SelfDepricated = true;
             }
         }
 
@@ -102,6 +118,53 @@ namespace Moq.AutoMock.Tests
                 mocker.GetInstance<WithService>();
                 var actualInstance = mocker.Extract<IService2>();
                 actualInstance.ShouldNotBeNull();
+            }
+        }
+
+        public class DescribeCreatingSelfMocks
+        {
+            private readonly AutoMocker mocker = new AutoMocker();
+
+            [Fact]
+            public void Self_mocks_are_useful_for_testing_most_of_class()
+            {
+                var selfMock = mocker.GetSelfMock<InsecureAboutSelf>();
+                selfMock.TellJoke();
+                selfMock.SelfDepricated.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void It_can_self_mock_objects_with_constructor_arguments()
+            {
+                var selfMock = mocker.GetSelfMock<WithService>();
+                selfMock.Service.ShouldNotBeNull();
+                Mock.Get(selfMock.Service).ShouldNotBeNull();
+            }
+        }
+
+        public class DescribeVerifyAll
+        {
+            private readonly AutoMocker mocker = new AutoMocker();
+
+            [Fact]
+            public void It_calls_VerifyAll_on_all_objects_that_are_mocks()
+            {
+                mocker.Use<IService2>(x => x.Other == Mock.Of<IService1>());
+                var selfMock = mocker.GetInstance<WithService>();
+                Assert.Throws(MockVerificationException, () => mocker.VerifyAll());
+            }
+
+            private static Type MockVerificationException
+            {
+                get { return typeof (Mock).Assembly.GetType("Moq.MockVerificationException"); }
+            }
+
+            [Fact]
+            public void It_doesnt_call_VerifyAll_if_the_object_isnt_a_mock()
+            {
+                mocker.Use<IService2>(new Service2());
+                mocker.GetInstance<WithService>();
+                mocker.VerifyAll();
             }
         }
     }

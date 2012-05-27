@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Moq.AutoMock
 {
@@ -13,9 +14,21 @@ namespace Moq.AutoMock
         public T GetInstance<T>()
             where T : class
         {
+            var arguments = CreateArguments<T>();
+            return (T)Activator.CreateInstance(typeof(T), arguments);
+        }
+
+        private object[] CreateArguments<T>() where T : class
+        {
             var ctor = constructorSelector.SelectFor(typeof (T));
             var arguments = ctor.GetParameters().Select(x => GetObjectFor(x.ParameterType)).ToArray();
-            return (T)Activator.CreateInstance(typeof(T), arguments);
+            return arguments;
+        }
+
+        public T GetSelfMock<T>() where T : class
+        {
+            var arguments = CreateArguments<T>();
+            return new Mock<T>(arguments).Object;
         }
 
         private object GetObjectFor(Type type)
@@ -44,6 +57,33 @@ namespace Moq.AutoMock
         public TService Extract<TService>()
         {
             return (TService) typeMap[typeof (TService)];
+        }
+
+        public void VerifyAll()
+        {
+            foreach (var pair in typeMap)
+            {
+                var value = GetMockSafely(pair.Key, pair.Value);
+                if (value != null)
+                    (value).VerifyAll();
+            }
+        }
+
+        private static Mock GetMockSafely(Type type, object value)
+        {
+            if (!value.GetType().GetProperties().Any(x => x.Name == "Mock"))
+                return null;
+
+            var method = typeof (Mock).GetMethod("Get", BindingFlags.Static | BindingFlags.Public);
+            var targetMethod = method.MakeGenericMethod(type);
+            try
+            {
+                return (Mock) targetMethod.Invoke(null, new[] {value});
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }
