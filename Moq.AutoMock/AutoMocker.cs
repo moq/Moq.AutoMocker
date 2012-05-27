@@ -95,6 +95,21 @@ namespace Moq.AutoMock
         }
 
         /// <summary>
+        /// Searches and retrieves the mock that the container uses for TService.
+        /// </summary>
+        /// <typeparam name="TService">The class or interface to search on</typeparam>
+        /// <exception cref="ArgumentException">if the requested object wasn't a Mock</exception>
+        /// <returns>a mock that </returns>
+        public Mock<TService> ExtractMock<TService>() where TService : class
+        {
+            var value = Extract<TService>() as Mock<TService>;
+            if (value == null)
+                throw new ArgumentException(string.Format("Registered service `{0}` was not a mock", Extract<TService>().GetType()));
+
+            return value;
+        }
+
+        /// <summary>
         /// This is a shortcut for calling `mock.VerifyAll()` on every mock that we have.
         /// </summary>
         public void VerifyAll()

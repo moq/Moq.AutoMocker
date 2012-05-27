@@ -49,6 +49,11 @@ namespace Moq.AutoMock.Tests
 
         #endregion
 
+        private static Type MockVerificationException
+        {
+            get { return typeof (Mock).Assembly.GetType("Moq.MockVerificationException"); }
+        }
+
         public class DescribeGetInstance
         {
             private readonly AutoMocker mocker = new AutoMocker();
@@ -119,6 +124,13 @@ namespace Moq.AutoMock.Tests
                 var actualInstance = mocker.Extract<IService2>();
                 actualInstance.ShouldNotBeNull();
             }
+
+            [Fact]
+            public void ExtractMock_throws_ArgumentException_when_object_isnt_A_mock()
+            {
+                mocker.Use<IService2>(new Service2());
+                Assert.Throws<ArgumentException>(() => mocker.ExtractMock<IService2>());
+            }
         }
 
         public class DescribeCreatingSelfMocks
@@ -152,11 +164,6 @@ namespace Moq.AutoMock.Tests
                 mocker.Use<IService2>(x => x.Other == Mock.Of<IService1>());
                 var selfMock = mocker.GetInstance<WithService>();
                 Assert.Throws(MockVerificationException, () => mocker.VerifyAll());
-            }
-
-            private static Type MockVerificationException
-            {
-                get { return typeof (Mock).Assembly.GetType("Moq.MockVerificationException"); }
             }
 
             [Fact]
