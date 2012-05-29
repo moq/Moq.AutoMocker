@@ -22,7 +22,7 @@ namespace Moq.AutoMock
         /// <typeparam name="T">A concrete type</typeparam>
         /// <returns>An instance of T with all constructor arguments derrived from services 
         /// setup in the container.</returns>
-        public T GetInstance<T>()
+        public T CreateInstance<T>()
             where T : class
         {
             var arguments = CreateArguments<T>();
@@ -44,7 +44,7 @@ namespace Moq.AutoMock
         /// </summary>
         /// <typeparam name="T">The instance that you want to build</typeparam>
         /// <returns>An instance with virtual and abstract members mocked</returns>
-        public T GetSelfMock<T>() where T : class
+        public T CreateSelfMock<T>() where T : class
         {
             var arguments = CreateArguments<T>();
             return new Mock<T>(arguments).Object;
@@ -85,11 +85,11 @@ namespace Moq.AutoMock
 
         /// <summary>
         /// Searches and retrieves an object from the container that matches TService. This can be
-        /// a service setup explicitly via `.Use()` or implicitly with `.GetInstance()`.
+        /// a service setup explicitly via `.Use()` or implicitly with `.CreateInstance()`.
         /// </summary>
         /// <typeparam name="TService">The class or interface to search on</typeparam>
         /// <returns>The object that implements TService</returns>
-        public TService Extract<TService>()
+        public TService Get<TService>()
         {
             return (TService) typeMap[typeof (TService)];
         }
@@ -100,11 +100,11 @@ namespace Moq.AutoMock
         /// <typeparam name="TService">The class or interface to search on</typeparam>
         /// <exception cref="ArgumentException">if the requested object wasn't a Mock</exception>
         /// <returns>a mock that </returns>
-        public Mock<TService> ExtractMock<TService>() where TService : class
+        public Mock<TService> GetMock<TService>() where TService : class
         {
-            var value = Extract<TService>() as Mock<TService>;
+            var value = Get<TService>() as Mock<TService>;
             if (value == null)
-                throw new ArgumentException(string.Format("Registered service `{0}` was not a mock", Extract<TService>().GetType()));
+                throw new ArgumentException(string.Format("Registered service `{0}` was not a mock", Get<TService>().GetType()));
 
             return value;
         }
