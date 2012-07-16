@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+    <metadata>
+        <id>Moq.AutoMocker</id>
+        <version>0.1.0</version>
+        <authors>Tim Kellogg</authors>
+        <description>An auto-mocking container that generates mocks using Moq</description>
+        <tags>moq automocking testing TDD</tags>
+        <language>en-US</language>
+    </metadata>
+    <dependencies>
+        <dependency id="Moq" version="4" />
+    </dependencies>
+</package>
