@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+  <metadata>
+    <id>Moq.AutoMock</id>
+    <version>0.1.0</version>
+    <authors>Tim Kellogg</authors>
+    <owners>Tim Kellogg</owners>
+    <licenseUrl>https://github.com/tkellogg/Moq.AutoMocker/blob/master/License.md</licenseUrl>
+    <projectUrl>https://github.com/tkellogg/Moq.AutoMocker</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<description>
+		An auto-mocking container that generates mocks using Moq
+		</description>
+    <copyright>Copyright Tim Kellogg 2012</copyright>
+		<tags>moq automocking testing TDD</tags>
+    <dependencies>
+      <dependency id="Moq" version="4.0" />
+    </dependencies>
+  </metadata>
+</package>
