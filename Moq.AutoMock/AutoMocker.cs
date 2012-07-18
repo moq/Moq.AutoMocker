@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Moq.Language.Flow;
 
 namespace Moq.AutoMock
 {
@@ -102,11 +103,11 @@ namespace Moq.AutoMock
         /// <returns>a mock that </returns>
         public Mock<TService> GetMock<TService>() where TService : class
         {
-            var value = Get<TService>() as Mock<TService>;
+            var value = Get<TService>();
             if (value == null)
                 throw new ArgumentException(string.Format("Registered service `{0}` was not a mock", Get<TService>().GetType()));
 
-            return value;
+            return Mock.Get(value);
         }
 
         /// <summary>
