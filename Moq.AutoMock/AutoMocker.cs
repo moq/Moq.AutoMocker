@@ -70,7 +70,7 @@ namespace Moq.AutoMock
         /// <param name="service"></param>
         public void Use<TService>(TService service)
         {
-            typeMap.Add(typeof(TService), service);
+            typeMap[typeof(TService)] = service;
         }
 
         /// <summary>

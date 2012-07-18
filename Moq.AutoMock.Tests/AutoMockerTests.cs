@@ -101,6 +101,15 @@ namespace Moq.AutoMock.Tests
                 instance.Service.ShouldImplement<IService2>();
                 instance.Service.Other.ShouldImplement<IService1>();
             }
+
+            [Fact]
+            public void Adding_an_instance_will_replace_existing_setups()
+            {
+                mocker.Use<IService2>(x => x.Other.ToString() == "kittens");
+                var otherService = Mock.Of<IService2>();
+                mocker.Use(otherService);
+                mocker.Get<IService2>().ShouldBeSameAs(otherService);
+            }
         }
 
         public class DescribeExtractingObjects
