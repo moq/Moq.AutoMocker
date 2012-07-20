@@ -112,6 +112,46 @@ namespace Moq.AutoMock.Tests
             }
         }
 
+        public class DescribeSetups
+        {
+            private readonly AutoMocker mocker = new AutoMocker();
+
+            /// <summary>
+            /// Some people find this more comfortable than the Mock.Of() style
+            /// </summary>
+            [Fact]
+            public void You_can_setup_a_mock_using_the_classic_Setup_style()
+            {
+                mocker.Setup<IService2>(x => x.Other).Returns(Mock.Of<IService1>());
+                var mock = mocker.Get<IService2>();
+                mock.ShouldNotBeNull();
+                mock.Other.ShouldNotBeNull();
+            }
+
+            [Fact]
+            public void You_can_do_multiple_setups_on_a_single_interface()
+            {
+                mocker.Setup<IService2>(x => x.Other).Returns(Mock.Of<IService1>());
+                mocker.Setup<IService2>(x => x.Name).Returns("pure awesomeness");
+                var mock = mocker.Get<IService2>();
+                mock.Name.ShouldEqual("pure awesomeness");
+            }
+        }
+
+        public class DescribeSingleVerify
+        {
+            private readonly AutoMocker mocker = new AutoMocker();
+
+            [Fact]
+            public void You_can_verify_a_single_method_call_directly()
+            {
+                var mock = new Mock<IService2>();
+                mocker.Use(mock.Object);
+                var name = mock.Object.Name;
+                mocker.Verify<IService2>(x => x.Name);
+            }
+        }
+
         public class DescribeExtractingObjects
         {
             private readonly AutoMocker mocker = new AutoMocker();

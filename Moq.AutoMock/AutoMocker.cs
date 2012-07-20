@@ -139,5 +139,20 @@ namespace Moq.AutoMock
                 return null;
             }
         }
+
+        public ISetup<TService, object> Setup<TService>(Expression<Func<TService, object>> setup)
+            where TService : class
+        {
+            var mock = new Mock<TService>();
+            Use(mock.Object);
+            return mock.Setup(setup);
+        }
+
+        public void Verify<T>(Expression<Func<T, object>> verificationExpression)
+            where T : class
+        {
+            var mock = GetMock<T>();
+            mock.Verify(verificationExpression);
+        }
     }
 }

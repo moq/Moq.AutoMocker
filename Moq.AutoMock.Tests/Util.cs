@@ -1,9 +1,13 @@
 ﻿namespace Moq.AutoMock.Tests
 {
-    public interface IService1 {}
+    public interface IService1
+    {
+        void Void();
+    }
     public interface IService2
     {
         IService1 Other { get; }
+        string Name { get; }
     }
 
     public class Service2 : IService2
@@ -12,5 +16,7 @@
         {
             get { return null; }
         }
+
+        public string Name { get; set; }
     }
 }
