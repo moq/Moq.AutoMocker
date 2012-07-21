@@ -46,11 +46,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutoMocker.cs" />
+    <Compile Include="AutoMocker.Verify.cs.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AutoMocker.Verify.cs.tt</DependentUpon>
+    </Compile>
     <Compile Include="ConstructorSelector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoMocker.Verify.cs.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>AutoMocker.Verify.cs.generated.cs</LastGenOutput>
+    </Compile>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

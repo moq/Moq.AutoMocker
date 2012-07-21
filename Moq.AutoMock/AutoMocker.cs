@@ -10,7 +10,7 @@ namespace Moq.AutoMock
     /// <summary>
     /// An auto-mocking IoC container that generates mock objects using Moq.
     /// </summary>
-    public class AutoMocker
+    public partial class AutoMocker
     {
         private readonly Dictionary<Type, object> typeMap = new Dictionary<Type, object>();
         private readonly ConstructorSelector constructorSelector = new ConstructorSelector();
@@ -148,11 +148,5 @@ namespace Moq.AutoMock
             return mock.Setup(setup);
         }
 
-        public void Verify<T>(Expression<Func<T, object>> verificationExpression)
-            where T : class
-        {
-            var mock = GetMock<T>();
-            mock.Verify(verificationExpression);
-        }
     }
 }
