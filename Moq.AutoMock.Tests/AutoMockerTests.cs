@@ -136,6 +136,15 @@ namespace Moq.AutoMock.Tests
                 var mock = mocker.Get<IService2>();
                 mock.Name.ShouldEqual("pure awesomeness");
             }
+
+            [Fact]
+            public void You_can_setup_a_void_void()
+            {
+                var x = 0;
+                mocker.Setup<IService1>(_ => _.Void()).Callback(() => x++);
+                mocker.Get<IService1>().Void();
+                x.ShouldEqual(1);
+            }
         }
 
         public class DescribeSingleVerify

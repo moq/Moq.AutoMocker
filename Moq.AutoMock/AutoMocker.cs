@@ -148,5 +148,13 @@ namespace Moq.AutoMock
             return mock.Setup(setup);
         }
 
+        public ISetup<TService> Setup<TService>(Expression<Action<TService>> setup)
+            where TService : class
+        {
+            var mock = new Mock<TService>();
+            Use(mock.Object);
+            return mock.Setup(setup);
+        }
+
     }
 }
