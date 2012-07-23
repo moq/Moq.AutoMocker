@@ -146,6 +146,9 @@ namespace Moq.AutoMock
             }
         }
 
+        /// <summary>
+        /// Shortcut for mock.Setup(...), creating the mock when necessary.
+        /// </summary>
         public ISetup<TService, object> Setup<TService>(Expression<Func<TService, object>> setup)
             where TService : class
         {
@@ -154,6 +157,9 @@ namespace Moq.AutoMock
             return mock.Setup(setup);
         }
 
+        /// <summary>
+        /// Shortcut for mock.Setup(...), creating the mock when necessary.
+        /// </summary>
         public ISetup<TService> Setup<TService>(Expression<Action<TService>> setup)
             where TService : class
         {
@@ -162,6 +168,12 @@ namespace Moq.AutoMock
             return mock.Setup(setup);
         }
 
+        /// <summary>
+        /// Combines all given types so that they are mocked by the same
+        /// mock. Some IoC containers call this "Forwarding" one type to 
+        /// other interfaces. In the end, this just means that all given
+        /// types will be implemnted by the same instance.
+        /// </summary>
         public void Combine(Type type, params Type[] forwardTo)
         {
             var mockObject = CreateMockOf(type);

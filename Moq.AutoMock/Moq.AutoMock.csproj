@@ -45,6 +45,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoMocker.Combine.cs.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AutoMocker.Combine.cs.tt</DependentUpon>
+    </Compile>
     <Compile Include="AutoMocker.cs" />
     <Compile Include="AutoMocker.Verify.cs.generated.cs">
       <AutoGen>True</AutoGen>
@@ -55,10 +60,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AutoMocker.Verify.cs.tt">
+    <None Include="AutoMocker.Verify.cs.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AutoMocker.Verify.cs.generated.cs</LastGenOutput>
-    </Compile>
+    </None>
+    <None Include="AutoMocker.Combine.cs.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>AutoMocker.Combine.cs.generated.cs</LastGenOutput>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

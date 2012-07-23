@@ -162,6 +162,17 @@ namespace Moq.AutoMock.Tests
                 mocker.Get<IService2>().ShouldBeSameAs(
                     mocker.Get<IService3>());
             }
+
+            [Fact]
+            public void Convenience_methods_work()
+            {
+                mocker.Combine<IService1, IService2, IService3>();
+
+                mocker.Get<IService1>().ShouldBeSameAs(
+                    mocker.Get<IService2>());
+                mocker.Get<IService2>().ShouldBeSameAs(
+                    mocker.Get<IService3>());
+            }
         }
 
         public class DescribeSingleVerify
