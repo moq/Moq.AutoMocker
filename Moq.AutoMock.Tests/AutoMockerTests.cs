@@ -147,6 +147,23 @@ namespace Moq.AutoMock.Tests
             }
         }
 
+        public class DescribeCombiningTypes
+        {
+            private readonly AutoMocker mocker = new AutoMocker();
+
+            [Fact]
+            public void It_uses_the_same_mock_for_all_instances()
+            {
+                mocker.Combine(typeof(IService1), typeof(IService2), 
+                    typeof(IService3));
+
+                mocker.Get<IService1>().ShouldBeSameAs(
+                    mocker.Get<IService2>());
+                mocker.Get<IService2>().ShouldBeSameAs(
+                    mocker.Get<IService3>());
+            }
+        }
+
         public class DescribeSingleVerify
         {
             private readonly AutoMocker mocker = new AutoMocker();

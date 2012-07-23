@@ -19,4 +19,9 @@
 
         public string Name { get; set; }
     }
+
+    public interface IService3
+    {
+        string MainMethodName { get; }
+    }
 }

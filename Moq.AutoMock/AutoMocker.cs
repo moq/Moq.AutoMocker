@@ -53,14 +53,20 @@ namespace Moq.AutoMock
 
         private object GetObjectFor(Type type)
         {
-            return typeMap.ContainsKey(type) ? typeMap[type] : CreateMockOf(type);
+            return typeMap.ContainsKey(type) ? typeMap[type] : CreateMockObjectAndStore(type);
         }
 
-        private object CreateMockOf(Type type)
+        private object CreateMockObjectAndStore(Type type)
+        {
+            var mock = CreateMockOf(type);
+            return (typeMap[type] = mock.Object);
+        }
+
+        private static Mock CreateMockOf(Type type)
         {
             var mockType = typeof (Mock<>).MakeGenericType(type);
-            var mock = (Mock)Activator.CreateInstance(mockType);
-            return (typeMap[type] = mock.Object);
+            var mock = (Mock) Activator.CreateInstance(mockType);
+            return mock;
         }
 
         /// <summary>
@@ -156,5 +162,20 @@ namespace Moq.AutoMock
             return mock.Setup(setup);
         }
 
+        public void Combine(Type type, params Type[] forwardTo)
+        {
+            var mockObject = CreateMockOf(type);
+            forwardTo.Aggregate(mockObject, As);
+
+            foreach (var serviceType in forwardTo.Concat(new[] { type }))
+                typeMap[serviceType] = mockObject.Object;
+        }
+
+        private static Mock As(Mock mock, Type forInterface)
+        {
+            var genericMethodDef = mock.GetType().GetMethods().Where(x => x.Name == "As");
+            var method = genericMethodDef.First().MakeGenericMethod(forInterface);
+            return (Mock) method.Invoke(mock, null);
+        }
     }
 }
