@@ -135,6 +135,7 @@ namespace Moq.AutoMock.Tests
                 mocker.Setup<IService2>(x => x.Name).Returns("pure awesomeness");
                 var mock = mocker.Get<IService2>();
                 mock.Name.ShouldEqual("pure awesomeness");
+                mock.Other.ShouldNotBeNull();
             }
 
             [Fact]

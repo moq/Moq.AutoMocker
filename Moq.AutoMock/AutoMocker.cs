@@ -12,7 +12,7 @@ namespace Moq.AutoMock
     /// </summary>
     public partial class AutoMocker
     {
-        private readonly Dictionary<Type, object> typeMap = new Dictionary<Type, object>();
+        private readonly Dictionary<Type, IInstance> typeMap = new Dictionary<Type, IInstance>();
         private readonly ConstructorSelector constructorSelector = new ConstructorSelector();
 
         /// <summary>
@@ -56,17 +56,25 @@ namespace Moq.AutoMock
             return typeMap.ContainsKey(type) ? typeMap[type] : CreateMockObjectAndStore(type);
         }
 
-        private object CreateMockObjectAndStore(Type type)
+        private Mock GetOrMakeMockFor(Type type)
         {
-            var mock = CreateMockOf(type);
-            return (typeMap[type] = mock.Object);
+            if (!typeMap.ContainsKey(type) || !typeMap[type].IsMock)
+                typeMap[type] = new MockInstance(type);
+
+            return Mock.Get(typeMap[type]);
         }
 
-        private static Mock CreateMockOf(Type type)
+        private bool IsMock(Type type, object @object)
         {
-            var mockType = typeof (Mock<>).MakeGenericType(type);
-            var mock = (Mock) Activator.CreateInstance(mockType);
-            return mock;
+            var isMockTemplate = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic)
+                .First(x => x.Name == "IsMock" && x.GetParameters().Length == 1);
+            var isMock = isMockTemplate.MakeGenericMethod(type);
+            return (bool) isMock.Invoke(this, new[] {@object});
+        }
+
+        private IInstance CreateMockObjectAndStore(Type type)
+        {
+            return (typeMap[type] = new MockInstance(type));
         }
 
         /// <summary>
@@ -76,7 +84,13 @@ namespace Moq.AutoMock
         /// <param name="service"></param>
         public void Use<TService>(TService service)
         {
-            typeMap[typeof(TService)] = service;
+            typeMap[typeof(TService)] = new RealInstance(service);
+        }
+
+        public void Use<TService>(Mock<TService> mockedService)
+            where TService : class
+        {
+            typeMap[typeof(TService)] = new MockInstance(mockedService);
         }
 
         /// <summary>
@@ -152,9 +166,7 @@ namespace Moq.AutoMock
         public ISetup<TService, object> Setup<TService>(Expression<Func<TService, object>> setup)
             where TService : class
         {
-            var mock = new Mock<TService>();
-            Use(mock.Object);
-            return mock.Setup(setup);
+            return Setup<ISetup<TService, object>, TService>(m => m.Setup(setup));
         }
 
         /// <summary>
@@ -163,9 +175,15 @@ namespace Moq.AutoMock
         public ISetup<TService> Setup<TService>(Expression<Action<TService>> setup)
             where TService : class
         {
-            var mock = new Mock<TService>();
+            return Setup<ISetup<TService>, TService>(m => m.Setup(setup));
+        }
+
+        private TReturn Setup<TReturn, TService>(Func<Mock<TService>, TReturn> returnValue)
+            where TService : class
+        {
+            var mock = (Mock<TService>) GetOrMakeMockFor(typeof (TService));
             Use(mock.Object);
-            return mock.Setup(setup);
+            return returnValue(mock);
         }
 
         /// <summary>
@@ -176,11 +194,11 @@ namespace Moq.AutoMock
         /// </summary>
         public void Combine(Type type, params Type[] forwardTo)
         {
-            var mockObject = CreateMockOf(type);
-            forwardTo.Aggregate(mockObject, As);
+            var mockObject = new MockInstance(type);
+            forwardTo.Aggregate(mockObject.Mock, As);
 
             foreach (var serviceType in forwardTo.Concat(new[] { type }))
-                typeMap[serviceType] = mockObject.Object;
+                typeMap[serviceType] = mockObject;
         }
 
         private static Mock As(Mock mock, Type forInterface)

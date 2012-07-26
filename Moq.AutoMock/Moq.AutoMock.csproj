@@ -57,6 +57,7 @@
       <DependentUpon>AutoMocker.Verify.cs.tt</DependentUpon>
     </Compile>
     <Compile Include="ConstructorSelector.cs" />
+    <Compile Include="Instance.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
