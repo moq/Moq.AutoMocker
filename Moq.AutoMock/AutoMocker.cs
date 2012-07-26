@@ -53,7 +53,8 @@ namespace Moq.AutoMock
 
         private object GetObjectFor(Type type)
         {
-            return typeMap.ContainsKey(type) ? typeMap[type] : CreateMockObjectAndStore(type);
+            var instance = typeMap.ContainsKey(type) ? typeMap[type] : CreateMockObjectAndStore(type);
+            return instance.Value;
         }
 
         private Mock GetOrMakeMockFor(Type type)
@@ -61,7 +62,7 @@ namespace Moq.AutoMock
             if (!typeMap.ContainsKey(type) || !typeMap[type].IsMock)
                 typeMap[type] = new MockInstance(type);
 
-            return Mock.Get(typeMap[type]);
+            return ((MockInstance) typeMap[type]).Mock;
         }
 
         private bool IsMock(Type type, object @object)
@@ -101,7 +102,7 @@ namespace Moq.AutoMock
         public void Use<TService>(Expression<Func<TService, bool>> setup) 
             where TService : class
         {
-            Use(Mock.Of(setup));
+            Use(Mock.Get(Mock.Of(setup)));
         }
 
         /// <summary>
@@ -112,7 +113,7 @@ namespace Moq.AutoMock
         /// <returns>The object that implements TService</returns>
         public TService Get<TService>()
         {
-            return (TService) typeMap[typeof (TService)];
+            return (TService) typeMap[typeof (TService)].Value;
         }
 
         /// <summary>
@@ -123,11 +124,12 @@ namespace Moq.AutoMock
         /// <returns>a mock that </returns>
         public Mock<TService> GetMock<TService>() where TService : class
         {
-            var value = Get<TService>();
-            if (value == null)
+            var instance = typeMap[typeof (TService)];
+            if (!instance.IsMock)
                 throw new ArgumentException(string.Format("Registered service `{0}` was not a mock", Get<TService>().GetType()));
 
-            return Mock.Get(value);
+            var mockInstance = (MockInstance) instance;
+            return (Mock<TService>) mockInstance.Mock;
         }
 
         /// <summary>
@@ -137,26 +139,8 @@ namespace Moq.AutoMock
         {
             foreach (var pair in typeMap)
             {
-                var value = GetMockSafely(pair.Key, pair.Value);
-                if (value != null)
-                    (value).VerifyAll();
-            }
-        }
-
-        private static Mock GetMockSafely(Type type, object value)
-        {
-            if (!value.GetType().GetProperties().Any(x => x.Name == "Mock"))
-                return null;
-
-            var method = typeof (Mock).GetMethod("Get", BindingFlags.Static | BindingFlags.Public);
-            var targetMethod = method.MakeGenericMethod(type);
-            try
-            {
-                return (Mock) targetMethod.Invoke(null, new[] {value});
-            }
-            catch
-            {
-                return null;
+                if (pair.Value.IsMock)
+                    (((MockInstance)pair.Value).Mock).VerifyAll();
             }
         }
 
@@ -182,7 +166,7 @@ namespace Moq.AutoMock
             where TService : class
         {
             var mock = (Mock<TService>) GetOrMakeMockFor(typeof (TService));
-            Use(mock.Object);
+            Use(mock);
             return returnValue(mock);
         }
 

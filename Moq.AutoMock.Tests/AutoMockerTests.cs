@@ -184,7 +184,7 @@ namespace Moq.AutoMock.Tests
             public void You_can_verify_a_single_method_call_directly()
             {
                 var mock = new Mock<IService2>();
-                mocker.Use(mock.Object);
+                mocker.Use(mock);
                 var name = mock.Object.Name;
                 mocker.Verify<IService2>(x => x.Name);
             }
