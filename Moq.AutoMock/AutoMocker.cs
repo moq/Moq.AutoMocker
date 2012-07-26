@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using Moq.Language.Flow;
 
 namespace Moq.AutoMock
@@ -65,14 +64,6 @@ namespace Moq.AutoMock
             return ((MockInstance) typeMap[type]).Mock;
         }
 
-        private bool IsMock(Type type, object @object)
-        {
-            var isMockTemplate = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic)
-                .First(x => x.Name == "IsMock" && x.GetParameters().Length == 1);
-            var isMock = isMockTemplate.MakeGenericMethod(type);
-            return (bool) isMock.Invoke(this, new[] {@object});
-        }
-
         private IInstance CreateMockObjectAndStore(Type type)
         {
             return (typeMap[type] = new MockInstance(type));
@@ -88,6 +79,11 @@ namespace Moq.AutoMock
             typeMap[typeof(TService)] = new RealInstance(service);
         }
 
+        /// <summary>
+        /// Adds an intance to the container.
+        /// </summary>
+        /// <typeparam name="TService">The type that the instance will be registered as</typeparam>
+        /// <param name="mockedService"></param>
         public void Use<TService>(Mock<TService> mockedService)
             where TService : class
         {
