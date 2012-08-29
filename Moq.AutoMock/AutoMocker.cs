@@ -120,7 +120,10 @@ namespace Moq.AutoMock
         /// <returns>a mock that </returns>
         public Mock<TService> GetMock<TService>() where TService : class
         {
-            var instance = typeMap[typeof (TService)];
+            IInstance instance;
+            if (!typeMap.TryGetValue(typeof(TService), out instance))
+                instance = CreateMockObjectAndStore(typeof(TService));
+
             if (!instance.IsMock)
                 throw new ArgumentException(string.Format("Registered service `{0}` was not a mock", Get<TService>().GetType()));
 
