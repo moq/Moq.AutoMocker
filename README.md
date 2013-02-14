@@ -1,4 +1,4 @@
-An automocking container for Moq. Use this if you're invested in you're IoC
+An automocking container for Moq. Use this if you're invested in your IoC
 container and want to decouple your unit tests from changes to their 
 constructor arguments.
 
