@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using Moq.Language.Flow;
 
 namespace Moq.AutoMock
@@ -25,8 +26,24 @@ namespace Moq.AutoMock
         public T CreateInstance<T>()
             where T : class
         {
+	        var type = typeof (T);
             var arguments = CreateArguments<T>();
-            return (T)Activator.CreateInstance(typeof(T), arguments);
+            var instance = (T)Activator.CreateInstance(type, arguments);
+
+			// We also want to create mocks for any public properties with getters and setters, which
+			// are not simple types or strings
+	        var properties = type
+		        .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+		        .Where(p => (p.CanRead && p.GetGetMethod(true).IsPublic) &&
+		                    (p.CanWrite && p.GetSetMethod(true).IsPublic) &&
+		                    !p.PropertyType.IsArray && !p.PropertyType.IsValueType &&
+		                    (p.PropertyType.IsClass || p.PropertyType.IsInterface));
+			foreach (var property in properties)
+			{
+				var propertyValue = GetObjectFor(property.PropertyType);
+				property.SetValue(instance, propertyValue, null);
+			}
+	        return instance;
         }
 
         private object[] CreateArguments<T>() where T : class

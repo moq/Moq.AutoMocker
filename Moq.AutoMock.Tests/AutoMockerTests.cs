@@ -276,5 +276,41 @@ namespace Moq.AutoMock.Tests
                 mocker.VerifyAll();
             }
         }
+
+	    public class DescribeCreatingMocksForProperties
+	    {
+		    private AutoMocker mocker = new AutoMocker();
+
+		    public class Property1
+		    {
+		    }
+
+		    public class Property2
+		    {
+		    }
+
+		    public interface IProperty3
+		    {
+		    }
+
+		    public class ClassWithPublicProperties
+		    {
+			    public Property1 Property1 { get; set; }
+			    public Property2 Property2 { get; private set; }
+			    public IProperty3 Property3 { get; set; }
+		    }
+
+		    [Fact]
+		    public void It_creates_mocks_for_properties_with_public_getter_and_setter()
+		    {
+			    var instance = mocker.CreateInstance<ClassWithPublicProperties>();
+			    Assert.NotNull(instance.Property1);
+			    Assert.Null(instance.Property2);
+			    Assert.NotNull(instance.Property3);
+
+				Assert.Equal(mocker.GetMock<Property1>().Object, instance.Property1);
+				Assert.Equal(mocker.GetMock<IProperty3>().Object, instance.Property3);
+		    }
+	    }
     }
 }
