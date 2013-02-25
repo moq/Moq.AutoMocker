@@ -1,6 +1,7 @@
 ﻿using System;
 using Should;
 using Xunit;
+using System.Reflection;
 
 namespace Moq.AutoMock.Tests
 {
@@ -303,7 +304,7 @@ namespace Moq.AutoMock.Tests
 		    [Fact]
 		    public void It_creates_mocks_for_properties_with_public_getter_and_setter()
 		    {
-			    var instance = mocker.CreateInstance<ClassWithPublicProperties>();
+			    var instance = mocker.CreateInstance<ClassWithPublicProperties>(Assembly.GetExecutingAssembly());
 			    Assert.NotNull(instance.Property1);
 			    Assert.Null(instance.Property2);
 			    Assert.NotNull(instance.Property3);

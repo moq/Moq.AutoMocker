@@ -23,12 +23,24 @@ namespace Moq.AutoMock
         /// <typeparam name="T">A concrete type</typeparam>
         /// <returns>An instance of T with all constructor arguments derrived from services 
         /// setup in the container.</returns>
-        public T CreateInstance<T>()
+		public T CreateInstance<T>(params Assembly[] srcAssemblies)
             where T : class
         {
 	        var type = typeof (T);
             var arguments = CreateArguments<T>();
             var instance = (T)Activator.CreateInstance(type, arguments);
+
+	        var tAssembly = typeof (T).Assembly;
+			if (srcAssemblies == null || srcAssemblies.Length == 0)
+			{
+				srcAssemblies = new [] { tAssembly };
+			}
+			else if (!srcAssemblies.Contains(tAssembly))
+			{
+				var assemblyList = srcAssemblies.ToList();
+				assemblyList.Add(tAssembly);
+				srcAssemblies = assemblyList.ToArray();
+			}
 
 			// We also want to create mocks for any public properties with getters and setters, which
 			// are not simple types or strings
@@ -37,7 +49,8 @@ namespace Moq.AutoMock
 		        .Where(p => (p.CanRead && p.GetGetMethod(true).IsPublic) &&
 		                    (p.CanWrite && p.GetSetMethod(true).IsPublic) &&
 		                    !p.PropertyType.IsArray && !p.PropertyType.IsValueType &&
-		                    (p.PropertyType.IsClass || p.PropertyType.IsInterface));
+		                    (p.PropertyType.IsClass || p.PropertyType.IsInterface) &&
+							srcAssemblies.Contains(p.PropertyType.Assembly));
 			foreach (var property in properties)
 			{
 				var propertyValue = GetObjectFor(property.PropertyType);
