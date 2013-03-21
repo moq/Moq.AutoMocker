@@ -15,15 +15,15 @@ namespace Moq.AutoMock
             Mock = value;
         }
 
-        public MockInstance(Type mockType, MockBehavior defaultBehavior)
-            :this(CreateMockOf(mockType, defaultBehavior))
+        public MockInstance(Type mockType)
+            :this(CreateMockOf(mockType))
         {
         }
 
-        private static Mock CreateMockOf(Type type, MockBehavior defaultBehavior)
+        private static Mock CreateMockOf(Type type)
         {
             var mockType = typeof (Mock<>).MakeGenericType(type);
-            var mock = (Mock) Activator.CreateInstance(mockType, new object[] { defaultBehavior });
+            var mock = (Mock) Activator.CreateInstance(mockType);
             return mock;
         }
 
