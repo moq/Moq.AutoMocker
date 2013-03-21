@@ -235,6 +235,19 @@ namespace Moq.AutoMock.Tests
             }
         }
 
+        public class DescribeExtractingStrictObjects
+        {
+            private readonly AutoMocker mocker = new AutoMocker(MockBehavior.Strict);
+
+            [Fact]
+            public void It_creates_a_mock_as_strict_if_the_object_is_missing()
+            {
+                var mock = mocker.GetMock<IService1>();
+                Assert.Equal(MockBehavior.Strict,mock.Behavior);
+            }
+        }
+
+
         public class DescribeCreatingSelfMocks
         {
             private readonly AutoMocker mocker = new AutoMocker();
