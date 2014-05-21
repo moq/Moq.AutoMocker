@@ -42,6 +42,16 @@ namespace Moq.AutoMock.Tests
             }
         }
 
+        public class WithSealedParams
+        {
+            public string Sealed { get; set; }
+
+            public WithSealedParams(string @sealed)
+            {
+                Sealed = @sealed;
+            }
+        }
+
         public class InsecureAboutSelf
         {
             public bool SelfDepricated { get; set; }
@@ -87,6 +97,14 @@ namespace Moq.AutoMock.Tests
             {
                 var instance = mocker.CreateInstance<OneConstructor>();
                 Mock.Get(instance.Empty).ShouldNotBeNull();
+            }
+
+            [Fact]
+            public void It_creates_mock_objects_for_ctor_sealed_parameters_when_instances_provided()
+            {
+                mocker.Use("Hello World");
+                WithSealedParams instance = mocker.CreateInstance<WithSealedParams>();
+                instance.Sealed.ShouldNotBeNull().ShouldEqual("Hello World");
             }
 
             [Fact]

@@ -19,10 +19,13 @@ namespace Moq.AutoMock
 
         private bool IsBetterChoice(ConstructorInfo current, ConstructorInfo candidate)
         {
+            if (current == null)
+                return true;
+
             if (candidate.GetParameters().Any(x => x.ParameterType.IsSealed && !x.ParameterType.IsArray))
                 return false;
 
-            return current == null || current.GetParameters().Length < candidate.GetParameters().Length;
+            return current.GetParameters().Length < candidate.GetParameters().Length;
         }
     }
 }

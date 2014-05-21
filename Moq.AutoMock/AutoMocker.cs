@@ -62,7 +62,6 @@ namespace Moq.AutoMock
             {
                 typeMap[type] = new MockInstance(type);
             }
-
             return ((MockInstance) typeMap[type]).Mock;
         }
 
@@ -71,6 +70,7 @@ namespace Moq.AutoMock
             if (type.IsArray)
             {
                 Type elmType = type.GetElementType();
+
                 MockArrayInstance instance = new MockArrayInstance(elmType);
                 if (typeMap.ContainsKey(elmType))
                     instance.Add(typeMap[elmType]);
