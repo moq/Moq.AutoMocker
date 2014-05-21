@@ -32,6 +32,26 @@ namespace Moq.AutoMock.Tests
             }
         }
 
+        public class WithServiceArray
+        {
+            public IService2[] Services { get; set; }
+
+            public WithServiceArray(IService2[] services)
+            {
+                Services = services;
+            }
+        }
+
+        public class WithSealedParams
+        {
+            public string Sealed { get; set; }
+
+            public WithSealedParams(string @sealed)
+            {
+                Sealed = @sealed;
+            }
+        }
+
         public class InsecureAboutSelf
         {
             public bool SelfDepricated { get; set; }
@@ -77,6 +97,29 @@ namespace Moq.AutoMock.Tests
             {
                 var instance = mocker.CreateInstance<OneConstructor>();
                 Mock.Get(instance.Empty).ShouldNotBeNull();
+            }
+
+            [Fact]
+            public void It_creates_mock_objects_for_ctor_sealed_parameters_when_instances_provided()
+            {
+                mocker.Use("Hello World");
+                WithSealedParams instance = mocker.CreateInstance<WithSealedParams>();
+                instance.Sealed.ShouldNotBeNull().ShouldEqual("Hello World");
+            }
+
+            [Fact]
+            public void It_creates_mock_objects_for_ctor_array_parameters()
+            {
+                WithServiceArray instance = mocker.CreateInstance<WithServiceArray>();
+                instance.Services.ShouldNotBeNull().ShouldBeEmpty();
+            }
+
+            [Fact]
+            public void It_creates_mock_objects_for_ctor_array_parameters_with_elements()
+            {
+                mocker.Use(new Mock<IService2>());
+                WithServiceArray instance = mocker.CreateInstance<WithServiceArray>();
+                instance.Services.ShouldNotBeNull().ShouldNotBeEmpty();
             }
         }
 

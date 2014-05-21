@@ -25,6 +25,13 @@ namespace Moq.AutoMock.Tests
             public WithSealedParameter() {}
             public WithSealedParameter(string @sealed) {}
         }
+
+        class WithArrayParameter
+        {
+            public WithArrayParameter() { }
+            public WithArrayParameter(string[] array) { }
+            public WithArrayParameter(string[] array, string @sealed) { }
+        }
         #endregion
 
         [Fact]
@@ -42,7 +49,14 @@ namespace Moq.AutoMock.Tests
         }
 
         [Fact]
-        public void It_wont_select_if_an_argument_is_sealed()
+        public void It_chooses_the_ctor_with_the_most_arguments_when_arguments_are_arrays()
+        {
+            var ctor = selector.SelectFor(typeof(WithArrayParameter));
+            ctor.GetParameters().Length.ShouldEqual(1);
+        }
+
+        [Fact]
+        public void It_wont_select_if_an_argument_is_sealed_and_not_array()
         {
             var ctor = selector.SelectFor(typeof (WithSealedParameter));
             ctor.GetParameters().Length.ShouldEqual(0);

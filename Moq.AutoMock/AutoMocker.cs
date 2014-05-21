@@ -59,13 +59,23 @@ namespace Moq.AutoMock
         private Mock GetOrMakeMockFor(Type type)
         {
             if (!typeMap.ContainsKey(type) || !typeMap[type].IsMock)
+            {
                 typeMap[type] = new MockInstance(type);
-
+            }
             return ((MockInstance) typeMap[type]).Mock;
         }
 
         private IInstance CreateMockObjectAndStore(Type type)
         {
+            if (type.IsArray)
+            {
+                Type elmType = type.GetElementType();
+
+                MockArrayInstance instance = new MockArrayInstance(elmType);
+                if (typeMap.ContainsKey(elmType))
+                    instance.Add(typeMap[elmType]);
+                return typeMap[type] = instance;
+            }
             return (typeMap[type] = new MockInstance(type));
         }
 
