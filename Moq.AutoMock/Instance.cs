@@ -48,6 +48,8 @@ namespace Moq.AutoMock
 
     class MockInstance : IInstance
     {
+		private static readonly ConstructorSelector ConstructorSelector = new ConstructorSelector();
+
         public MockInstance(Mock value)
         {
             Mock = value;
@@ -60,9 +62,15 @@ namespace Moq.AutoMock
 
         private static Mock CreateMockOf(Type type)
         {
-            var mockType = typeof (Mock<>).MakeGenericType(type);
-            var mock = (Mock) Activator.CreateInstance(mockType);
-            return mock;
+			var mockType = typeof(Mock<>).MakeGenericType(type);
+			var ctor = ConstructorSelector.SelectFor(type);
+			object[] args = null;
+			if (ctor != null)
+				args = new object[ctor.GetParameters().Length];
+
+			return (args == null || args.Length == 0)
+				? (Mock)Activator.CreateInstance(mockType)
+				: (Mock)Activator.CreateInstance(mockType, new object[] { args });
         }
 
         public object Value

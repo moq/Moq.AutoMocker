@@ -1,4 +1,5 @@
 _ReSharper.*/
+*.DotSettings
 *.suo
 *.swp
 *.user
