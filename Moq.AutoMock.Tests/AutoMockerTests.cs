@@ -67,6 +67,8 @@ namespace Moq.AutoMock.Tests
             }
         }
 
+
+
         #endregion
 
         private static Type MockVerificationException
@@ -188,6 +190,15 @@ namespace Moq.AutoMock.Tests
                 mocker.Setup<IService1>(_ => _.Void()).Callback(() => x++);
                 mocker.Get<IService1>().Void();
                 x.ShouldEqual(1);
+            }
+
+            [Fact]
+            public void You_can_setup_a_method_that_returns_a_primitive()
+            {
+                mocker.Setup<IServiceWithPrimitives, long>(s => s.ReturnsALong()).Returns(100L);
+
+                var mock = mocker.Get<IServiceWithPrimitives>();
+                mock.ReturnsALong().ShouldEqual(100L);
             }
         }
 

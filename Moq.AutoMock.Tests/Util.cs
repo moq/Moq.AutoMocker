@@ -24,4 +24,9 @@
     {
         string MainMethodName { get; }
     }
+
+    public interface IServiceWithPrimitives
+    {
+        long ReturnsALong();
+    }
 }
