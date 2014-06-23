@@ -171,6 +171,21 @@ namespace Moq.AutoMock
             return Setup<ISetup<TService>, TService>(m => m.Setup(setup));
         }
 
+        /// <summary>
+        /// Shortcut for mock.Setup(...), creating the mock when necessary.
+        /// For specific return types. E.g. primitive, structs
+        /// that cannot be infered
+        /// </summary>
+        /// <typeparam name="TService"></typeparam>
+        /// <typeparam name="TReturn"></typeparam>
+        /// <param name="setup"></param>
+        /// <returns></returns>
+        public ISetup<TService, TReturn> Setup<TService, TReturn>(Expression<Func<TService, TReturn>> setup)
+            where TService : class
+        {
+            return Setup<ISetup<TService, TReturn>, TService>(m => m.Setup(setup));
+        }
+
         private TReturn Setup<TReturn, TService>(Func<Mock<TService>, TReturn> returnValue)
             where TService : class
         {
