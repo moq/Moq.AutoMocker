@@ -193,12 +193,63 @@ namespace Moq.AutoMock.Tests
             }
 
             [Fact]
-            public void You_can_setup_a_method_that_returns_a_primitive()
+            public void You_can_setup_a_method_that_returns_a_value_type()
             {
                 mocker.Setup<IServiceWithPrimitives, long>(s => s.ReturnsALong()).Returns(100L);
 
                 var mock = mocker.Get<IServiceWithPrimitives>();
                 mock.ReturnsALong().ShouldEqual(100L);
+            }
+
+            [Fact]
+            public void If_you_setup_a_method_that_returns_a_value_type_without_specifying_return_type_you_get_useful_exception()
+            {
+                //a method without parameters
+                var ex = Assert.Throws<NotSupportedException>(() => mocker.Setup<IServiceWithPrimitives>(s => s.ReturnsALong()).Returns(100L));
+                ex.Message.ShouldEqual("Use the Setup overload that allows specifying TReturn if the setup returns a value type");
+            }
+
+            [Fact]
+            public void If_you_setup_a_method_with_a_parameter_that_returns_a_value_type_without_specifying_return_type_you_get_useful_exception()
+            {
+                //a method with parameters
+                var ex = Assert.Throws<NotSupportedException>(() => mocker.Setup<IServiceWithPrimitives>(s => s.ReturnsALongWithParameter(It.IsAny<string>())).Returns(100L));
+
+                ex.Message.ShouldEqual("Use the Setup overload that allows specifying TReturn if the setup returns a value type");
+
+            }
+
+            [Fact]
+            public void If_you_setup_a_method_with_a_callback_that_returns_a_value_type_without_specifying_return_type_you_get_useful_exception()
+            {
+                //a method with parameters
+                var capturedVariable = string.Empty;
+
+                var ex = Assert.Throws<NotSupportedException>(() => mocker.Setup<IServiceWithPrimitives>(s => s.ReturnsALongWithParameter(It.IsAny<string>())).Returns(100L).Callback<string>(s => capturedVariable = s));
+
+                ex.Message.ShouldEqual("Use the Setup overload that allows specifying TReturn if the setup returns a value type");
+
+            }
+
+            [Fact]
+            public void If_you_setup_a_method_that_returns_a_value_type_via_a_lambda_without_specifying_return_type_you_get_useful_exception()
+            {
+                //a method with parameters
+                var ex = Assert.Throws<NotSupportedException>(() => mocker.Setup<IServiceWithPrimitives>(s => s.ReturnsALongWithParameter(It.IsAny<string>())).Returns<string>(s => s.Length));
+
+                ex.Message.ShouldEqual("Use the Setup overload that allows specifying TReturn if the setup returns a value type");
+
+            }
+
+            [Fact]
+            public void You_can_setup_a_method_that_returns_a_reference_type_via_a_lambda_without_specifying_return_type()
+            {
+                //a method with parameters
+                mocker.Setup<IServiceWithPrimitives>(s => s.ReturnsAReferenceWithParameter(It.IsAny<string>()))
+                        .Returns<string>(s => s += "2");
+
+                var mock = mocker.Get<IServiceWithPrimitives>();
+                mock.ReturnsAReferenceWithParameter("blah").ShouldEqual("blah2");
             }
         }
 
