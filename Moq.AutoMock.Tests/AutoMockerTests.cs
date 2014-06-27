@@ -67,6 +67,13 @@ namespace Moq.AutoMock.Tests
             }
         }
 
+        public class WithStatic
+        {
+            public static string Get()
+            {
+                return string.Empty;
+            }
+        }
 
 
         #endregion
@@ -250,6 +257,18 @@ namespace Moq.AutoMock.Tests
 
                 var mock = mocker.Get<IServiceWithPrimitives>();
                 mock.ReturnsAReferenceWithParameter("blah").ShouldEqual("blah2");
+            }
+
+            [Fact]
+            public void You_can_setup_a_method_with_a_static_that_returns_a_reference_type_via_a_lambda_without_specifying_return_type()
+            {
+                //a method with parameters
+                
+                mocker.Setup<IService4>(s => s.MainMethodName(WithStatic.Get()))
+                        .Returns<string>(s => s += "2");
+
+                var mock = mocker.Get<IService4>();
+                mock.MainMethodName(WithStatic.Get()).ShouldEqual("2");
             }
         }
 
