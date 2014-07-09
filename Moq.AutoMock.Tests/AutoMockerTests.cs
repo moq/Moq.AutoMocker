@@ -137,6 +137,13 @@ namespace Moq.AutoMock.Tests
             {
                 Assert.Throws<ArgumentException>(() => mocker.CreateInstance<ConstructorThrows>());
             }
+
+            [Fact]
+            public void It_throws_original_exception_caught_whilst_creating_object_with_original_stack_trace()
+            {
+                ArgumentException exception = Assert.Throws<ArgumentException>(() => mocker.CreateInstance<ConstructorThrows>());
+                Assert.Contains(typeof(ConstructorThrows).Name, exception.StackTrace);
+            }
         }
 
         public class DescribeUsingExplicitObjects

@@ -33,7 +33,7 @@ namespace Moq.AutoMock
             }
             catch (TargetInvocationException e)
             {
-                throw e.InnerException;
+                throw e.InnerException.PreserveStackTrace();
             }
         }
 
