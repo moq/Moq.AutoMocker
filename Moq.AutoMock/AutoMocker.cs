@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using Moq.Language.Flow;
 
 namespace Moq.AutoMock
@@ -26,7 +27,14 @@ namespace Moq.AutoMock
             where T : class
         {
             var arguments = CreateArguments<T>();
-            return (T)Activator.CreateInstance(typeof(T), arguments);
+            try
+            {
+                return (T) Activator.CreateInstance(typeof (T), arguments);
+            }
+            catch (TargetInvocationException e)
+            {
+                throw e.InnerException.PreserveStackTrace();
+            }
         }
 
         private object[] CreateArguments<T>() where T : class

@@ -67,6 +67,14 @@ namespace Moq.AutoMock.Tests
             }
         }
 
+        public class ConstructorThrows
+        {
+            public ConstructorThrows()
+            {
+                throw new ArgumentException();
+            }
+        }
+
 
 
         #endregion
@@ -122,6 +130,19 @@ namespace Moq.AutoMock.Tests
                 mocker.Use(new Mock<IService2>());
                 WithServiceArray instance = mocker.CreateInstance<WithServiceArray>();
                 instance.Services.ShouldNotBeNull().ShouldNotBeEmpty();
+            }
+
+            [Fact]
+            public void It_throws_original_exception_caught_whilst_creating_object()
+            {
+                Assert.Throws<ArgumentException>(() => mocker.CreateInstance<ConstructorThrows>());
+            }
+
+            [Fact]
+            public void It_throws_original_exception_caught_whilst_creating_object_with_original_stack_trace()
+            {
+                ArgumentException exception = Assert.Throws<ArgumentException>(() => mocker.CreateInstance<ConstructorThrows>());
+                Assert.Contains(typeof(ConstructorThrows).Name, exception.StackTrace);
             }
         }
 
