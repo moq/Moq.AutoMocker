@@ -31,6 +31,11 @@
 
     }
 
+    public interface IService5
+    {
+        string Name { get; set; }
+    }
+
     public interface IServiceWithPrimitives
     {
         long ReturnsALong();

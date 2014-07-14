@@ -186,6 +186,7 @@ namespace Moq.AutoMock
             return Setup<ISetup<TService, object>, TService>(func);
         }
 
+
         /// <summary>
         /// We are expecting expression to be m => m.Setup(setup). We will assume this structure
         /// and check if the inner setup is Converted (casted) to Object
@@ -253,6 +254,20 @@ namespace Moq.AutoMock
         }
 
         /// <summary>
+        /// Shortcut for mock.SetupAllProperties(), creating the mock when necessary
+        /// </summary>
+        /// <typeparam name="TService"></typeparam>
+        /// <returns></returns>
+        public Mock<TService> SetupAllProperties<TService>() where TService : class
+        {
+            var mock = (Mock<TService>)GetOrMakeMockFor(typeof(TService));
+            Use(mock);
+            mock.SetupAllProperties();
+            return mock;
+        }
+
+
+        /// <summary>
         /// Combines all given types so that they are mocked by the same
         /// mock. Some IoC containers call this "Forwarding" one type to 
         /// other interfaces. In the end, this just means that all given
@@ -273,5 +288,7 @@ namespace Moq.AutoMock
             var method = genericMethodDef.First().MakeGenericMethod(forInterface);
             return (Mock) method.Invoke(mock, null);
         }
+
+                
     }
 }

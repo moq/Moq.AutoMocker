@@ -292,6 +292,18 @@ namespace Moq.AutoMock.Tests
                 var mock = mocker.Get<IService4>();
                 mock.MainMethodName(WithStatic.Get()).ShouldEqual("2");
             }
+
+            [Fact]
+            public void You_can_set_up_all_properties_with_one_line()
+            {
+                mocker.SetupAllProperties<IService5>();
+
+                var mock = mocker.Get<IService5>();
+
+                mock.Name = "aname";
+                
+                mock.Name.ShouldEqual("aname");
+            }
         }
 
         public class DescribeCombiningTypes
