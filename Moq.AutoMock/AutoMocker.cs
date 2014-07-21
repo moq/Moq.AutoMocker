@@ -14,7 +14,7 @@ namespace Moq.AutoMock
     {
         private readonly Dictionary<Type, IInstance> typeMap = new Dictionary<Type, IInstance>();
         private readonly ConstructorSelector constructorSelector = new ConstructorSelector();
-
+        private CastChecker castChecker = new CastChecker();
         /// <summary>
         /// Constructs an instance from known services. Any dependancies (constructor arguments)
         /// are fulfilled by searching the container or, if not found, automatically generating
@@ -178,7 +178,7 @@ namespace Moq.AutoMock
             Expression<Func<Mock<TService>, ISetup<TService, object>>> expression = m => m.Setup(setup);
             //check if Func results in a cast to object (boxing). If so then the user should have used the Setup overload that
             //specifies TReturn for value types
-            if (DoesContainCastToObject(expression))
+            if (castChecker.DoesContainCastToObject(expression))
             {
                 throw new NotSupportedException("Use the Setup overload that allows specifying TReturn if the setup returns a value type");
             }
@@ -186,40 +186,6 @@ namespace Moq.AutoMock
             return Setup<ISetup<TService, object>, TService>(func);
         }
 
-
-        /// <summary>
-        /// We are expecting expression to be m => m.Setup(setup). We will assume this structure
-        /// and check if the inner setup is Converted (casted) to Object
-        /// </summary>
-        /// <param name="expression"></param>
-        /// <returns></returns>
-        private bool DoesContainCastToObject<TService>(Expression<Func<Mock<TService>, ISetup<TService, object>>> expression) where TService : class
-        {
-            //expression is assumed to be a lambda so the cast here would cause an exception if it was not the expected format
-            var lambdaExpression = (LambdaExpression)expression;
-
-            //m.Setup(setup)
-            //lambdaExpression.Body is assumed to be a MethodCallExpression so the cast here would cause an exception if it was not the expected format
-            var methodCallExpression = (MethodCallExpression)lambdaExpression.Body;
-
-            //only one argument in m.Setup(setup)
-            var setupArgument = (ConstantExpression)((MemberExpression)methodCallExpression.Arguments[0]).Expression;
-
-            //get the setup parameter from the anonymous type
-            dynamic argumentValue = setupArgument.Value;
-
-            //it should be a lambda this is the lambda that is the setup specified
-            var setup = (LambdaExpression)argumentValue.setup;
-
-            //Does its body Convert to System.Object?
-            if (setup.Body.NodeType == ExpressionType.Convert && setup.Body.Type == typeof(System.Object))
-            {
-                return true;
-            }
-
-            //does not contain a Cast To Object
-            return false;
-        }
 
         /// <summary>
         /// Shortcut for mock.Setup(...), creating the mock when necessary.
@@ -289,6 +255,53 @@ namespace Moq.AutoMock
             return (Mock) method.Invoke(mock, null);
         }
 
-                
+        /*extra verify methods to copy with primitive return type
+         * Not using the TextTempatingFileGenerator for now for this
+         */
+        public void Verify<T, TResult>(Expression<Func<T, TResult>> expression)
+            where T : class
+            where TResult : struct
+        {
+            var mock = GetMock<T>();
+            mock.Verify(expression);
+        }
+
+
+        public void Verify<T, TResult>(Expression<Func<T, TResult>> expression, Times times)
+            where T : class
+            where TResult : struct
+        {
+            var mock = GetMock<T>();
+            mock.Verify(expression, times);
+        }
+
+
+        public void Verify<T, TResult>(Expression<Func<T, TResult>> expression, Func<Times> times)
+            where T : class
+            where TResult : struct
+        {
+            var mock = GetMock<T>();
+            
+            mock.Verify(expression, times);
+        }
+
+
+        public void Verify<T, TResult>(Expression<Func<T, TResult>> expression, String failMessage)
+            where T : class
+            where TResult : struct
+        {
+            var mock = GetMock<T>();
+            mock.Verify(expression, failMessage);
+        }
+
+
+        public void Verify<T, TResult>(Expression<Func<T, TResult>> expression, Times times, String failMessage)
+            where T : class
+            where TResult : struct
+        {
+            var mock = GetMock<T>();
+            mock.Verify(expression, times, failMessage);
+        }
+
     }
 }

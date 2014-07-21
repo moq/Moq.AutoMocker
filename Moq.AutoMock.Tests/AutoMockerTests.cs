@@ -346,6 +346,25 @@ namespace Moq.AutoMock.Tests
                 var name = mock.Object.Name;
                 mocker.Verify<IService2>(x => x.Name);
             }
+
+            [Fact]
+            public void You_can_verify_a_method_that_returns_a_value_type()
+            {
+                mocker.Setup<IServiceWithPrimitives, long>(s => s.ReturnsALong()).Returns(100L);
+
+                var mock = mocker.Get<IServiceWithPrimitives>();
+                mock.ReturnsALong().ShouldEqual(100L);
+
+                mocker.Verify<IServiceWithPrimitives, long>(s => s.ReturnsALong(), Times.Once());
+            }
+
+            [Fact]
+            public void If_you_verify_a_method_that_returns_a_value_type_without_specifying_return_type_you_get_useful_exception()
+            {
+                //a method without parameters
+                var ex = Assert.Throws<NotSupportedException>(() => mocker.Verify<IServiceWithPrimitives>(s => s.ReturnsALong(), Times.Once()));
+                ex.Message.ShouldEqual("Use the Verify overload that allows specifying TReturn if the setup returns a value type");
+            }
         }
 
         public class DescribeExtractingObjects
