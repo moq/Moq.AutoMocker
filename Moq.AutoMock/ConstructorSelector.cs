@@ -6,23 +6,25 @@ namespace Moq.AutoMock
 {
     internal class ConstructorSelector
     {
-        public ConstructorInfo SelectFor(Type type)
+        public ConstructorInfo SelectFor(Type type, Type[] existingTypes)
         {
             ConstructorInfo best = null;
             foreach (var constructor in type.GetConstructors())
             {
-                if (IsBetterChoice(best, constructor))
+                if (IsBetterChoice(best, constructor, existingTypes))
                     best = constructor;
             }
             return best;
         }
 
-        private bool IsBetterChoice(ConstructorInfo current, ConstructorInfo candidate)
+        private bool IsBetterChoice(ConstructorInfo current, ConstructorInfo candidate, Type[] existingTypes)
         {
             if (current == null)
                 return true;
 
-            if (candidate.GetParameters().Any(x => x.ParameterType.IsSealed && !x.ParameterType.IsArray))
+            if (candidate.GetParameters()
+                         .Where(x => !existingTypes.Contains(x.ParameterType))
+                         .Any(x => x.ParameterType.IsSealed && !x.ParameterType.IsArray))
                 return false;
 
             return current.GetParameters().Length < candidate.GetParameters().Length;
