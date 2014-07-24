@@ -39,7 +39,7 @@ namespace Moq.AutoMock
 
         private object[] CreateArguments<T>() where T : class
         {
-            var ctor = constructorSelector.SelectFor(typeof (T));
+            var ctor = constructorSelector.SelectFor(typeof (T), typeMap.Keys.ToArray());
             var arguments = ctor.GetParameters().Select(x => GetObjectFor(x.ParameterType)).ToArray();
             return arguments;
         }
