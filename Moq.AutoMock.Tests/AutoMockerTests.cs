@@ -110,6 +110,17 @@ namespace Moq.AutoMock.Tests
             }
 
             [Fact]
+            public void It_creates_mock_objects_for_ctor_parameters_with_supplied_behavior()
+            {
+                var strictMocker = new AutoMocker(MockBehavior.Strict);
+
+                var instance = strictMocker.CreateInstance<OneConstructor>();
+                var mock = Mock.Get(instance.Empty);
+                mock.ShouldNotBeNull();
+                mock.Behavior.ShouldEqual(MockBehavior.Strict);
+            }
+
+            [Fact]
             public void It_creates_mock_objects_for_ctor_sealed_parameters_when_instances_provided()
             {
                 mocker.Use("Hello World");
