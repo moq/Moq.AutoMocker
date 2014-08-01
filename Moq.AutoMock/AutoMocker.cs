@@ -36,10 +36,26 @@ namespace Moq.AutoMock
         public T CreateInstance<T>()
             where T : class
         {
-            var arguments = CreateArguments<T>();
+            return CreateInstance<T>(false);
+        }
+
+        /// <summary>
+        /// Constructs an instance from known services. Any dependancies (constructor arguments)
+        /// are fulfilled by searching the container or, if not found, automatically generating
+        /// mocks.
+        /// </summary>
+        /// <typeparam name="T">A concrete type</typeparam>
+        /// <param name="enablePrivate">When true, private constructors will also be used to
+        /// create mocks.</param>
+        /// <returns>An instance of T with all constructor arguments derrived from services 
+        /// setup in the container.</returns>
+        public T CreateInstance<T>(bool enablePrivate) where T : class
+        {
+            var bindingFlags = GetBindingFlags(enablePrivate);
+            var arguments = CreateArguments<T>(bindingFlags);
             try
             {
-                return (T) Activator.CreateInstance(typeof (T), arguments);
+                return (T)Activator.CreateInstance(typeof(T), bindingFlags, null, arguments, null);
             }
             catch (TargetInvocationException e)
             {
@@ -47,9 +63,16 @@ namespace Moq.AutoMock
             }
         }
 
-        private object[] CreateArguments<T>() where T : class
+        private static BindingFlags GetBindingFlags(bool enablePrivate)
         {
-            var ctor = constructorSelector.SelectFor(typeof (T), typeMap.Keys.ToArray());
+            var bindingFlags = BindingFlags.Instance | BindingFlags.Public;
+            if (enablePrivate) bindingFlags = bindingFlags | BindingFlags.NonPublic;
+            return bindingFlags;
+        }
+
+        private object[] CreateArguments<T>(BindingFlags bindingFlags) where T : class
+        {
+            var ctor = constructorSelector.SelectFor(typeof(T), typeMap.Keys.ToArray(), bindingFlags);
             var arguments = ctor.GetParameters().Select(x => GetObjectFor(x.ParameterType)).ToArray();
             return arguments;
         }
@@ -64,7 +87,22 @@ namespace Moq.AutoMock
         /// <returns>An instance with virtual and abstract members mocked</returns>
         public T CreateSelfMock<T>() where T : class
         {
-            var arguments = CreateArguments<T>();
+            return CreateSelfMock<T>(false);
+        }
+
+        /// <summary>
+        /// Constructs a self-mock from the services available in the container. A self-mock is
+        /// a concrete object that has virtual and abstract members mocked. The purpose is so that
+        /// you can test the majority of a class but mock out a resource. This is great for testing
+        /// abstract classes, or avoiding breaking cohesion even further with a non-abstract class.
+        /// </summary>
+        /// <typeparam name="T">The instance that you want to build</typeparam>
+        /// <param name="enablePrivate">When true, private constructors will also be used to
+        /// create mocks.</param>
+        /// <returns>An instance with virtual and abstract members mocked</returns>
+        public T CreateSelfMock<T>(bool enablePrivate) where T : class
+        {
+            var arguments = CreateArguments<T>(GetBindingFlags(enablePrivate));
             return new Mock<T>(mockBehavior, arguments).Object;
         }
 

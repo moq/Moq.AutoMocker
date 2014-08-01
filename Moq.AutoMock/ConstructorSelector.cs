@@ -6,10 +6,10 @@ namespace Moq.AutoMock
 {
     internal class ConstructorSelector
     {
-        public ConstructorInfo SelectFor(Type type, Type[] existingTypes)
+        public ConstructorInfo SelectFor(Type type, Type[] existingTypes, BindingFlags bindingFlags)
         {
             ConstructorInfo best = null;
-            foreach (var constructor in type.GetConstructors())
+            foreach (var constructor in type.GetConstructors(bindingFlags))
             {
                 if (IsBetterChoice(best, constructor, existingTypes))
                     best = constructor;
