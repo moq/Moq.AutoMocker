@@ -32,6 +32,20 @@ namespace Moq.AutoMock.Tests
             }
         }
 
+        public class WithServiceInternal
+        {
+            public IService1 Service { get; set; }
+
+            internal WithServiceInternal(IService1 service)
+            {
+                Service = service;
+            }
+
+            public WithServiceInternal() : this(null)
+            {                
+            }
+        }
+
         public class WithServiceArray
         {
             public IService2[] Services { get; set; }
@@ -107,6 +121,13 @@ namespace Moq.AutoMock.Tests
             {
                 var instance = mocker.CreateInstance<OneConstructor>();
                 Mock.Get(instance.Empty).ShouldNotBeNull();
+            }
+
+            [Fact]
+            public void It_creates_mock_objects_for_internal_ctor_parameters()
+            {
+                var instance = mocker.CreateInstance<WithServiceInternal>(true);
+                Mock.Get(instance.Service).ShouldNotBeNull();
             }
 
             [Fact]

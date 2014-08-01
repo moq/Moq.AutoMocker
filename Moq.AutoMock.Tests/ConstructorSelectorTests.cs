@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using Should;
 using Xunit;
 
@@ -6,6 +7,7 @@ namespace Moq.AutoMock.Tests
 {
     public class ConstructorSelectorTests
     {
+        private const BindingFlags DefaultBindingFlags = BindingFlags.Instance | BindingFlags.Public;
         private readonly ConstructorSelector selector = new ConstructorSelector();
         #region Types used for testing
         class WithDefaultAndSingleParameter
@@ -33,41 +35,55 @@ namespace Moq.AutoMock.Tests
             public WithArrayParameter(string[] array) { }
             public WithArrayParameter(string[] array, string @sealed) { }
         }
+
+        class WithPrivateConstructor
+        {
+            public WithPrivateConstructor(IService1 service1) { }
+            private WithPrivateConstructor(IService1 service1, IService2 service2) { }
+        }
         #endregion
 
         [Fact]
         public void It_chooses_the_ctor_with_arguments()
         {
-            var ctor = selector.SelectFor(typeof (WithDefaultAndSingleParameter), new Type[0]);
+            var ctor = selector.SelectFor(typeof(WithDefaultAndSingleParameter), new Type[0], DefaultBindingFlags);
             ctor.GetParameters().Length.ShouldEqual(1);
         }
 
         [Fact]
         public void It_chooses_the_ctor_with_the_most_arguments()
         {
-            var ctor = selector.SelectFor(typeof (With3Parameters), new Type[0]);
+            var ctor = selector.SelectFor(typeof(With3Parameters), new Type[0], DefaultBindingFlags);
             ctor.GetParameters().Length.ShouldEqual(2);
         }
 
         [Fact]
         public void It_chooses_the_ctor_with_the_most_arguments_when_arguments_are_arrays()
         {
-            var ctor = selector.SelectFor(typeof(WithArrayParameter), new Type[0]);
+            var ctor = selector.SelectFor(typeof(WithArrayParameter), new Type[0], DefaultBindingFlags);
             ctor.GetParameters().Length.ShouldEqual(1);
         }
 
         [Fact]
         public void It_wont_select_if_an_argument_is_sealed_and_not_array()
         {
-            var ctor = selector.SelectFor(typeof (WithSealedParameter), new Type[0]);
+            var ctor = selector.SelectFor(typeof(WithSealedParameter), new Type[0], DefaultBindingFlags);
             ctor.GetParameters().Length.ShouldEqual(0);
         }
 
         [Fact]
         public void It_will_select_if_an_argument_is_sealed_and_supplied()
         {
-            var ctor = selector.SelectFor(typeof (WithSealedParameter), new Type[] { typeof(string) });
+            var ctor = selector.SelectFor(typeof(WithSealedParameter), new Type[] { typeof(string) }, DefaultBindingFlags);
             ctor.GetParameters().Length.ShouldEqual(1);
+        }
+
+        [Fact]
+        public void It_will_select_a_private_ctor_when_specified()
+        {
+            const BindingFlags privateBindingFlags = DefaultBindingFlags | BindingFlags.NonPublic;
+            var ctor = selector.SelectFor(typeof(WithPrivateConstructor), new Type[0], privateBindingFlags);
+            ctor.GetParameters().Length.ShouldEqual(2);
         }
     }
 }
