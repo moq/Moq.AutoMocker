@@ -5,14 +5,14 @@ using Moq.Language.Flow;
 
 namespace Moq.AutoMock
 {
-    public class CastChecker
+    public static class CastChecker
     {
         /// We are expecting expression to be m => m.Setup(setup). We will assume this structure
         /// and check if the inner setup is Converted (casted) to Object
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public bool DoesContainCastToObject<TService>(Expression<Func<Mock<TService>, ISetup<TService, object>>> expression) where TService : class
+        public static bool DoesContainCastToObject<TService>(Expression<Func<Mock<TService>, ISetup<TService, object>>> expression) where TService : class
         {
             //expression is assumed to be a lambda so the cast here would cause an exception if it was not the expected format
             var lambdaExpression = (LambdaExpression)expression;
@@ -41,7 +41,7 @@ namespace Moq.AutoMock
             return false;
         }
 
-        public bool DoesReturnPrimitive<TService>(Expression<Func<TService, object>> expression)            where TService : class
+        public static bool DoesReturnPrimitive<TService>(Expression<Func<TService, object>> expression)            where TService : class
         {
             //expression is assumed to be a lambda so the cast here would cause an exception if it was not the expected format
             var lambdaExpression = (LambdaExpression)expression;

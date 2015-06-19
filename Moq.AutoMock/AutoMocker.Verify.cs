@@ -73,7 +73,7 @@ namespace Moq.AutoMock
 		{
 			var mock = GetMock<T>();
 
-            if (castChecker.DoesReturnPrimitive(expression))
+            if (CastChecker.DoesReturnPrimitive(expression))
                 throw new NotSupportedException("Use the Verify overload that allows specifying TReturn if the setup returns a value type");
 
 			mock.Verify(expression);
@@ -85,7 +85,7 @@ namespace Moq.AutoMock
 		{
 			var mock = GetMock<T>();
 
-            if (castChecker.DoesReturnPrimitive(expression))
+            if (CastChecker.DoesReturnPrimitive(expression))
                 throw new NotSupportedException("Use the Verify overload that allows specifying TReturn if the setup returns a value type");
 
 			mock.Verify(expression, times);
@@ -97,7 +97,7 @@ namespace Moq.AutoMock
 		{
 			var mock = GetMock<T>();
 
-            if (castChecker.DoesReturnPrimitive(expression))
+            if (CastChecker.DoesReturnPrimitive(expression))
                 throw new NotSupportedException("Use the Verify overload that allows specifying TReturn if the setup returns a value type");
 
 			mock.Verify(expression, times);
@@ -109,7 +109,7 @@ namespace Moq.AutoMock
 		{
 			var mock = GetMock<T>();
 
-            if (castChecker.DoesReturnPrimitive(expression))
+            if (CastChecker.DoesReturnPrimitive(expression))
                 throw new NotSupportedException("Use the Verify overload that allows specifying TReturn if the setup returns a value type");
 
 			mock.Verify(expression, failMessage);
@@ -121,7 +121,7 @@ namespace Moq.AutoMock
 		{
 			var mock = GetMock<T>();
 
-            if (castChecker.DoesReturnPrimitive(expression))
+            if (CastChecker.DoesReturnPrimitive(expression))
                 throw new NotSupportedException("Use the Verify overload that allows specifying TReturn if the setup returns a value type");
 
 			mock.Verify(expression, times, failMessage);

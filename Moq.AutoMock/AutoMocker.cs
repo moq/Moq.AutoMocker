@@ -15,7 +15,6 @@ namespace Moq.AutoMock
         private readonly Dictionary<Type, IInstance> typeMap = new Dictionary<Type, IInstance>();
         private readonly ConstructorSelector constructorSelector = new ConstructorSelector();
         private readonly MockBehavior mockBehavior;
-        private readonly CastChecker castChecker = new CastChecker();
 
         public AutoMocker(MockBehavior mockBehavior)
         {
@@ -224,7 +223,7 @@ namespace Moq.AutoMock
             Expression<Func<Mock<TService>, ISetup<TService, object>>> expression = m => m.Setup(setup);
             //check if Func results in a cast to object (boxing). If so then the user should have used the Setup overload that
             //specifies TReturn for value types
-            if (castChecker.DoesContainCastToObject(expression))
+            if (CastChecker.DoesContainCastToObject(expression))
             {
                 throw new NotSupportedException("Use the Setup overload that allows specifying TReturn if the setup returns a value type");
             }
@@ -301,9 +300,12 @@ namespace Moq.AutoMock
             return (Mock) method.Invoke(mock, null);
         }
 
-        /*extra verify methods to copy with primitive return type
-         * Not using the TextTempatingFileGenerator for now for this
-         */
+        /// <summary>
+        /// Verify a mock in the container.
+        /// </summary>
+        /// <typeparam name="T">Type of the mock</typeparam>
+        /// <typeparam name="TResult">Return type of the full expression</typeparam>
+        /// <param name="expression"></param>
         public void Verify<T, TResult>(Expression<Func<T, TResult>> expression)
             where T : class
             where TResult : struct
@@ -312,7 +314,13 @@ namespace Moq.AutoMock
             mock.Verify(expression);
         }
 
-
+        /// <summary>
+        /// Verify a mock in the container.
+        /// </summary>
+        /// <typeparam name="T">Type of the mock</typeparam>
+        /// <typeparam name="TResult">Return type of the full expression</typeparam>
+        /// <param name="expression"></param>
+        /// <param name="times"></param>
         public void Verify<T, TResult>(Expression<Func<T, TResult>> expression, Times times)
             where T : class
             where TResult : struct
@@ -321,7 +329,13 @@ namespace Moq.AutoMock
             mock.Verify(expression, times);
         }
 
-
+        /// <summary>
+        /// Verify a mock in the container.
+        /// </summary>
+        /// <typeparam name="T">Type of the mock</typeparam>
+        /// <typeparam name="TResult">Return type of the full expression</typeparam>
+        /// <param name="expression"></param>
+        /// <param name="times"></param>
         public void Verify<T, TResult>(Expression<Func<T, TResult>> expression, Func<Times> times)
             where T : class
             where TResult : struct
@@ -331,7 +345,13 @@ namespace Moq.AutoMock
             mock.Verify(expression, times);
         }
 
-
+        /// <summary>
+        /// Verify a mock in the container.
+        /// </summary>
+        /// <typeparam name="T">Type of the mock</typeparam>
+        /// <typeparam name="TResult">Return type of the full expression</typeparam>
+        /// <param name="expression"></param>
+        /// <param name="failMessage"></param>
         public void Verify<T, TResult>(Expression<Func<T, TResult>> expression, String failMessage)
             where T : class
             where TResult : struct
@@ -340,7 +360,14 @@ namespace Moq.AutoMock
             mock.Verify(expression, failMessage);
         }
 
-
+        /// <summary>
+        /// Verify a mock in the container.
+        /// </summary>
+        /// <typeparam name="T">Type of the mock</typeparam>
+        /// <typeparam name="TResult">Return type of the full expression</typeparam>
+        /// <param name="expression"></param>
+        /// <param name="times"></param>
+        /// <param name="failMessage"></param>
         public void Verify<T, TResult>(Expression<Func<T, TResult>> expression, Times times, String failMessage)
             where T : class
             where TResult : struct
