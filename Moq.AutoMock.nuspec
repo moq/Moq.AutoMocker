@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>Moq.AutoMock</id>
-    <version>1.0.0.0</version>
+    <version>0.4.0.0</version>
     <authors>Tim Kellogg</authors>
     <owners>Tim Kellogg</owners>
     <licenseUrl>https://github.com/tkellogg/Moq.AutoMocker/blob/master/License.md</licenseUrl>
