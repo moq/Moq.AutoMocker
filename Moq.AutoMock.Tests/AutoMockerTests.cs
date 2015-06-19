@@ -81,6 +81,14 @@ namespace Moq.AutoMock.Tests
             }
         }
 
+        public class WithStatic
+        {
+            public static string Get()
+            {
+                return string.Empty;
+            }
+        }
+
         public class ConstructorThrows
         {
             public ConstructorThrows()
@@ -246,12 +254,87 @@ namespace Moq.AutoMock.Tests
             }
 
             [Fact]
-            public void You_can_setup_a_method_that_returns_a_primitive()
+            public void You_can_setup_a_method_that_returns_a_value_type()
             {
                 mocker.Setup<IServiceWithPrimitives, long>(s => s.ReturnsALong()).Returns(100L);
 
                 var mock = mocker.Get<IServiceWithPrimitives>();
                 mock.ReturnsALong().ShouldEqual(100L);
+            }
+
+            [Fact]
+            public void If_you_setup_a_method_that_returns_a_value_type_without_specifying_return_type_you_get_useful_exception()
+            {
+                //a method without parameters
+                var ex = Assert.Throws<NotSupportedException>(() => mocker.Setup<IServiceWithPrimitives>(s => s.ReturnsALong()).Returns(100L));
+                ex.Message.ShouldEqual("Use the Setup overload that allows specifying TReturn if the setup returns a value type");
+            }
+
+            [Fact]
+            public void If_you_setup_a_method_with_a_parameter_that_returns_a_value_type_without_specifying_return_type_you_get_useful_exception()
+            {
+                //a method with parameters
+                var ex = Assert.Throws<NotSupportedException>(() => mocker.Setup<IServiceWithPrimitives>(s => s.ReturnsALongWithParameter(It.IsAny<string>())).Returns(100L));
+
+                ex.Message.ShouldEqual("Use the Setup overload that allows specifying TReturn if the setup returns a value type");
+
+            }
+
+            [Fact]
+            public void If_you_setup_a_method_with_a_callback_that_returns_a_value_type_without_specifying_return_type_you_get_useful_exception()
+            {
+                //a method with parameters
+                var capturedVariable = string.Empty;
+
+                var ex = Assert.Throws<NotSupportedException>(() => mocker.Setup<IServiceWithPrimitives>(s => s.ReturnsALongWithParameter(It.IsAny<string>())).Returns(100L).Callback<string>(s => capturedVariable = s));
+
+                ex.Message.ShouldEqual("Use the Setup overload that allows specifying TReturn if the setup returns a value type");
+
+            }
+
+            [Fact]
+            public void If_you_setup_a_method_that_returns_a_value_type_via_a_lambda_without_specifying_return_type_you_get_useful_exception()
+            {
+                //a method with parameters
+                var ex = Assert.Throws<NotSupportedException>(() => mocker.Setup<IServiceWithPrimitives>(s => s.ReturnsALongWithParameter(It.IsAny<string>())).Returns<string>(s => s.Length));
+
+                ex.Message.ShouldEqual("Use the Setup overload that allows specifying TReturn if the setup returns a value type");
+
+            }
+
+            [Fact]
+            public void You_can_setup_a_method_that_returns_a_reference_type_via_a_lambda_without_specifying_return_type()
+            {
+                //a method with parameters
+                mocker.Setup<IServiceWithPrimitives>(s => s.ReturnsAReferenceWithParameter(It.IsAny<string>()))
+                        .Returns<string>(s => s += "2");
+
+                var mock = mocker.Get<IServiceWithPrimitives>();
+                mock.ReturnsAReferenceWithParameter("blah").ShouldEqual("blah2");
+            }
+
+            [Fact]
+            public void You_can_setup_a_method_with_a_static_that_returns_a_reference_type_via_a_lambda_without_specifying_return_type()
+            {
+                //a method with parameters
+                
+                mocker.Setup<IService4>(s => s.MainMethodName(WithStatic.Get()))
+                        .Returns<string>(s => s += "2");
+
+                var mock = mocker.Get<IService4>();
+                mock.MainMethodName(WithStatic.Get()).ShouldEqual("2");
+            }
+
+            [Fact]
+            public void You_can_set_up_all_properties_with_one_line()
+            {
+                mocker.SetupAllProperties<IService5>();
+
+                var mock = mocker.Get<IService5>();
+
+                mock.Name = "aname";
+                
+                mock.Name.ShouldEqual("aname");
             }
         }
 
@@ -295,6 +378,25 @@ namespace Moq.AutoMock.Tests
                 var name = mock.Object.Name;
                 mocker.Verify<IService2>(x => x.Name);
             }
+
+            [Fact]
+            public void You_can_verify_a_method_that_returns_a_value_type()
+            {
+                mocker.Setup<IServiceWithPrimitives, long>(s => s.ReturnsALong()).Returns(100L);
+
+                var mock = mocker.Get<IServiceWithPrimitives>();
+                mock.ReturnsALong().ShouldEqual(100L);
+
+                mocker.Verify<IServiceWithPrimitives, long>(s => s.ReturnsALong(), Times.Once());
+            }
+
+            [Fact]
+            public void If_you_verify_a_method_that_returns_a_value_type_without_specifying_return_type_you_get_useful_exception()
+            {
+                //a method without parameters
+                var ex = Assert.Throws<NotSupportedException>(() => mocker.Verify<IServiceWithPrimitives>(s => s.ReturnsALong(), Times.Once()));
+                ex.Message.ShouldEqual("Use the Verify overload that allows specifying TReturn if the setup returns a value type");
+            }
         }
 
         public class DescribeExtractingObjects
@@ -323,6 +425,13 @@ namespace Moq.AutoMock.Tests
             public void It_creates_a_mock_if_the_oject_is_missing()
             {
                 var mock = mocker.GetMock<IService1>();
+                mock.ShouldNotBeNull();
+            }
+
+            [Fact]
+            public void It_creates_a_mock_if_the_object_is_missing_using_Get()
+            {
+                var mock = mocker.Get<IService1>();
                 mock.ShouldNotBeNull();
             }
 

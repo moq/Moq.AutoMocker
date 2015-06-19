@@ -25,8 +25,21 @@
         string MainMethodName { get; }
     }
 
+    public interface IService4
+    {
+        string MainMethodName(string input);
+
+    }
+
+    public interface IService5
+    {
+        string Name { get; set; }
+    }
+
     public interface IServiceWithPrimitives
     {
         long ReturnsALong();
+        long ReturnsALongWithParameter(string parameter);
+        string ReturnsAReferenceWithParameter(string parameter);
     }
 }

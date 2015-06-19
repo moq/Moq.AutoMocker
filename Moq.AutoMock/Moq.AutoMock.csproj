@@ -52,21 +52,14 @@
       <DependentUpon>AutoMocker.Combine.cs.tt</DependentUpon>
     </Compile>
     <Compile Include="AutoMocker.cs" />
-    <Compile Include="AutoMocker.Verify.cs.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>AutoMocker.Verify.cs.tt</DependentUpon>
-    </Compile>
+    <Compile Include="CastChecker.cs" />
     <Compile Include="ConstructorSelector.cs" />
     <Compile Include="ExceptionExtensions.cs" />
     <Compile Include="Instance.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="AutoMocker.Verify.cs.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>AutoMocker.Verify.cs.generated.cs</LastGenOutput>
-    </None>
+    <Compile Include="AutoMocker.Verify.cs" />
     <None Include="AutoMocker.Combine.cs.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AutoMocker.Combine.cs.generated.cs</LastGenOutput>

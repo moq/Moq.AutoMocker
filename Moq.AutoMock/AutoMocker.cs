@@ -15,6 +15,7 @@ namespace Moq.AutoMock
         private readonly Dictionary<Type, IInstance> typeMap = new Dictionary<Type, IInstance>();
         private readonly ConstructorSelector constructorSelector = new ConstructorSelector();
         private readonly MockBehavior mockBehavior;
+        private readonly CastChecker castChecker = new CastChecker();
 
         public AutoMocker(MockBehavior mockBehavior)
         {
@@ -175,6 +176,10 @@ namespace Moq.AutoMock
         /// <returns>The object that implements TService</returns>
         public TService Get<TService>()
         {
+            IInstance instance;
+            if (!typeMap.TryGetValue(typeof(TService), out instance))
+                instance = CreateMockObjectAndStore(typeof(TService));
+
             return (TService) typeMap[typeof (TService)].Value;
         }
 
@@ -215,8 +220,18 @@ namespace Moq.AutoMock
         public ISetup<TService, object> Setup<TService>(Expression<Func<TService, object>> setup)
             where TService : class
         {
-            return Setup<ISetup<TService, object>, TService>(m => m.Setup(setup));
+            Func<Mock<TService>, ISetup<TService, object>> func = m => m.Setup(setup);
+            Expression<Func<Mock<TService>, ISetup<TService, object>>> expression = m => m.Setup(setup);
+            //check if Func results in a cast to object (boxing). If so then the user should have used the Setup overload that
+            //specifies TReturn for value types
+            if (castChecker.DoesContainCastToObject(expression))
+            {
+                throw new NotSupportedException("Use the Setup overload that allows specifying TReturn if the setup returns a value type");
+            }
+
+            return Setup<ISetup<TService, object>, TService>(func);
         }
+
 
         /// <summary>
         /// Shortcut for mock.Setup(...), creating the mock when necessary.
@@ -251,6 +266,20 @@ namespace Moq.AutoMock
         }
 
         /// <summary>
+        /// Shortcut for mock.SetupAllProperties(), creating the mock when necessary
+        /// </summary>
+        /// <typeparam name="TService"></typeparam>
+        /// <returns></returns>
+        public Mock<TService> SetupAllProperties<TService>() where TService : class
+        {
+            var mock = (Mock<TService>)GetOrMakeMockFor(typeof(TService));
+            Use(mock);
+            mock.SetupAllProperties();
+            return mock;
+        }
+
+
+        /// <summary>
         /// Combines all given types so that they are mocked by the same
         /// mock. Some IoC containers call this "Forwarding" one type to 
         /// other interfaces. In the end, this just means that all given
@@ -271,5 +300,54 @@ namespace Moq.AutoMock
             var method = genericMethodDef.First().MakeGenericMethod(forInterface);
             return (Mock) method.Invoke(mock, null);
         }
+
+        /*extra verify methods to copy with primitive return type
+         * Not using the TextTempatingFileGenerator for now for this
+         */
+        public void Verify<T, TResult>(Expression<Func<T, TResult>> expression)
+            where T : class
+            where TResult : struct
+        {
+            var mock = GetMock<T>();
+            mock.Verify(expression);
+        }
+
+
+        public void Verify<T, TResult>(Expression<Func<T, TResult>> expression, Times times)
+            where T : class
+            where TResult : struct
+        {
+            var mock = GetMock<T>();
+            mock.Verify(expression, times);
+        }
+
+
+        public void Verify<T, TResult>(Expression<Func<T, TResult>> expression, Func<Times> times)
+            where T : class
+            where TResult : struct
+        {
+            var mock = GetMock<T>();
+            
+            mock.Verify(expression, times);
+        }
+
+
+        public void Verify<T, TResult>(Expression<Func<T, TResult>> expression, String failMessage)
+            where T : class
+            where TResult : struct
+        {
+            var mock = GetMock<T>();
+            mock.Verify(expression, failMessage);
+        }
+
+
+        public void Verify<T, TResult>(Expression<Func<T, TResult>> expression, Times times, String failMessage)
+            where T : class
+            where TResult : struct
+        {
+            var mock = GetMock<T>();
+            mock.Verify(expression, times, failMessage);
+        }
+
     }
 }
