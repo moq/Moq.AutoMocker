@@ -9,7 +9,7 @@ Simplest usage is to build an instance that you can unit test.
 
 ```csharp
 var mocker = new AutoMocker();
-var car = mocker.GetInstance<Car>();
+var car = mocker.CreateInstance<Car>();
 
 car.DriveTrain.ShouldNotBeNull();
 car.DriveTrain.ShouldImplement<IDriveTrain>();
@@ -27,14 +27,14 @@ mocker.Use<IDriveTrain>(new DriveTrain);
 // OR, setup a Mock
 mocker.Use<IDriveTrain>(x => x.Shaft.Length == 5);
 
-var car = mocker.GetInstance<Car>();
+var car = mocker.CreateInstance<Car>();
 ```
 
 Extracting Mocks
 ----------------
 
 At some point you might need to get to a mock that was auto-generated. For
-this, use the `.Extract<>()` or `.ExtractMock<>()` methods.
+this, use the `.Get<>()` or `.GetMock<>()` methods.
 
 ```csharp
 var mocker = new AutoMocker();
@@ -42,11 +42,11 @@ var mocker = new AutoMocker();
 // Let's say you have a setup that needs verifying
 mocker.Use<IDriveTrain>(x => x.Accelerate(42) == true);
 
-var car = mocker.GetInstance<Car>();
+var car = mocker.CreateInstance<Car>();
 car.Accelarate(42);
 
 // Then extract & verify
-var driveTrainMock = mocker.ExtractMock<IDriveTrain>();
+var driveTrainMock = mocker.GetMock<IDriveTrain>();
 driveTrainMock.VerifyAll();
 ```
 
@@ -56,7 +56,7 @@ Alternately, there's an even faster way to verify all mocks in the container:
 var mocker = new AutoMocker();
 mocker.Use<IDriveTrain>(x => x.Accelerate(42) == true);
 
-var car = mocker.GetInstance<Car>();
+var car = mocker.CreateInstance<Car>();
 car.Accelarate(42);
 
 // This method verifies all mocks in the container
