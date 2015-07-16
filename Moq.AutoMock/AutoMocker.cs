@@ -131,9 +131,6 @@ namespace Moq.AutoMock
             if (!typeMap.TryGetValue(typeof(TService), out instance))
                 instance = CreateMockObjectAndStore(typeof(TService));
 
-            if (!instance.IsMock)
-                throw new ArgumentException(string.Format("Registered service `{0}` was not a mock", Get<TService>().GetType()));
-
             return (TService) typeMap[typeof (TService)].Value;
         }
 
