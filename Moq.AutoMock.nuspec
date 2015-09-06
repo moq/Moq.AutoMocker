@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>Moq.AutoMock</id>
-    <version>0.3.2.1</version>
+    <version>1.0.0.0</version>
     <authors>Tim Kellogg</authors>
     <owners>Tim Kellogg</owners>
     <licenseUrl>https://github.com/tkellogg/Moq.AutoMocker/blob/master/License.md</licenseUrl>
@@ -11,10 +11,14 @@
 		<description>
 		An auto-mocking container that generates mocks using Moq
 		</description>
-    <copyright>Copyright Tim Kellogg 2012</copyright>
+    <copyright>Copyright Tim Kellogg 2015</copyright>
 		<tags>moq automocking testing TDD</tags>
     <dependencies>
       <dependency id="Moq" version="4.0" />
     </dependencies>
   </metadata>
+  <files>
+    <file src="Moq.AutoMock.dll" target="lib\net40" />
+    <file src="Moq.AutoMock.pdb" target="lib\net40" />
+  </files>
 </package>
