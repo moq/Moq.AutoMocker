@@ -23,7 +23,7 @@ container (i.e. `For<IService>().Use(x)` in StructureMap).
 ```csharp
 var mocker = new AutoMocker();
 
-mocker.Use<IDriveTrain>(new DriveTrain);
+mocker.Use<IDriveTrain>(new DriveTrain());
 // OR, setup a Mock
 mocker.Use<IDriveTrain>(x => x.Shaft.Length == 5);
 
