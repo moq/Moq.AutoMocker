@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Moq.AutoMock
 {
@@ -31,9 +32,9 @@ namespace Moq.AutoMock
             get
             {
                 int i = 0;
-                Array array = Array.CreateInstance(type,mocks.Count);
+                Array array = Array.CreateInstance(type, mocks.Count);
                 foreach (IInstance instance in mocks)
-                    array.SetValue(instance.Value, i++); 
+                    array.SetValue(instance.Value, i++);
                 return array;
             }
         }
@@ -53,15 +54,27 @@ namespace Moq.AutoMock
             Mock = value;
         }
 
-        public MockInstance(Type mockType, MockBehavior mockBehavior)
-            :this(CreateMockOf(mockType, mockBehavior))
+        public MockInstance(AutoMocker autoMocker, Type mockType, MockBehavior mockBehavior, BindingFlags bindingFlags)
+            : this(CreateMockOf(autoMocker, mockType, mockBehavior, bindingFlags))
         {
+
         }
 
-        private static Mock CreateMockOf(Type type, MockBehavior mockBehavior)
+        private static Mock CreateMockOf(AutoMocker autoMocker, Type type, MockBehavior mockBehavior, BindingFlags bindingFlags)
         {
-            var mockType = typeof (Mock<>).MakeGenericType(type);
-            var mock = (Mock) Activator.CreateInstance(mockType, mockBehavior);
+            if (type.IsClass && !type.IsAbstract)
+            {
+                MethodInfo method = typeof(AutoMocker).GetMethods().Single(mi => mi.Name == nameof(AutoMocker.CreateSelfMock) && mi.GetParameters().SingleOrDefault(pi => pi.ParameterType == typeof(bool)) != null);
+                MethodInfo genericMethod = method.MakeGenericMethod(type);
+                object value = genericMethod.Invoke(autoMocker, new object[] { bindingFlags.HasFlag(BindingFlags.NonPublic) });
+
+                MethodInfo getMethod = typeof(Mock).GetMethod("Get");
+                MethodInfo genericGetMethod = getMethod.MakeGenericMethod(type);
+                return (Mock)genericGetMethod.Invoke(null, new[] { value });
+            }
+
+            var mockType = typeof(Mock<>).MakeGenericType(type);
+            var mock = (Mock)Activator.CreateInstance(mockType, mockBehavior);
             return mock;
         }
 

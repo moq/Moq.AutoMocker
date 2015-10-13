@@ -73,7 +73,7 @@ namespace Moq.AutoMock
         private object[] CreateArguments<T>(BindingFlags bindingFlags) where T : class
         {
             var ctor = constructorSelector.SelectFor(typeof(T), typeMap.Keys.ToArray(), bindingFlags);
-            var arguments = ctor.GetParameters().Select(x => GetObjectFor(x.ParameterType)).ToArray();
+            var arguments = ctor.GetParameters().Select(x => GetObjectFor(x.ParameterType, bindingFlags)).ToArray();
             return arguments;
         }
 
@@ -106,9 +106,9 @@ namespace Moq.AutoMock
             return new Mock<T>(mockBehavior, arguments).Object;
         }
 
-        private object GetObjectFor(Type type)
+        private object GetObjectFor(Type type, BindingFlags bindingFlags)
         {
-            var instance = typeMap.ContainsKey(type) ? typeMap[type] : CreateMockObjectAndStore(type);
+            var instance = typeMap.ContainsKey(type) ? typeMap[type] : CreateMockObjectAndStore(type, bindingFlags);
             return instance.Value;
         }
 
@@ -116,12 +116,12 @@ namespace Moq.AutoMock
         {
             if (!typeMap.ContainsKey(type) || !typeMap[type].IsMock)
             {
-                typeMap[type] = new MockInstance(type, mockBehavior);
+                typeMap[type] = new MockInstance(this, type, mockBehavior, BindingFlags.Public);
             }
             return ((MockInstance) typeMap[type]).Mock;
         }
 
-        private IInstance CreateMockObjectAndStore(Type type)
+        private IInstance CreateMockObjectAndStore(Type type, BindingFlags bindingFlags)
         {
             if (type.IsArray)
             {
@@ -132,7 +132,7 @@ namespace Moq.AutoMock
                     instance.Add(typeMap[elmType]);
                 return typeMap[type] = instance;
             }
-            return (typeMap[type] = new MockInstance(type, mockBehavior));
+            return (typeMap[type] = new MockInstance(this, type, mockBehavior, bindingFlags));
         }
 
         /// <summary>
@@ -177,7 +177,7 @@ namespace Moq.AutoMock
         {
             IInstance instance;
             if (!typeMap.TryGetValue(typeof(TService), out instance))
-                instance = CreateMockObjectAndStore(typeof(TService));
+                instance = CreateMockObjectAndStore(typeof(TService), BindingFlags.Public);
 
             return (TService) typeMap[typeof (TService)].Value;
         }
@@ -192,7 +192,7 @@ namespace Moq.AutoMock
         {
             IInstance instance;
             if (!typeMap.TryGetValue(typeof(TService), out instance))
-                instance = CreateMockObjectAndStore(typeof(TService));
+                instance = CreateMockObjectAndStore(typeof(TService), BindingFlags.Public);
 
             if (!instance.IsMock)
                 throw new ArgumentException(string.Format("Registered service `{0}` was not a mock", Get<TService>().GetType()));
@@ -286,7 +286,7 @@ namespace Moq.AutoMock
         /// </summary>
         public void Combine(Type type, params Type[] forwardTo)
         {
-            var mockObject = new MockInstance(type, mockBehavior);
+            var mockObject = new MockInstance(this, type, mockBehavior, BindingFlags.Public);
             forwardTo.Aggregate(mockObject.Mock, As);
 
             foreach (var serviceType in forwardTo.Concat(new[] { type }))
