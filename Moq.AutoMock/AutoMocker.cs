@@ -214,6 +214,18 @@ namespace Moq.AutoMock
         }
 
         /// <summary>
+        /// This is a shortcut for calling `mock.Verify()` on every mock that we have.
+        /// </summary>
+        public void Verify()
+        {
+            foreach (var pair in typeMap)
+            {
+                if (pair.Value.IsMock)
+                    (((MockInstance)pair.Value).Mock).Verify();
+            }
+        }
+
+        /// <summary>
         /// Shortcut for mock.Setup(...), creating the mock when necessary.
         /// </summary>
         public ISetup<TService, object> Setup<TService>(Expression<Func<TService, object>> setup)

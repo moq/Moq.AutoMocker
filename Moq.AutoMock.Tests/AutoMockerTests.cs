@@ -391,6 +391,17 @@ namespace Moq.AutoMock.Tests
             }
 
             [Fact]
+            public void You_can_verify_all_setups_marked_as_verifiable()
+            {
+                mocker.Setup<IService1>(x => x.Void()).Verifiable();
+                mocker.Setup<IService5>(x => x.Name).Returns("Test");
+
+                mocker.Get<IService1>().Void();
+                
+                mocker.Verify();
+            }
+
+            [Fact]
             public void If_you_verify_a_method_that_returns_a_value_type_without_specifying_return_type_you_get_useful_exception()
             {
                 //a method without parameters
