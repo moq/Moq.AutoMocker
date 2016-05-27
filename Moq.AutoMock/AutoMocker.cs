@@ -52,7 +52,7 @@ namespace Moq.AutoMock
         public T CreateInstance<T>(bool enablePrivate) where T : class
         {
             var bindingFlags = GetBindingFlags(enablePrivate);
-            var arguments = CreateArguments<T>(bindingFlags);
+            var arguments = CreateArguments(typeof(T), bindingFlags);
             try
             {
                 return (T)Activator.CreateInstance(typeof(T), bindingFlags, null, arguments, null);
@@ -70,10 +70,10 @@ namespace Moq.AutoMock
             return bindingFlags;
         }
 
-        private object[] CreateArguments<T>(BindingFlags bindingFlags) where T : class
+        private object[] CreateArguments(Type type, BindingFlags bindingFlags)
         {
-            var ctor = constructorSelector.SelectFor(typeof(T), typeMap.Keys.ToArray(), bindingFlags);
-            var arguments = ctor.GetParameters().Select(x => GetObjectFor(x.ParameterType)).ToArray();
+            var ctor = constructorSelector.SelectFor(type, typeMap.Keys.ToArray(), bindingFlags);
+            var arguments = ctor.GetParameters().Select(x => GetObjectFor(x.ParameterType, bindingFlags)).ToArray();
             return arguments;
         }
 
@@ -102,13 +102,19 @@ namespace Moq.AutoMock
         /// <returns>An instance with virtual and abstract members mocked</returns>
         public T CreateSelfMock<T>(bool enablePrivate) where T : class
         {
-            var arguments = CreateArguments<T>(GetBindingFlags(enablePrivate));
+            var arguments = CreateArguments(typeof(T), GetBindingFlags(enablePrivate));
             return new Mock<T>(mockBehavior, arguments).Object;
         }
 
-        private object GetObjectFor(Type type)
+        public Mock CreateSelfMock(Type type, bool enablePrivate)
         {
-            var instance = typeMap.ContainsKey(type) ? typeMap[type] : CreateMockObjectAndStore(type);
+            var arguments = CreateArguments(type, GetBindingFlags(enablePrivate));
+            return CreateMockOf(type, arguments);
+        }
+
+        private object GetObjectFor(Type type, BindingFlags bindingFlags)
+        {
+            var instance = typeMap.ContainsKey(type) ? typeMap[type] : CreateMockObjectAndStore(type, bindingFlags);
             return instance.Value;
         }
 
@@ -116,12 +122,12 @@ namespace Moq.AutoMock
         {
             if (!typeMap.ContainsKey(type) || !typeMap[type].IsMock)
             {
-                typeMap[type] = new MockInstance(type, mockBehavior);
+                typeMap[type] = new MockInstance(AutoMockTypeOf(type, BindingFlags.Public));
             }
-            return ((MockInstance) typeMap[type]).Mock;
+            return ((MockInstance)typeMap[type]).Mock;
         }
 
-        private IInstance CreateMockObjectAndStore(Type type)
+        private IInstance CreateMockObjectAndStore(Type type, BindingFlags bindingFlags)
         {
             if (type.IsArray)
             {
@@ -132,7 +138,22 @@ namespace Moq.AutoMock
                     instance.Add(typeMap[elmType]);
                 return typeMap[type] = instance;
             }
-            return (typeMap[type] = new MockInstance(type, mockBehavior));
+            return (typeMap[type] = new MockInstance(AutoMockTypeOf(type, bindingFlags)));
+        }
+
+
+        private Mock AutoMockTypeOf(Type type, BindingFlags bindingFlags)
+        {
+            Mock mock = type.IsClass && !type.IsAbstract ?
+                CreateSelfMock(type, bindingFlags.HasFlag(BindingFlags.NonPublic)) :
+                CreateMockOf(type, new object[] { });
+            return mock;
+        }
+
+        private Mock CreateMockOf(Type type, object[] arguments)
+        {
+            var mockType = typeof(Mock<>).MakeGenericType(type);
+            return (Mock)Activator.CreateInstance(mockType, mockBehavior, arguments);
         }
 
         /// <summary>
@@ -161,7 +182,7 @@ namespace Moq.AutoMock
         /// </summary>
         /// <typeparam name="TService">The type that the instance will be registered as</typeparam>
         /// <param name="setup">A shortcut for Mock.Of's syntax</param>
-        public void Use<TService>(Expression<Func<TService, bool>> setup) 
+        public void Use<TService>(Expression<Func<TService, bool>> setup)
             where TService : class
         {
             Use(Mock.Get(Mock.Of(setup)));
@@ -177,9 +198,9 @@ namespace Moq.AutoMock
         {
             IInstance instance;
             if (!typeMap.TryGetValue(typeof(TService), out instance))
-                instance = CreateMockObjectAndStore(typeof(TService));
+                instance = CreateMockObjectAndStore(typeof(TService), BindingFlags.Public);
 
-            return (TService) typeMap[typeof (TService)].Value;
+            return (TService)typeMap[typeof(TService)].Value;
         }
 
         /// <summary>
@@ -192,13 +213,13 @@ namespace Moq.AutoMock
         {
             IInstance instance;
             if (!typeMap.TryGetValue(typeof(TService), out instance))
-                instance = CreateMockObjectAndStore(typeof(TService));
+                instance = CreateMockObjectAndStore(typeof(TService), BindingFlags.Public);
 
             if (!instance.IsMock)
                 throw new ArgumentException(string.Format("Registered service `{0}` was not a mock", Get<TService>().GetType()));
 
-            var mockInstance = (MockInstance) instance;
-            return (Mock<TService>) mockInstance.Mock;
+            var mockInstance = (MockInstance)instance;
+            return (Mock<TService>)mockInstance.Mock;
         }
 
         /// <summary>
@@ -271,7 +292,7 @@ namespace Moq.AutoMock
         private TReturn Setup<TReturn, TService>(Func<Mock<TService>, TReturn> returnValue)
             where TService : class
         {
-            var mock = (Mock<TService>) GetOrMakeMockFor(typeof (TService));
+            var mock = (Mock<TService>)GetOrMakeMockFor(typeof(TService));
             Use(mock);
             return returnValue(mock);
         }
@@ -298,7 +319,7 @@ namespace Moq.AutoMock
         /// </summary>
         public void Combine(Type type, params Type[] forwardTo)
         {
-            var mockObject = new MockInstance(type, mockBehavior);
+            var mockObject = new MockInstance(AutoMockTypeOf(type, BindingFlags.Public));
             forwardTo.Aggregate(mockObject.Mock, As);
 
             foreach (var serviceType in forwardTo.Concat(new[] { type }))
@@ -309,7 +330,7 @@ namespace Moq.AutoMock
         {
             var genericMethodDef = mock.GetType().GetMethods().Where(x => x.Name == "As");
             var method = genericMethodDef.First().MakeGenericMethod(forInterface);
-            return (Mock) method.Invoke(mock, null);
+            return (Mock)method.Invoke(mock, null);
         }
 
         /// <summary>
@@ -353,7 +374,7 @@ namespace Moq.AutoMock
             where TResult : struct
         {
             var mock = GetMock<T>();
-            
+
             mock.Verify(expression, times);
         }
 

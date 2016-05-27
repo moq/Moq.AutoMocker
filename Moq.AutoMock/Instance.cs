@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Moq.AutoMock
 {
@@ -31,9 +32,9 @@ namespace Moq.AutoMock
             get
             {
                 int i = 0;
-                Array array = Array.CreateInstance(type,mocks.Count);
+                Array array = Array.CreateInstance(type, mocks.Count);
                 foreach (IInstance instance in mocks)
-                    array.SetValue(instance.Value, i++); 
+                    array.SetValue(instance.Value, i++);
                 return array;
             }
         }
@@ -51,18 +52,6 @@ namespace Moq.AutoMock
         public MockInstance(Mock value)
         {
             Mock = value;
-        }
-
-        public MockInstance(Type mockType, MockBehavior mockBehavior)
-            :this(CreateMockOf(mockType, mockBehavior))
-        {
-        }
-
-        private static Mock CreateMockOf(Type type, MockBehavior mockBehavior)
-        {
-            var mockType = typeof (Mock<>).MakeGenericType(type);
-            var mock = (Mock) Activator.CreateInstance(mockType, mockBehavior);
-            return mock;
         }
 
         public object Value
