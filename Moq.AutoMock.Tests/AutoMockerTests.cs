@@ -1,5 +1,6 @@
 ﻿using System;
-using Should;
+using System.Linq.Expressions;
+using System.Reflection;
 using Xunit;
 
 namespace Moq.AutoMock.Tests
@@ -103,7 +104,7 @@ namespace Moq.AutoMock.Tests
 
         private static Type MockVerificationException
         {
-            get { return typeof (Mock).Assembly.GetType("Moq.MockVerificationException"); }
+            get { return typeof (Mock).GetTypeInfo().Assembly.GetType("Moq.MockVerificationException"); }
         }
 
         public class DescribeCreateInstance
@@ -114,28 +115,28 @@ namespace Moq.AutoMock.Tests
             public void It_creates_object_with_no_constructor()
             {
                 var instance = mocker.CreateInstance<Empty>();
-                instance.ShouldNotBeNull();
+                Assert.NotNull(instance);
             }
 
             [Fact]
             public void It_creates_objects_for_ctor_parameters()
             {
                 var instance = mocker.CreateInstance<OneConstructor>();
-                instance.Empty.ShouldNotBeNull();
+                Assert.NotNull(instance.Empty);
             }
 
             [Fact]
             public void It_creates_mock_objects_for_ctor_parameters()
             {
                 var instance = mocker.CreateInstance<OneConstructor>();
-                Mock.Get(instance.Empty).ShouldNotBeNull();
+                Assert.NotNull(Mock.Get(instance.Empty));
             }
 
             [Fact]
             public void It_creates_mock_objects_for_internal_ctor_parameters()
             {
                 var instance = mocker.CreateInstance<WithServiceInternal>(true);
-                Mock.Get(instance.Service).ShouldNotBeNull();
+                Assert.NotNull(Mock.Get(instance.Service));
             }
 
             [Fact]
@@ -145,8 +146,8 @@ namespace Moq.AutoMock.Tests
 
                 var instance = strictMocker.CreateInstance<OneConstructor>();
                 var mock = Mock.Get(instance.Empty);
-                mock.ShouldNotBeNull();
-                mock.Behavior.ShouldEqual(MockBehavior.Strict);
+                Assert.NotNull(mock);
+                Assert.Equal(MockBehavior.Strict, mock.Behavior);
             }
 
             [Fact]
@@ -154,14 +155,16 @@ namespace Moq.AutoMock.Tests
             {
                 mocker.Use("Hello World");
                 WithSealedParams instance = mocker.CreateInstance<WithSealedParams>();
-                instance.Sealed.ShouldNotBeNull().ShouldEqual("Hello World");
+                Assert.Equal("Hello World", instance.Sealed);
             }
 
             [Fact]
             public void It_creates_mock_objects_for_ctor_array_parameters()
             {
                 WithServiceArray instance = mocker.CreateInstance<WithServiceArray>();
-                instance.Services.ShouldNotBeNull().ShouldBeEmpty();
+                IService2[] services = instance.Services;
+                Assert.NotNull(services);
+                Assert.Empty(services);
             }
 
             [Fact]
@@ -169,7 +172,9 @@ namespace Moq.AutoMock.Tests
             {
                 mocker.Use(new Mock<IService2>());
                 WithServiceArray instance = mocker.CreateInstance<WithServiceArray>();
-                instance.Services.ShouldNotBeNull().ShouldNotBeEmpty();
+                IService2[] services = instance.Services;
+                Assert.NotNull(services);
+                Assert.NotEmpty(services);
             }
 
             [Fact]
@@ -196,7 +201,7 @@ namespace Moq.AutoMock.Tests
                 var empty = new Empty();
                 mocker.Use(empty);
                 var instance = mocker.CreateInstance<OneConstructor>();
-                instance.Empty.ShouldBeSameAs(empty);
+                Assert.Same(empty, instance.Empty);
             }
 
             [Fact]
@@ -204,8 +209,8 @@ namespace Moq.AutoMock.Tests
             {
                 mocker.Use<IService2>(x => x.Other == Mock.Of<IService1>());
                 var instance = mocker.CreateInstance<WithService>();
-                instance.Service.ShouldImplement<IService2>();
-                instance.Service.Other.ShouldImplement<IService1>();
+                Assert.IsAssignableFrom<IService2>(instance.Service);
+                Assert.IsAssignableFrom<IService1>(instance.Service.Other);
             }
 
             [Fact]
@@ -214,7 +219,7 @@ namespace Moq.AutoMock.Tests
                 mocker.Use<IService2>(x => x.Other.ToString() == "kittens");
                 var otherService = Mock.Of<IService2>();
                 mocker.Use(otherService);
-                mocker.Get<IService2>().ShouldBeSameAs(otherService);
+                Assert.Same(otherService, mocker.Get<IService2>());
             }
         }
 
@@ -230,8 +235,8 @@ namespace Moq.AutoMock.Tests
             {
                 mocker.Setup<IService2>(x => x.Other).Returns(Mock.Of<IService1>());
                 var mock = mocker.Get<IService2>();
-                mock.ShouldNotBeNull();
-                mock.Other.ShouldNotBeNull();
+                Assert.NotNull(mock);
+                Assert.NotNull(mock.Other);
             }
 
             [Fact]
@@ -240,8 +245,8 @@ namespace Moq.AutoMock.Tests
                 mocker.Setup<IService2>(x => x.Other).Returns(Mock.Of<IService1>());
                 mocker.Setup<IService2>(x => x.Name).Returns("pure awesomeness");
                 var mock = mocker.Get<IService2>();
-                mock.Name.ShouldEqual("pure awesomeness");
-                mock.Other.ShouldNotBeNull();
+                Assert.Equal("pure awesomeness", mock.Name);
+                Assert.NotNull(mock.Other);
             }
 
             [Fact]
@@ -250,7 +255,7 @@ namespace Moq.AutoMock.Tests
                 var x = 0;
                 mocker.Setup<IService1>(_ => _.Void()).Callback(() => x++);
                 mocker.Get<IService1>().Void();
-                x.ShouldEqual(1);
+                Assert.Equal(1, x);
             }
 
             [Fact]
@@ -259,24 +264,24 @@ namespace Moq.AutoMock.Tests
                 mocker.Setup<IServiceWithPrimitives, long>(s => s.ReturnsALong()).Returns(100L);
 
                 var mock = mocker.Get<IServiceWithPrimitives>();
-                mock.ReturnsALong().ShouldEqual(100L);
+                Assert.Equal(100L, mock.ReturnsALong());
             }
 
             [Fact]
             public void If_you_setup_a_method_that_returns_a_value_type_without_specifying_return_type_you_get_useful_exception()
             {
                 //a method without parameters
-                var ex = Assert.Throws<NotSupportedException>(() => mocker.Setup<IServiceWithPrimitives>(s => s.ReturnsALong()).Returns(100L));
-                ex.Message.ShouldEqual("Use the Setup overload that allows specifying TReturn if the setup returns a value type");
+                var ex = Assert.Throws<NotSupportedException>(() => mocker.Setup<IServiceWithPrimitives>(s => (object)s.ReturnsALong()).Returns(100L));
+                Assert.Equal("Use the Setup overload that allows specifying TReturn if the setup returns a value type", ex.Message);
             }
 
             [Fact]
             public void If_you_setup_a_method_with_a_parameter_that_returns_a_value_type_without_specifying_return_type_you_get_useful_exception()
             {
                 //a method with parameters
-                var ex = Assert.Throws<NotSupportedException>(() => mocker.Setup<IServiceWithPrimitives>(s => s.ReturnsALongWithParameter(It.IsAny<string>())).Returns(100L));
+                var ex = Assert.Throws<NotSupportedException>(() => mocker.Setup<IServiceWithPrimitives>(s => (object)s.ReturnsALongWithParameter(It.IsAny<string>())).Returns(100L));
 
-                ex.Message.ShouldEqual("Use the Setup overload that allows specifying TReturn if the setup returns a value type");
+                Assert.Equal("Use the Setup overload that allows specifying TReturn if the setup returns a value type", ex.Message);
 
             }
 
@@ -286,9 +291,9 @@ namespace Moq.AutoMock.Tests
                 //a method with parameters
                 var capturedVariable = string.Empty;
 
-                var ex = Assert.Throws<NotSupportedException>(() => mocker.Setup<IServiceWithPrimitives>(s => s.ReturnsALongWithParameter(It.IsAny<string>())).Returns(100L).Callback<string>(s => capturedVariable = s));
+                var ex = Assert.Throws<NotSupportedException>(() => mocker.Setup<IServiceWithPrimitives>(s => (object)s.ReturnsALongWithParameter(It.IsAny<string>())).Returns(100L).Callback<string>(s => capturedVariable = s));
 
-                ex.Message.ShouldEqual("Use the Setup overload that allows specifying TReturn if the setup returns a value type");
+                Assert.Equal("Use the Setup overload that allows specifying TReturn if the setup returns a value type", ex.Message);
 
             }
 
@@ -296,9 +301,9 @@ namespace Moq.AutoMock.Tests
             public void If_you_setup_a_method_that_returns_a_value_type_via_a_lambda_without_specifying_return_type_you_get_useful_exception()
             {
                 //a method with parameters
-                var ex = Assert.Throws<NotSupportedException>(() => mocker.Setup<IServiceWithPrimitives>(s => s.ReturnsALongWithParameter(It.IsAny<string>())).Returns<string>(s => s.Length));
+                var ex = Assert.Throws<NotSupportedException>(() => mocker.Setup<IServiceWithPrimitives>(s => (object)s.ReturnsALongWithParameter(It.IsAny<string>())).Returns<string>(s => s.Length));
 
-                ex.Message.ShouldEqual("Use the Setup overload that allows specifying TReturn if the setup returns a value type");
+                Assert.Equal("Use the Setup overload that allows specifying TReturn if the setup returns a value type", ex.Message);
 
             }
 
@@ -310,7 +315,7 @@ namespace Moq.AutoMock.Tests
                         .Returns<string>(s => s += "2");
 
                 var mock = mocker.Get<IServiceWithPrimitives>();
-                mock.ReturnsAReferenceWithParameter("blah").ShouldEqual("blah2");
+                Assert.Equal("blah2", mock.ReturnsAReferenceWithParameter("blah"));
             }
 
             [Fact]
@@ -322,7 +327,7 @@ namespace Moq.AutoMock.Tests
                         .Returns<string>(s => s += "2");
 
                 var mock = mocker.Get<IService4>();
-                mock.MainMethodName(WithStatic.Get()).ShouldEqual("2");
+                Assert.Equal("2", mock.MainMethodName(WithStatic.Get()));
             }
 
             [Fact]
@@ -334,7 +339,7 @@ namespace Moq.AutoMock.Tests
 
                 mock.Name = "aname";
                 
-                mock.Name.ShouldEqual("aname");
+                Assert.Equal("aname", mock.Name);
             }
         }
 
@@ -348,10 +353,8 @@ namespace Moq.AutoMock.Tests
                 mocker.Combine(typeof(IService1), typeof(IService2), 
                     typeof(IService3));
 
-                mocker.Get<IService1>().ShouldBeSameAs(
-                    mocker.Get<IService2>());
-                mocker.Get<IService2>().ShouldBeSameAs(
-                    mocker.Get<IService3>());
+                Assert.Same(mocker.Get<IService2>(), mocker.Get<IService1>());
+                Assert.Same(mocker.Get<IService3>(), mocker.Get<IService2>());
             }
 
             [Fact]
@@ -359,10 +362,8 @@ namespace Moq.AutoMock.Tests
             {
                 mocker.Combine<IService1, IService2, IService3>();
 
-                mocker.Get<IService1>().ShouldBeSameAs(
-                    mocker.Get<IService2>());
-                mocker.Get<IService2>().ShouldBeSameAs(
-                    mocker.Get<IService3>());
+                Assert.Same(mocker.Get<IService2>(), mocker.Get<IService1>());
+                Assert.Same(mocker.Get<IService3>(), mocker.Get<IService2>());
             }
         }
 
@@ -385,7 +386,7 @@ namespace Moq.AutoMock.Tests
                 mocker.Setup<IServiceWithPrimitives, long>(s => s.ReturnsALong()).Returns(100L);
 
                 var mock = mocker.Get<IServiceWithPrimitives>();
-                mock.ReturnsALong().ShouldEqual(100L);
+                Assert.Equal(100L, mock.ReturnsALong());
 
                 mocker.Verify<IServiceWithPrimitives, long>(s => s.ReturnsALong(), Times.Once());
             }
@@ -405,8 +406,8 @@ namespace Moq.AutoMock.Tests
             public void If_you_verify_a_method_that_returns_a_value_type_without_specifying_return_type_you_get_useful_exception()
             {
                 //a method without parameters
-                var ex = Assert.Throws<NotSupportedException>(() => mocker.Verify<IServiceWithPrimitives>(s => s.ReturnsALong(), Times.Once()));
-                ex.Message.ShouldEqual("Use the Verify overload that allows specifying TReturn if the setup returns a value type");
+                var ex = Assert.Throws<NotSupportedException>(() => mocker.Verify<IServiceWithPrimitives>(s => (object)s.ReturnsALong(), Times.Once()));
+                Assert.Equal("Use the Verify overload that allows specifying TReturn if the setup returns a value type", ex.Message);
             }
         }
 
@@ -421,7 +422,7 @@ namespace Moq.AutoMock.Tests
                 mocker.Use(setupInstance);
 
                 var actualInstance = mocker.Get<IService1>();
-                actualInstance.ShouldBeSameAs(setupInstance);
+                Assert.Same(setupInstance, actualInstance);
             }
 
             [Fact]
@@ -436,14 +437,14 @@ namespace Moq.AutoMock.Tests
             public void It_creates_a_mock_if_the_oject_is_missing()
             {
                 var mock = mocker.GetMock<IService1>();
-                mock.ShouldNotBeNull();
+                Assert.NotNull(mock);
             }
 
             [Fact]
             public void It_creates_a_mock_if_the_object_is_missing_using_Get()
             {
                 var mock = mocker.Get<IService1>();
-                mock.ShouldNotBeNull();
+                Assert.NotNull(mock);
             }
 
             [Fact]
@@ -451,7 +452,7 @@ namespace Moq.AutoMock.Tests
             {
                 mocker.CreateInstance<WithService>();
                 var actualInstance = mocker.Get<IService2>();
-                actualInstance.ShouldNotBeNull();
+                Assert.NotNull(actualInstance);
             }
 
             [Fact]
@@ -484,15 +485,15 @@ namespace Moq.AutoMock.Tests
             {
                 var selfMock = mocker.CreateSelfMock<InsecureAboutSelf>();
                 selfMock.TellJoke();
-                selfMock.SelfDepricated.ShouldBeFalse();
+                Assert.False(selfMock.SelfDepricated);
             }
 
             [Fact]
             public void It_can_self_mock_objects_with_constructor_arguments()
             {
                 var selfMock = mocker.CreateSelfMock<WithService>();
-                selfMock.Service.ShouldNotBeNull();
-                Mock.Get(selfMock.Service).ShouldNotBeNull();
+                Assert.NotNull(selfMock.Service);
+                Assert.NotNull(Mock.Get(selfMock.Service));
             }
         }
 
