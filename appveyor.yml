@@ -3,7 +3,7 @@ image: Visual Studio 2017
 nuget:
   disable_publish_on_pr: true
 build_script:
-- cmd: msbuild Moq.AutoMock\Moq.AutoMock.csproj -p:Configuration=Release,PackageVersion=$env:appveyor_build_version -t:Restore,Build,Pack
+- ps: msbuild Moq.AutoMock\Moq.AutoMock.csproj -p:Configuration=Release,PackageVersion=$env:appveyor_build_version -t:Restore,Build,Pack
 artifacts:
 - path: '**\*.nupkg'
 deploy:
