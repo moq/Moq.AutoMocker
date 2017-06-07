@@ -6,9 +6,9 @@
     <RootNamespace>Moq.AutoMock</RootNamespace>
     <AssemblyName>Moq.AutoMock</AssemblyName>
     <AssemblyTitle>Moq.AutoMocker</AssemblyTitle>
-    <Product>Moq.AutoMocker</Product>
+    <Product>Moq.AutoMocker.Standard</Product>
     <Copyright>Copyright © 2016</Copyright>
-    <Version>0.5.0</Version>
+    <Version Condition="'$(Version)' == ''">0.5.0-alpha</Version>
   </PropertyGroup>
 
   <ItemGroup>
