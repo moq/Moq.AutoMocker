@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using Moq.Language.Flow;
 
 namespace Moq.AutoMock
@@ -55,11 +56,13 @@ namespace Moq.AutoMock
             var arguments = CreateArguments<T>(bindingFlags);
             try
             {
-                return (T)Activator.CreateInstance(typeof(T), bindingFlags, null, arguments, null);
+                var ctor = constructorSelector.SelectFor(typeof(T), typeMap.Keys.ToArray(), bindingFlags);
+                return (T) ctor.Invoke(arguments);
             }
             catch (TargetInvocationException e)
             {
-                throw e.InnerException.PreserveStackTrace();
+                ExceptionDispatchInfo.Capture(e.InnerException).Throw();
+                throw;  //Not really reachable either way, but I like this better than return default(T)
             }
         }
 

@@ -24,7 +24,7 @@ namespace Moq.AutoMock
 
             if (candidate.GetParameters()
                          .Where(x => !existingTypes.Contains(x.ParameterType))
-                         .Any(x => x.ParameterType.IsSealed && !x.ParameterType.IsArray))
+                         .Any(x => x.ParameterType.GetTypeInfo().IsSealed && !x.ParameterType.IsArray))
                 return false;
 
             return current.GetParameters().Length < candidate.GetParameters().Length;

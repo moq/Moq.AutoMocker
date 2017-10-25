@@ -1,0 +1,12 @@
+version: 0.5.0.{build}
+image: Visual Studio 2017
+nuget:
+  disable_publish_on_pr: true
+build_script:
+- ps: msbuild Moq.AutoMock\Moq.AutoMock.csproj -p:Configuration=Release,PackageVersion=$env:appveyor_build_version -t:Restore,Build,Pack
+artifacts:
+- path: '**\*.nupkg'
+deploy:
+- provider: NuGet
+  api_key:
+    secure: +7xnWj2H6CI1zQJHcbFMDRCJcSn1HYWp2HgKSRGRn5QxmrVhkdgUcddOSsLewFkm
