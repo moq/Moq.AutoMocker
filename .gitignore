@@ -6,3 +6,4 @@ bin/
 obj/
 packages/
 build/
+/.vs

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq.Expressions;
 using System.Reflection;
 using Xunit;
 
@@ -19,7 +18,7 @@ namespace Moq.AutoMock.Tests
 
             public OneConstructor(Empty empty)
             {
-                this.Empty = empty;
+                Empty = empty;
             }
         }
 
@@ -102,10 +101,7 @@ namespace Moq.AutoMock.Tests
 
         #endregion
 
-        private static Type MockVerificationException
-        {
-            get { return typeof (Mock).GetTypeInfo().Assembly.GetType("Moq.MockVerificationException"); }
-        }
+        private static Type MockVerificationException => typeof (Mock).GetTypeInfo().Assembly.GetType("Moq.MockVerificationException");
 
         public class DescribeCreateInstance
         {
@@ -271,7 +267,7 @@ namespace Moq.AutoMock.Tests
             public void If_you_setup_a_method_that_returns_a_value_type_without_specifying_return_type_you_get_useful_exception()
             {
                 //a method without parameters
-                var ex = Assert.Throws<NotSupportedException>(() => mocker.Setup<IServiceWithPrimitives>(s => (object)s.ReturnsALong()).Returns(100L));
+                var ex = Assert.Throws<NotSupportedException>(() => mocker.Setup<IServiceWithPrimitives>(s => s.ReturnsALong()).Returns(100L));
                 Assert.Equal("Use the Setup overload that allows specifying TReturn if the setup returns a value type", ex.Message);
             }
 
@@ -279,7 +275,7 @@ namespace Moq.AutoMock.Tests
             public void If_you_setup_a_method_with_a_parameter_that_returns_a_value_type_without_specifying_return_type_you_get_useful_exception()
             {
                 //a method with parameters
-                var ex = Assert.Throws<NotSupportedException>(() => mocker.Setup<IServiceWithPrimitives>(s => (object)s.ReturnsALongWithParameter(It.IsAny<string>())).Returns(100L));
+                var ex = Assert.Throws<NotSupportedException>(() => mocker.Setup<IServiceWithPrimitives>(s => s.ReturnsALongWithParameter(It.IsAny<string>())).Returns(100L));
 
                 Assert.Equal("Use the Setup overload that allows specifying TReturn if the setup returns a value type", ex.Message);
 
@@ -291,7 +287,7 @@ namespace Moq.AutoMock.Tests
                 //a method with parameters
                 var capturedVariable = string.Empty;
 
-                var ex = Assert.Throws<NotSupportedException>(() => mocker.Setup<IServiceWithPrimitives>(s => (object)s.ReturnsALongWithParameter(It.IsAny<string>())).Returns(100L).Callback<string>(s => capturedVariable = s));
+                var ex = Assert.Throws<NotSupportedException>(() => mocker.Setup<IServiceWithPrimitives>(s => s.ReturnsALongWithParameter(It.IsAny<string>())).Returns(100L).Callback<string>(s => capturedVariable = s));
 
                 Assert.Equal("Use the Setup overload that allows specifying TReturn if the setup returns a value type", ex.Message);
 
@@ -301,7 +297,7 @@ namespace Moq.AutoMock.Tests
             public void If_you_setup_a_method_that_returns_a_value_type_via_a_lambda_without_specifying_return_type_you_get_useful_exception()
             {
                 //a method with parameters
-                var ex = Assert.Throws<NotSupportedException>(() => mocker.Setup<IServiceWithPrimitives>(s => (object)s.ReturnsALongWithParameter(It.IsAny<string>())).Returns<string>(s => s.Length));
+                var ex = Assert.Throws<NotSupportedException>(() => mocker.Setup<IServiceWithPrimitives>(s => s.ReturnsALongWithParameter(It.IsAny<string>())).Returns<string>(s => s.Length));
 
                 Assert.Equal("Use the Setup overload that allows specifying TReturn if the setup returns a value type", ex.Message);
 
@@ -324,7 +320,7 @@ namespace Moq.AutoMock.Tests
                 //a method with parameters
                 
                 mocker.Setup<IService4>(s => s.MainMethodName(WithStatic.Get()))
-                        .Returns<string>(s => s += "2");
+                        .Returns<string>(s => s + "2");
 
                 var mock = mocker.Get<IService4>();
                 Assert.Equal("2", mock.MainMethodName(WithStatic.Get()));
@@ -406,7 +402,7 @@ namespace Moq.AutoMock.Tests
             public void If_you_verify_a_method_that_returns_a_value_type_without_specifying_return_type_you_get_useful_exception()
             {
                 //a method without parameters
-                var ex = Assert.Throws<NotSupportedException>(() => mocker.Verify<IServiceWithPrimitives>(s => (object)s.ReturnsALong(), Times.Once()));
+                var ex = Assert.Throws<NotSupportedException>(() => mocker.Verify<IServiceWithPrimitives>(s => s.ReturnsALong(), Times.Once()));
                 Assert.Equal("Use the Verify overload that allows specifying TReturn if the setup returns a value type", ex.Message);
             }
         }
@@ -505,7 +501,7 @@ namespace Moq.AutoMock.Tests
             public void It_calls_VerifyAll_on_all_objects_that_are_mocks()
             {
                 mocker.Use<IService2>(x => x.Other == Mock.Of<IService1>());
-                var selfMock = mocker.CreateInstance<WithService>();
+                var _ = mocker.CreateInstance<WithService>();
                 Assert.Throws(MockVerificationException, () => mocker.VerifyAll());
             }
 

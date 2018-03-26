@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Moq" version="4.6.38-alpha" />
+    <PackageReference Include="Moq" version="4.8.2" />
   </ItemGroup>
   <ItemGroup>
     <!--<Compile Include="**\*.cs" Exclude="**\*.generated.cs"/>
