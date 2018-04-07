@@ -143,9 +143,18 @@ namespace Moq.AutoMock
         /// </summary>
         /// <typeparam name="TService">The type that the instance will be registered as</typeparam>
         /// <param name="service"></param>
-        public void Use<TService>(TService service)
+        public void Use<TService>(TService service) => Use(typeof(TService), service);
+
+        /// <summary>
+        /// Adds an intance to the container.
+        /// </summary>
+        /// <param name="service">The type that will </param>
+        public void Use(Type type, object service)
         {
-            typeMap[typeof(TService)] = new RealInstance(service);
+            if (type == null) throw new ArgumentNullException(nameof(type));
+            if (service != null && !type.IsInstanceOfType(service))
+                throw new ArgumentException($"{nameof(service)} is not of type {type}");
+            typeMap[type] = new RealInstance(service);
         }
 
         /// <summary>
