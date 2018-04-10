@@ -229,7 +229,7 @@ namespace Moq.AutoMock.Tests
             [Fact]
             public void You_can_setup_a_mock_using_the_classic_Setup_style()
             {
-                mocker.Setup<IService2>(x => x.Other).Returns(Mock.Of<IService1>());
+                mocker.Setup<IService2, IService1>(x => x.Other).Returns(Mock.Of<IService1>());
                 var mock = mocker.Get<IService2>();
                 Assert.NotNull(mock);
                 Assert.NotNull(mock.Other);
@@ -238,8 +238,8 @@ namespace Moq.AutoMock.Tests
             [Fact]
             public void You_can_do_multiple_setups_on_a_single_interface()
             {
-                mocker.Setup<IService2>(x => x.Other).Returns(Mock.Of<IService1>());
-                mocker.Setup<IService2>(x => x.Name).Returns("pure awesomeness");
+                mocker.Setup<IService2, IService1>(x => x.Other).Returns(Mock.Of<IService1>());
+                mocker.Setup<IService2, string>(x => x.Name).Returns("pure awesomeness");
                 var mock = mocker.Get<IService2>();
                 Assert.Equal("pure awesomeness", mock.Name);
                 Assert.NotNull(mock.Other);
@@ -307,7 +307,7 @@ namespace Moq.AutoMock.Tests
             public void You_can_setup_a_method_that_returns_a_reference_type_via_a_lambda_without_specifying_return_type()
             {
                 //a method with parameters
-                mocker.Setup<IServiceWithPrimitives>(s => s.ReturnsAReferenceWithParameter(It.IsAny<string>()))
+                mocker.Setup<IServiceWithPrimitives, string>(s => s.ReturnsAReferenceWithParameter(It.IsAny<string>()))
                         .Returns<string>(s => s += "2");
 
                 var mock = mocker.Get<IServiceWithPrimitives>();
@@ -319,7 +319,7 @@ namespace Moq.AutoMock.Tests
             {
                 //a method with parameters
                 
-                mocker.Setup<IService4>(s => s.MainMethodName(WithStatic.Get()))
+                mocker.Setup<IService4, string>(s => s.MainMethodName(WithStatic.Get()))
                         .Returns<string>(s => s + "2");
 
                 var mock = mocker.Get<IService4>();
@@ -391,7 +391,7 @@ namespace Moq.AutoMock.Tests
             public void You_can_verify_all_setups_marked_as_verifiable()
             {
                 mocker.Setup<IService1>(x => x.Void()).Verifiable();
-                mocker.Setup<IService5>(x => x.Name).Returns("Test");
+                mocker.Setup<IService5, string>(x => x.Name).Returns("Test");
 
                 mocker.Get<IService1>().Void();
                 
