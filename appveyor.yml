@@ -13,7 +13,7 @@ nuget:
   disable_publish_on_pr: true
 build_script:
 - ps: dotnet pack -c release Moq.AutoMock
-build_script:
+test_script:
 - ps: dotnet test -c release Moq.AutoMock.Tests
 artifacts:
 - path: '**\*.nupkg'
