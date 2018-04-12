@@ -101,8 +101,6 @@ namespace Moq.AutoMock.Tests
 
         #endregion
 
-        private static Type MockVerificationException => typeof (Mock).GetTypeInfo().Assembly.GetType("Moq.MockVerificationException");
-
         public class DescribeCreateInstance
         {
             private readonly AutoMocker mocker = new AutoMocker();
@@ -502,7 +500,8 @@ namespace Moq.AutoMock.Tests
             {
                 mocker.Use<IService2>(x => x.Other == Mock.Of<IService1>());
                 var _ = mocker.CreateInstance<WithService>();
-                Assert.Throws(MockVerificationException, () => mocker.VerifyAll());
+                var ex = Assert.Throws<MockException>(() => mocker.VerifyAll());
+                Assert.True(ex.IsVerificationError);
             }
 
             [Fact]
