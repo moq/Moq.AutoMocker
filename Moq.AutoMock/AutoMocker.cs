@@ -235,20 +235,11 @@ namespace Moq.AutoMock
         /// <summary>
         /// Shortcut for mock.Setup(...), creating the mock when necessary.
         /// </summary>
+        [Obsolete("No longer supported with Moq 4.8 and later. Use Setup<TService, TReturn> instead.", true)]
         public ISetup<TService, object> Setup<TService>(Expression<Func<TService, object>> setup)
             where TService : class
         {
-            ISetup<TService, object> Func(Mock<TService> m) => m.Setup(setup);
-            
-            Expression<Func<Mock<TService>, ISetup<TService, object>>> expression = m => m.Setup(setup);
-            //check if Func results in a cast to object (boxing). If so then the user should have used the Setup overload that
-            //specifies TReturn for value types
-            if (CastChecker.DoesContainCastToObject(expression))
-            {
-                throw new NotSupportedException("Use the Setup overload that allows specifying TReturn if the setup returns a value type");
-            }
-
-            return Setup((Func<Mock<TService>, ISetup<TService, object>>) Func);
+            throw new NotSupportedException("No longer supported in Moq 4.8 and later. Use Setup<TService, TReturn> instead.");
         }
         
         /// <summary>
@@ -274,7 +265,7 @@ namespace Moq.AutoMock
         {
             return Setup<ISetup<TService, TReturn>, TService>(m => m.Setup(setup));
         }
-
+        
         private TReturn Setup<TReturn, TService>(Func<Mock<TService>, TReturn> returnValue)
             where TService : class
         {
