@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Moq.Language.Flow;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
-using Moq.Language.Flow;
 
 namespace Moq.AutoMock
 {
@@ -143,9 +143,18 @@ namespace Moq.AutoMock
         /// </summary>
         /// <typeparam name="TService">The type that the instance will be registered as</typeparam>
         /// <param name="service"></param>
-        public void Use<TService>(TService service)
+        public void Use<TService>(TService service) => Use(typeof(TService), service);
+
+        /// <summary>
+        /// Adds an intance to the container.
+        /// </summary>
+        /// <param name="service">The type that will </param>
+        public void Use(Type type, object service)
         {
-            typeMap[typeof(TService)] = new RealInstance(service);
+            if (type == null) throw new ArgumentNullException(nameof(type));
+            if (service != null && !type.IsInstanceOfType(service))
+                throw new ArgumentException($"{nameof(service)} is not of type {type}");
+            typeMap[type] = new RealInstance(service);
         }
 
         /// <summary>
@@ -176,14 +185,9 @@ namespace Moq.AutoMock
         /// </summary>
         /// <typeparam name="TService">The class or interface to search on</typeparam>
         /// <returns>The object that implements TService</returns>
-        public TService Get<TService>()
-        {
-            IInstance instance;
-            if (!typeMap.TryGetValue(typeof(TService), out instance))
-                instance = CreateMockObjectAndStore(typeof(TService));
+        public TService Get<TService>() => GetImplementation<TService>(typeof(TService));
 
-            return (TService) typeMap[typeof (TService)].Value;
-        }
+        public object Get(Type serviceType) => GetImplementation<object>(serviceType);
 
         /// <summary>
         /// Searches and retrieves the mock that the container uses for TService.
@@ -193,15 +197,15 @@ namespace Moq.AutoMock
         /// <returns>a mock that </returns>
         public Mock<TService> GetMock<TService>() where TService : class
         {
-            IInstance instance;
-            if (!typeMap.TryGetValue(typeof(TService), out instance))
-                instance = CreateMockObjectAndStore(typeof(TService));
+            return GetMockImplementation<TService>(typeof(TService));
+        }
 
-            if (!instance.IsMock)
-                throw new ArgumentException(string.Format("Registered service `{0}` was not a mock", Get<TService>().GetType()));
+        public Mock<object> GetMock(Type serviceType)
+        {
+            if (serviceType == null) throw new ArgumentNullException(nameof(serviceType));
+            if (!serviceType.GetTypeInfo().IsClass) throw new ArgumentException($"'{serviceType.FullName}' is not a class", nameof(serviceType));
 
-            var mockInstance = (MockInstance) instance;
-            return (Mock<TService>) mockInstance.Mock;
+            return GetMockImplementation<object>(serviceType);
         }
 
         /// <summary>
@@ -212,7 +216,7 @@ namespace Moq.AutoMock
             foreach (var pair in typeMap)
             {
                 if (pair.Value.IsMock)
-                    (((MockInstance)pair.Value).Mock).VerifyAll();
+                    ((MockInstance)pair.Value).Mock.VerifyAll();
             }
         }
 
@@ -224,29 +228,20 @@ namespace Moq.AutoMock
             foreach (var pair in typeMap)
             {
                 if (pair.Value.IsMock)
-                    (((MockInstance)pair.Value).Mock).Verify();
+                    ((MockInstance)pair.Value).Mock.Verify();
             }
         }
 
         /// <summary>
         /// Shortcut for mock.Setup(...), creating the mock when necessary.
         /// </summary>
+        [Obsolete("No longer supported with Moq 4.8 and later. Use Setup<TService, TReturn> instead.", true)]
         public ISetup<TService, object> Setup<TService>(Expression<Func<TService, object>> setup)
             where TService : class
         {
-            Func<Mock<TService>, ISetup<TService, object>> func = m => m.Setup(setup);
-            Expression<Func<Mock<TService>, ISetup<TService, object>>> expression = m => m.Setup(setup);
-            //check if Func results in a cast to object (boxing). If so then the user should have used the Setup overload that
-            //specifies TReturn for value types
-            if (CastChecker.DoesContainCastToObject(expression))
-            {
-                throw new NotSupportedException("Use the Setup overload that allows specifying TReturn if the setup returns a value type");
-            }
-
-            return Setup<ISetup<TService, object>, TService>(func);
+            throw new NotSupportedException("No longer supported in Moq 4.8 and later. Use Setup<TService, TReturn> instead.");
         }
-
-
+        
         /// <summary>
         /// Shortcut for mock.Setup(...), creating the mock when necessary.
         /// </summary>
@@ -270,7 +265,7 @@ namespace Moq.AutoMock
         {
             return Setup<ISetup<TService, TReturn>, TService>(m => m.Setup(setup));
         }
-
+        
         private TReturn Setup<TReturn, TService>(Func<Mock<TService>, TReturn> returnValue)
             where TService : class
         {
@@ -391,5 +386,24 @@ namespace Moq.AutoMock
             mock.Verify(expression, times, failMessage);
         }
 
+        private Mock<T> GetMockImplementation<T>(Type serviceType) where T : class
+        {
+            if (!typeMap.TryGetValue(serviceType, out var instance))
+                instance = CreateMockObjectAndStore(serviceType);
+
+            if (!instance.IsMock)
+                throw new ArgumentException(string.Format("Registered service `{0}` was not a mock", GetImplementation<object>(serviceType).GetType()));
+
+            var mockInstance = (MockInstance) instance;
+            return (Mock<T>) mockInstance.Mock;
+        }
+
+        private T GetImplementation<T>(Type serviceType)
+        {
+            if (!typeMap.TryGetValue(serviceType, out _))
+                CreateMockObjectAndStore(serviceType);
+
+            return (T) typeMap[serviceType].Value;
+        }
     }
 }

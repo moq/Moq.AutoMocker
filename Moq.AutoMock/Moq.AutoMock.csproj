@@ -6,14 +6,20 @@
     <RootNamespace>Moq.AutoMock</RootNamespace>
     <AssemblyName>Moq.AutoMock</AssemblyName>
     <AssemblyTitle>Moq.AutoMocker</AssemblyTitle>
-    <PackageId>Moq.AutoMocker.NETStandard</PackageId>
     <Product>Moq.AutoMocker</Product>
     <Copyright>Copyright © 2016</Copyright>
+
     <Version>0.5.0</Version>
+    <Authors>Tim Kellogg</Authors>
+    <PackageDescription>An auto-mocking container that generates mocks using Moq</PackageDescription>
+    <Copyright>Copyright Tim Kellogg 2015</Copyright>
+    <PackageLicenseUrl>https://github.com/tkellogg/Moq.AutoMocker/blob/master/License.md</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/tkellogg/Moq.AutoMocker</PackageProjectUrl>
+		<Tags>moq;automocking;testing;TDD</Tags>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Moq" version="4.6.38-alpha" />
+    <PackageReference Include="Moq" version="4.8.2" />
   </ItemGroup>
   <ItemGroup>
     <!--<Compile Include="**\*.cs" Exclude="**\*.generated.cs"/>
