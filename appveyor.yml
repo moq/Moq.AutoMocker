@@ -15,7 +15,7 @@ build_script:
 - ps: dotnet pack -c release Moq.AutoMock
 test_script:
 - ps: dotnet test -c release Moq.AutoMock.Tests -l trx
-- ps: $wc = New-Object 'System.Net.WebClient'; Get-ChildItem -Recurse *.trx | % { Resolve-Path $_ } | % { $wc.UploadFile("https://ci.appveyor.com/api/testresults/mstest/$($env:APPVEYOR_JOB_ID)", $_) }
+- ps: $wc = New-Object 'System.Net.WebClient'; Get-ChildItem -Recurse *.trx | % { Resolve-Path $_ } | ForEach-Object { $wc.UploadFile("https://ci.appveyor.com/api/testresults/mstest/$($env:APPVEYOR_JOB_ID)", $_) }
 artifacts:
 - path: '**\*.nupkg'
 deploy: off
