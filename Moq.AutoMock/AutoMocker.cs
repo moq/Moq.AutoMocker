@@ -14,7 +14,6 @@ namespace Moq.AutoMock
     public partial class AutoMocker
     {
         private readonly Dictionary<Type, IInstance> typeMap = new Dictionary<Type, IInstance>();
-        private readonly ConstructorSelector constructorSelector = new ConstructorSelector();
         private readonly MockBehavior mockBehavior;
 
         public AutoMocker(MockBehavior mockBehavior)
@@ -56,7 +55,7 @@ namespace Moq.AutoMock
             var arguments = CreateArguments<T>(bindingFlags);
             try
             {
-                var ctor = constructorSelector.SelectFor(typeof(T), typeMap.Keys.ToArray(), bindingFlags);
+                var ctor = ConstructorSelector.SelectFor(typeof(T), typeMap.Keys.ToArray(), bindingFlags);
                 return (T) ctor.Invoke(arguments);
             }
             catch (TargetInvocationException e)
@@ -75,7 +74,7 @@ namespace Moq.AutoMock
 
         private object[] CreateArguments<T>(BindingFlags bindingFlags) where T : class
         {
-            var ctor = constructorSelector.SelectFor(typeof(T), typeMap.Keys.ToArray(), bindingFlags);
+            var ctor = ConstructorSelector.SelectFor(typeof(T), typeMap.Keys.ToArray(), bindingFlags);
             var arguments = ctor.GetParameters().Select(x => GetObjectFor(x.ParameterType)).ToArray();
             return arguments;
         }
@@ -135,7 +134,7 @@ namespace Moq.AutoMock
                     instance.Add(typeMap[elmType]);
                 return typeMap[type] = instance;
             }
-            return (typeMap[type] = new MockInstance(type, mockBehavior));
+            return typeMap[type] = new MockInstance(type, mockBehavior);
         }
 
         /// <summary>
@@ -148,7 +147,8 @@ namespace Moq.AutoMock
         /// <summary>
         /// Adds an intance to the container.
         /// </summary>
-        /// <param name="service">The type that will </param>
+        /// <param name="type">The type of service to use</param>
+        /// <param name="service">The service to use</param>
         public void Use(Type type, object service)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
@@ -161,7 +161,7 @@ namespace Moq.AutoMock
         /// Adds an intance to the container.
         /// </summary>
         /// <typeparam name="TService">The type that the instance will be registered as</typeparam>
-        /// <param name="mockedService"></param>
+        /// <param name="mockedService">The mocked service</param>
         public void Use<TService>(Mock<TService> mockedService)
             where TService : class
         {
@@ -187,6 +187,12 @@ namespace Moq.AutoMock
         /// <returns>The object that implements TService</returns>
         public TService Get<TService>() => GetImplementation<TService>(typeof(TService));
 
+        /// <summary>
+        /// Searches and retrieves an object from the container that matches the serviceType. This can be
+        /// a service setup explicitly via `.Use()` or implicitly with `.CreateInstance()`.
+        /// </summary>
+        /// <param name="serviceType">The type of service to retrieve</param>
+        /// <returns></returns>
         public object Get(Type serviceType) => GetImplementation<object>(serviceType);
 
         /// <summary>
@@ -194,12 +200,17 @@ namespace Moq.AutoMock
         /// </summary>
         /// <typeparam name="TService">The class or interface to search on</typeparam>
         /// <exception cref="ArgumentException">if the requested object wasn't a Mock</exception>
-        /// <returns>a mock that </returns>
+        /// <returns>A mock of TService</returns>
         public Mock<TService> GetMock<TService>() where TService : class
         {
             return GetMockImplementation<TService>(typeof(TService));
         }
 
+        /// <summary>
+        /// Searches and retrieves the mock that the container uses for serviceType.
+        /// </summary>
+        /// <param name="serviceType">The type of service to retrieve</param>
+        /// <returns>A mock of serviceType</returns>
         public Mock<object> GetMock(Type serviceType)
         {
             if (serviceType == null) throw new ArgumentNullException(nameof(serviceType));

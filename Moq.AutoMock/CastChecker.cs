@@ -7,6 +7,7 @@ namespace Moq.AutoMock
 {
     public static class CastChecker
     {
+        /// <summary>
         /// We are expecting expression to be m => m.Setup(setup). We will assume this structure
         /// and check if the inner setup is Converted (casted) to Object
         /// </summary>
@@ -32,7 +33,7 @@ namespace Moq.AutoMock
             var setup = (LambdaExpression)p.GetValue(setupArgument.Value);
 
             //Does its body Convert to System.Object?
-            if (setup.Body.NodeType == ExpressionType.Convert && setup.Body.Type == typeof(System.Object))
+            if (setup.Body.NodeType == ExpressionType.Convert && setup.Body.Type == typeof(object))
             {
                 return true;
             }
@@ -41,13 +42,14 @@ namespace Moq.AutoMock
             return false;
         }
 
-        public static bool DoesReturnPrimitive<TService>(Expression<Func<TService, object>> expression)            where TService : class
+        public static bool DoesReturnPrimitive<TService>(Expression<Func<TService, object>> expression)
+            where TService : class
         {
             //expression is assumed to be a lambda so the cast here would cause an exception if it was not the expected format
             var lambdaExpression = (LambdaExpression)expression;
 
             //Does its body Convert to System.Object?
-            if (lambdaExpression.Body.NodeType == ExpressionType.Convert && lambdaExpression.Body.Type == typeof(System.Object))
+            if (lambdaExpression.Body.NodeType == ExpressionType.Convert && lambdaExpression.Body.Type == typeof(object))
             {
                 return true;
             }

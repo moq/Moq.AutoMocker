@@ -4,13 +4,13 @@ using System.Linq;
 
 namespace Moq.AutoMock
 {
-    interface IInstance
+    internal interface IInstance
     {
         object Value { get; }
         bool IsMock { get; }
     }
 
-    class MockArrayInstance : IInstance
+    internal sealed class MockArrayInstance : IInstance
     {
         private readonly Type type;
         private readonly List<IInstance> mocks;
@@ -19,11 +19,6 @@ namespace Moq.AutoMock
         {
             this.type = type;
             mocks = new List<IInstance>();
-        }
-
-        public IEnumerable<IInstance> Mocks
-        {
-            get { return mocks; }
         }
 
         public object Value
@@ -46,7 +41,7 @@ namespace Moq.AutoMock
         }
     }
 
-    class MockInstance : IInstance
+    internal sealed class MockInstance : IInstance
     {
         public MockInstance(Mock value)
         {
@@ -65,24 +60,21 @@ namespace Moq.AutoMock
             return mock;
         }
 
-        public object Value
-        {
-            get { return Mock.Object; }
-        }
+        public object Value => Mock.Object;
 
-        public Mock Mock { get; private set; }
+        public Mock Mock { get; }
 
-        public bool IsMock { get { return true; } }
+        public bool IsMock => true;
     }
 
-    class RealInstance : IInstance
+    internal sealed class RealInstance : IInstance
     {
         public RealInstance(object value)
         {
             Value = value;
         }
 
-        public object Value { get; private set; }
-        public bool IsMock { get { return false; } }
+        public object Value { get; }
+        public bool IsMock => false;
     }
 }

@@ -8,7 +8,7 @@ namespace Moq.AutoMock.Tests
     public class ConstructorSelectorTests
     {
         private const BindingFlags DefaultBindingFlags = BindingFlags.Instance | BindingFlags.Public;
-        private readonly ConstructorSelector selector = new ConstructorSelector();
+
         #region Types used for testing
         class WithDefaultAndSingleParameter
         {
@@ -46,35 +46,35 @@ namespace Moq.AutoMock.Tests
         [TestMethod]
         public void It_chooses_the_ctor_with_arguments()
         {
-            var ctor = selector.SelectFor(typeof(WithDefaultAndSingleParameter), new Type[0], DefaultBindingFlags);
+            var ctor = ConstructorSelector.SelectFor(typeof(WithDefaultAndSingleParameter), new Type[0], DefaultBindingFlags);
             Assert.AreEqual(1, ctor.GetParameters().Length);
         }
 
         [TestMethod]
         public void It_chooses_the_ctor_with_the_most_arguments()
         {
-            var ctor = selector.SelectFor(typeof(With3Parameters), new Type[0], DefaultBindingFlags);
+            var ctor = ConstructorSelector.SelectFor(typeof(With3Parameters), new Type[0], DefaultBindingFlags);
             Assert.AreEqual(2, ctor.GetParameters().Length);
         }
 
         [TestMethod]
         public void It_chooses_the_ctor_with_the_most_arguments_when_arguments_are_arrays()
         {
-            var ctor = selector.SelectFor(typeof(WithArrayParameter), new Type[0], DefaultBindingFlags);
+            var ctor = ConstructorSelector.SelectFor(typeof(WithArrayParameter), new Type[0], DefaultBindingFlags);
             Assert.AreEqual(1, ctor.GetParameters().Length);
         }
 
         [TestMethod]
         public void It_wont_select_if_an_argument_is_sealed_and_not_array()
         {
-            var ctor = selector.SelectFor(typeof(WithSealedParameter), new Type[0], DefaultBindingFlags);
+            var ctor = ConstructorSelector.SelectFor(typeof(WithSealedParameter), new Type[0], DefaultBindingFlags);
             Assert.AreEqual(0, ctor.GetParameters().Length);
         }
 
         [TestMethod]
         public void It_will_select_if_an_argument_is_sealed_and_supplied()
         {
-            var ctor = selector.SelectFor(typeof(WithSealedParameter), new Type[] { typeof(string) }, DefaultBindingFlags);
+            var ctor = ConstructorSelector.SelectFor(typeof(WithSealedParameter), new Type[] { typeof(string) }, DefaultBindingFlags);
             Assert.AreEqual(1, ctor.GetParameters().Length);
         }
 
@@ -82,7 +82,7 @@ namespace Moq.AutoMock.Tests
         public void It_will_select_a_private_ctor_when_specified()
         {
             const BindingFlags privateBindingFlags = DefaultBindingFlags | BindingFlags.NonPublic;
-            var ctor = selector.SelectFor(typeof(WithPrivateConstructor), new Type[0], privateBindingFlags);
+            var ctor = ConstructorSelector.SelectFor(typeof(WithPrivateConstructor), new Type[0], privateBindingFlags);
             Assert.AreEqual(2, ctor.GetParameters().Length);
         }
     }

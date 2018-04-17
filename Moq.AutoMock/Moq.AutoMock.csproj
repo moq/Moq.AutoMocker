@@ -18,6 +18,11 @@
 		<Tags>moq;automocking;testing;TDD</Tags>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Moq" version="4.8.2" />
   </ItemGroup>
