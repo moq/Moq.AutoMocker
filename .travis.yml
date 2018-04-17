@@ -1,5 +1,5 @@
 language: csharp
-solution: Moq.AutoMoq.sln
+solution: Moq.AutoMock.sln
 mono: none
 dotnet: 2.0.0
 script:
