@@ -1,6 +1,0 @@
-language: csharp
-mono: none
-dotnet: 2.0.0
-script:
- - dotnet build -c Release
- - dotnet test Moq.AutoMock.Tests -c Release
