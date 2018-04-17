@@ -3,7 +3,7 @@ namespace Moq.AutoMock
 {
     public partial class AutoMocker
     {
-        
+
         /// <summary>
         /// Combines all given types so that they are mocked by the same
         /// mock. Some IoC containers call this "Forwarding" one type to 
@@ -14,8 +14,8 @@ namespace Moq.AutoMock
         {
             Combine(typeof(TService), typeof(TAsWellAs1));
         }
-            
-        
+
+
         /// <summary>
         /// Combines all given types so that they are mocked by the same
         /// mock. Some IoC containers call this "Forwarding" one type to 
@@ -26,8 +26,8 @@ namespace Moq.AutoMock
         {
             Combine(typeof(TService), typeof(TAsWellAs1), typeof(TAsWellAs2));
         }
-            
-        
+
+
         /// <summary>
         /// Combines all given types so that they are mocked by the same
         /// mock. Some IoC containers call this "Forwarding" one type to 
@@ -38,8 +38,8 @@ namespace Moq.AutoMock
         {
             Combine(typeof(TService), typeof(TAsWellAs1), typeof(TAsWellAs2), typeof(TAsWellAs3));
         }
-            
-        
+
+
         /// <summary>
         /// Combines all given types so that they are mocked by the same
         /// mock. Some IoC containers call this "Forwarding" one type to 
@@ -50,8 +50,8 @@ namespace Moq.AutoMock
         {
             Combine(typeof(TService), typeof(TAsWellAs1), typeof(TAsWellAs2), typeof(TAsWellAs3), typeof(TAsWellAs4));
         }
-            
-        
+
+
         /// <summary>
         /// Combines all given types so that they are mocked by the same
         /// mock. Some IoC containers call this "Forwarding" one type to 
@@ -62,8 +62,8 @@ namespace Moq.AutoMock
         {
             Combine(typeof(TService), typeof(TAsWellAs1), typeof(TAsWellAs2), typeof(TAsWellAs3), typeof(TAsWellAs4), typeof(TAsWellAs5));
         }
-            
-        
+
+
         /// <summary>
         /// Combines all given types so that they are mocked by the same
         /// mock. Some IoC containers call this "Forwarding" one type to 
@@ -74,8 +74,8 @@ namespace Moq.AutoMock
         {
             Combine(typeof(TService), typeof(TAsWellAs1), typeof(TAsWellAs2), typeof(TAsWellAs3), typeof(TAsWellAs4), typeof(TAsWellAs5), typeof(TAsWellAs6));
         }
-            
-        
+
+
         /// <summary>
         /// Combines all given types so that they are mocked by the same
         /// mock. Some IoC containers call this "Forwarding" one type to 
@@ -86,8 +86,8 @@ namespace Moq.AutoMock
         {
             Combine(typeof(TService), typeof(TAsWellAs1), typeof(TAsWellAs2), typeof(TAsWellAs3), typeof(TAsWellAs4), typeof(TAsWellAs5), typeof(TAsWellAs6), typeof(TAsWellAs7));
         }
-            
-        
+
+
         /// <summary>
         /// Combines all given types so that they are mocked by the same
         /// mock. Some IoC containers call this "Forwarding" one type to 
@@ -98,8 +98,8 @@ namespace Moq.AutoMock
         {
             Combine(typeof(TService), typeof(TAsWellAs1), typeof(TAsWellAs2), typeof(TAsWellAs3), typeof(TAsWellAs4), typeof(TAsWellAs5), typeof(TAsWellAs6), typeof(TAsWellAs7), typeof(TAsWellAs8));
         }
-            
-        
+
+
         /// <summary>
         /// Combines all given types so that they are mocked by the same
         /// mock. Some IoC containers call this "Forwarding" one type to 
@@ -110,8 +110,8 @@ namespace Moq.AutoMock
         {
             Combine(typeof(TService), typeof(TAsWellAs1), typeof(TAsWellAs2), typeof(TAsWellAs3), typeof(TAsWellAs4), typeof(TAsWellAs5), typeof(TAsWellAs6), typeof(TAsWellAs7), typeof(TAsWellAs8), typeof(TAsWellAs9));
         }
-            
-        
+
+
         /// <summary>
         /// Combines all given types so that they are mocked by the same
         /// mock. Some IoC containers call this "Forwarding" one type to 
@@ -122,6 +122,6 @@ namespace Moq.AutoMock
         {
             Combine(typeof(TService), typeof(TAsWellAs1), typeof(TAsWellAs2), typeof(TAsWellAs3), typeof(TAsWellAs4), typeof(TAsWellAs5), typeof(TAsWellAs6), typeof(TAsWellAs7), typeof(TAsWellAs8), typeof(TAsWellAs9), typeof(TAsWellAs10));
         }
-            
-            }
+
+    }
 }
