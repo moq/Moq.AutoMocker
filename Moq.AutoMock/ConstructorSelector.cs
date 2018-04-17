@@ -4,9 +4,9 @@ using System.Reflection;
 
 namespace Moq.AutoMock
 {
-    internal class ConstructorSelector
+    internal static class ConstructorSelector
     {
-        public ConstructorInfo SelectFor(Type type, Type[] existingTypes, BindingFlags bindingFlags)
+        public static ConstructorInfo SelectFor(Type type, Type[] existingTypes, BindingFlags bindingFlags)
         {
             ConstructorInfo best = null;
             foreach (var constructor in type.GetConstructors(bindingFlags))
@@ -17,7 +17,7 @@ namespace Moq.AutoMock
             return best;
         }
 
-        private bool IsBetterChoice(ConstructorInfo current, ConstructorInfo candidate, Type[] existingTypes)
+        private static bool IsBetterChoice(ConstructorInfo current, ConstructorInfo candidate, Type[] existingTypes)
         {
             if (current == null)
                 return true;
