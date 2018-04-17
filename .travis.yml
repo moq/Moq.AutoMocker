@@ -1,6 +1,6 @@
 language: csharp
-solution: Moq.AutoMock.sln
 mono: none
 dotnet: 2.0.0
 script:
- - dotnet restore
+ - dotnet build -c Release
+ - dotnet test Moq.AutoMock.Tests -c Release
