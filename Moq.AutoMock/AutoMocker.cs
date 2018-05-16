@@ -14,16 +14,32 @@ namespace Moq.AutoMock
     public partial class AutoMocker
     {
         private readonly Dictionary<Type, IInstance> typeMap = new Dictionary<Type, IInstance>();
-        private readonly MockBehavior mockBehavior;
+
+        public AutoMocker()
+            : this(MockBehavior.Default)
+        {
+        }
 
         public AutoMocker(MockBehavior mockBehavior)
+            : this(mockBehavior, DefaultValue.Empty)
         {
-            this.mockBehavior = mockBehavior;
         }
 
-        public AutoMocker() : this(MockBehavior.Default)
+        public AutoMocker(MockBehavior mockBehavior, DefaultValue defaultValue)
+            : this(mockBehavior, defaultValue, callBase: false)
         {
         }
+
+        public AutoMocker(MockBehavior mockBehavior, DefaultValue defaultValue, bool callBase)
+        {
+            this.MockBehavior = mockBehavior;
+            this.DefaultValue = defaultValue;
+            this.CallBase = callBase;
+        }
+
+        public MockBehavior MockBehavior { get; private set; }
+        public DefaultValue DefaultValue { get; private set; }
+        public bool CallBase { get; private set; }
 
         /// <summary>
         /// Constructs an instance from known services. Any dependancies (constructor arguments)
@@ -105,7 +121,10 @@ namespace Moq.AutoMock
         public T CreateSelfMock<T>(bool enablePrivate) where T : class
         {
             var arguments = CreateArguments<T>(GetBindingFlags(enablePrivate));
-            return new Mock<T>(mockBehavior, arguments).Object;
+            var mock = new Mock<T>(MockBehavior, arguments);
+            SetMockProperties(mock);
+            // TODO: add to typeMap?
+            return mock.Object;
         }
 
         private object GetObjectFor(Type type)
@@ -118,7 +137,7 @@ namespace Moq.AutoMock
         {
             if (!typeMap.ContainsKey(type) || !typeMap[type].IsMock)
             {
-                typeMap[type] = new MockInstance(type, mockBehavior);
+                typeMap[type] = new MockInstance(CreateMockOf(type));
             }
             return ((MockInstance) typeMap[type]).Mock;
         }
@@ -134,7 +153,21 @@ namespace Moq.AutoMock
                     instance.Add(typeMap[elmType]);
                 return typeMap[type] = instance;
             }
-            return typeMap[type] = new MockInstance(type, mockBehavior);
+            return typeMap[type] = new MockInstance(CreateMockOf(type));
+        }
+
+        private Mock CreateMockOf(Type type)
+        {
+            var mockType = typeof(Mock<>).MakeGenericType(type);
+            var mock = (Mock)Activator.CreateInstance(mockType, MockBehavior);
+            SetMockProperties(mock);
+            return mock;
+        }
+
+        private void SetMockProperties(Mock mock)
+        {
+            mock.DefaultValue = DefaultValue;
+            mock.CallBase = CallBase;
         }
 
         /// <summary>
@@ -307,7 +340,7 @@ namespace Moq.AutoMock
         /// </summary>
         public void Combine(Type type, params Type[] forwardTo)
         {
-            var mockObject = new MockInstance(type, mockBehavior);
+            var mockObject = new MockInstance(CreateMockOf(type));
             forwardTo.Aggregate(mockObject.Mock, As);
 
             foreach (var serviceType in forwardTo.Concat(new[] { type }))
