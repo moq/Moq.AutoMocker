@@ -1,0 +1,23 @@
+version: 1.0.0.{build}
+image: Visual Studio 2017
+skip_tags: true
+
+init:
+- pwsh: Update-AppveyorBuild -Version "${env:APPVEYOR_BUILD_VERSION}(if (-not $env:APPVEYOR_REPO_BRANCH -ieq 'release') { '-pre' })"
+
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: '{version}'
+  package_version: '{version}'
+  assembly_version: '{version}'
+  file_version: '{version}'
+  informational_version: '{version}'
+
+before_build:
+- pwsh: msbuild -t:Restore
+
+build:
+  publish_nuget: true
+  publish_nuget_symbols: true
+  verbosity: minimal
