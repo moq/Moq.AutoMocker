@@ -1,21 +1,12 @@
-version: 1.0.{build}-pre
+version: 1.0.{build}
 image: Visual Studio 2017
-configuration: Release
-dotnet_csproj:
-  patch: true
-  file: '**\*.csproj'
-  version: '{version}'
-  package_version: '{version}'
-  assembly_version: '{version}'
-  file_version: '{version}'
-  informational_version: '{version}'
-nuget:
-  disable_publish_on_pr: true
-build_script:
-- ps: dotnet pack -c release Moq.AutoMock
-test_script:
-- ps: dotnet test -c release Moq.AutoMock.Tests -l trx
-- ps: $wc = New-Object 'System.Net.WebClient'; Get-ChildItem -Recurse *.trx | % { Resolve-Path $_ } | ForEach-Object { $wc.UploadFile("https://ci.appveyor.com/api/testresults/mstest/$($env:APPVEYOR_JOB_ID)", $_) }
+
+skip_tags: true
+
+build:
+  publish_nuget: true
+  publish_nuget_symbols: true
+  verbosity: minimal
+
 artifacts:
 - path: '**\*.nupkg'
-deploy: off
