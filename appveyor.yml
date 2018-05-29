@@ -3,7 +3,7 @@ image: Visual Studio 2017
 skip_tags: true
 
 init:
-- pwsh: appveyor UpdateBuild -Version "${env:APPVEYOR_BUILD_VERSION}-${env:APPVEYOR_REPO_BRANCH}"
+- pwsh: appveyor UpdateBuild -Version "${env:APPVEYOR_BUILD_VERSION}$(if (-not ($env:APPVEYOR_REPO_BRANCH -ieq 'release')) { '-pre' })"
 
 dotnet_csproj:
   patch: true
