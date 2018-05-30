@@ -31,14 +31,6 @@ build:
 #   api_key:
 #     secure: zZeQU3//rH05N4dUycvkzwQEljtwvDuVk7e+aNBNgZonpUvM0lg0EswTyYtUttv5
 
-nuget:
-  account_feed: true
-  project_feed: true
-  disable_publish_on_pr: true
-
-artifacts:
-  - path: '**\*.nupkg'
-
 for:
 -
   version: 1.0.{build}-pre
