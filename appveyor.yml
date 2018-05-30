@@ -1,4 +1,4 @@
-version: 1.0.{build}
+version: 1.0.{build}-pre
 image: Visual Studio 2017
 skip_tags: true
 configuration: Release
@@ -33,8 +33,7 @@ build:
 for:
 -
   branches:
-    except:
+    only:
       - release
-  init:
-  - pwsh: appveyor UpdateBuild -Version "${env:APPVEYOR_BUILD_VERSION}-pre"
+  version: 1.0.{build}
 
