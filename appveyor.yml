@@ -34,4 +34,4 @@ for:
   branches:
     except:
       - release
-  version: $(APPVEYOR_BUILD_VERSION)-pre
+  version: 1.0.{build}-pre
