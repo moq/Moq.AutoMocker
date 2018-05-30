@@ -1,7 +1,8 @@
-version: 1.0.{build}-pre
+
 image: Visual Studio 2017
-skip_tags: true
 configuration: Release
+skip_tags: true
+skip_branch_with_pr: true
 
 branches:
   only:
@@ -30,10 +31,20 @@ build:
 #   api_key:
 #     secure: zZeQU3//rH05N4dUycvkzwQEljtwvDuVk7e+aNBNgZonpUvM0lg0EswTyYtUttv5
 
+nuget:
+  account_feed: true
+  project_feed: true
+  disable_publish_on_pr: true
+
+artifacts:
+  - path: '**\*.nupkg'
+
 for:
+-
+  version: 1.0.{build}-pre
+
 -
   branches:
     only:
       - release
   version: 1.0.{build}
-
