@@ -2,7 +2,6 @@
 image: Visual Studio 2017
 configuration: Release
 skip_tags: true
-skip_branch_with_pr: true
 
 branches:
   only:
@@ -45,3 +44,4 @@ for:
     only:
       - release
   version: 1.0.{build}
+
