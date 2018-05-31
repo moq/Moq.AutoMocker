@@ -1,4 +1,4 @@
-# Moq.AutoMock  [![Build status](https://ci.appveyor.com/api/projects/status/y066j02n3873ya92/branch/master?svg=true)](https://ci.appveyor.com/project/adamhewitt627/moq-automocker/branch/master) [![NuGet Status](http://img.shields.io/nuget/v/Moq.AutoMocker.NETStandard.svg?style=flat)](https://www.nuget.org/packages/Moq.AutoMocker.NETStandard/)
+# Moq.AutoMock  [![Build status](https://ci.appveyor.com/api/projects/status/elxubw30grm36c3y?svg=true)](https://ci.appveyor.com/project/AutoMocker/moq-automocker)[![NuGet Status](http://img.shields.io/nuget/v/Moq.AutoMock.svg?style=flat)](https://www.nuget.org/packages/Moq.AutoMock)
 
 An automocking container for Moq. Use this if you're invested in your IoC
 container and want to decouple your unit tests from changes to their 

@@ -1,6 +1,13 @@
-version: 0.5.0.{build}
+
 image: Visual Studio 2017
 configuration: Release
+skip_tags: true
+
+branches:
+  only:
+    - master
+    - release
+
 dotnet_csproj:
   patch: true
   file: '**\*.csproj'
@@ -9,12 +16,31 @@ dotnet_csproj:
   assembly_version: '{version}'
   file_version: '{version}'
   informational_version: '{version}'
+
+before_build:
+- pwsh: msbuild -t:Restore
+
+build:
+  publish_nuget: true
+  publish_nuget_symbols: true
+  verbosity: minimal
+
+deploy:
+- provider: Environment
+  name: NuGet Deploy
+
 nuget:
+  account_feed: false
+  project_feed: true
   disable_publish_on_pr: true
-build_script:
-- ps: dotnet pack -c release Moq.AutoMock
-test_script:
-- ps: dotnet test -c release Moq.AutoMock.Tests
-artifacts:
-- path: '**\*.nupkg'
-deploy: off
+
+for:
+-
+  version: 1.0.{build}-pre
+
+-
+  branches:
+    only:
+      - release
+  version: 1.0.{build}
+

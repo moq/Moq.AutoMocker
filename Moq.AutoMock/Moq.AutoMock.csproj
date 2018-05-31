@@ -7,15 +7,19 @@
     <AssemblyName>Moq.AutoMock</AssemblyName>
     <AssemblyTitle>Moq.AutoMocker</AssemblyTitle>
     <Product>Moq.AutoMocker</Product>
-    <Copyright>Copyright © 2016</Copyright>
+    <Copyright>Copyright © 2018</Copyright>
 
     <Version>0.5.0</Version>
-    <Authors>Tim Kellogg</Authors>
+    <Authors>Tim Kellogg,Adam Hewitt,Kevin Bost</Authors>
     <PackageDescription>An auto-mocking container that generates mocks using Moq</PackageDescription>
-    <Copyright>Copyright Tim Kellogg 2015</Copyright>
-    <PackageLicenseUrl>https://github.com/tkellogg/Moq.AutoMocker/blob/master/License.md</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/tkellogg/Moq.AutoMocker</PackageProjectUrl>
-		<Tags>moq;automocking;testing;TDD</Tags>
+    <Copyright>Copyright Tim Kellogg 2018</Copyright>
+    <PackageLicenseUrl>https://github.com/moq/Moq.AutoMocker/blob/master/License.md</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/moq/Moq.AutoMocker/Moq.AutoMocker</PackageProjectUrl>
+    <Tags>moq;automocking;testing;TDD</Tags>
+
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <DebugType>embedded</DebugType>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -24,8 +28,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-62925-02" />
     <PackageReference Include="Moq" version="4.8.2" />
   </ItemGroup>
+  
   <ItemGroup>
     <!--<Compile Include="**\*.cs" Exclude="**\*.generated.cs"/>
     <Compile Include="AutoMocker.Combine.cs.generated.cs">
