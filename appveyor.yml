@@ -44,3 +44,5 @@ for:
 
 -
   deploy: off
+  init:
+  - pwsh: appveyor UpdateBuild -Version "$env:APPVEYOR_BUILD_VERSION-ci$env:APPVEYOR_BUILD_ID"
