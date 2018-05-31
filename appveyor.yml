@@ -3,11 +3,6 @@ image: Visual Studio 2017
 configuration: Release
 skip_tags: true
 
-branches:
-  only:
-    - master
-    - release
-
 dotnet_csproj:
   patch: true
   file: '**\*.csproj'
@@ -41,3 +36,11 @@ for:
       - master
   init:
   - pwsh: appveyor UpdateBuild -Version "$env:APPVEYOR_BUILD_VERSION-pre"
+
+-
+  branches:
+    only:
+      - release
+
+-
+  deploy: off
