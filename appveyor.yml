@@ -1,12 +1,7 @@
-
+version: 1.0.{build}
 image: Visual Studio 2017
 configuration: Release
 skip_tags: true
-
-branches:
-  only:
-    - master
-    - release
 
 dotnet_csproj:
   patch: true
@@ -36,11 +31,18 @@ nuget:
 
 for:
 -
-  version: 1.0.{build}-pre
+  branches:
+    only:
+      - master
+  init:
+  - pwsh: appveyor UpdateBuild -Version "$env:APPVEYOR_BUILD_VERSION-pre"
 
 -
   branches:
     only:
       - release
-  version: 1.0.{build}
 
+-
+  deploy: off
+  init:
+  - pwsh: appveyor UpdateBuild -Version "$env:APPVEYOR_BUILD_VERSION-ci$env:APPVEYOR_BUILD_ID"
