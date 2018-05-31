@@ -37,7 +37,7 @@ nuget:
 for:
 -
   branches:
-    except:
-      - release
+    only:
+      - master
   init:
   - pwsh: appveyor UpdateBuild -Version "$env:APPVEYOR_BUILD_VERSION-pre"
