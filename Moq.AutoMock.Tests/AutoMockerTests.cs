@@ -143,6 +143,21 @@ namespace Moq.AutoMock.Tests
                 var mock = Mock.Get(instance.Empty);
                 Assert.IsNotNull(mock);
                 Assert.AreEqual(MockBehavior.Strict, mock.Behavior);
+                Assert.AreEqual(MockBehavior.Strict, strictMocker.MockBehavior);
+                Assert.AreEqual(DefaultValue.Empty, strictMocker.DefaultValue);
+            }
+
+            [TestMethod]
+            public void It_creates_mock_objects_for_ctor_parameters_with_loose_behavior()
+            {
+                var looseMocker = new AutoMocker(MockBehavior.Loose, DefaultValue.Mock);
+
+                var instance = looseMocker.CreateInstance<WithService>();
+                var mock = Mock.Get(instance.Service);
+                Assert.IsNotNull(instance.Service.Other);
+                Assert.AreEqual(MockBehavior.Loose, mock.Behavior);
+                Assert.AreEqual(MockBehavior.Loose, looseMocker.MockBehavior);
+                Assert.AreEqual(DefaultValue.Mock, looseMocker.DefaultValue);
             }
 
             [TestMethod]
@@ -471,6 +486,7 @@ namespace Moq.AutoMock.Tests
                 var _ = mocker.CreateInstance<WithService>();
                 var ex = Assert.ThrowsException<MockException>(() => mocker.VerifyAll());
                 Assert.IsTrue(ex.IsVerificationError);
+                // TODO: short of string matching "=>" how to verify both errors were caught in a single exception?
             }
 
             [TestMethod]

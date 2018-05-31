@@ -14,6 +14,8 @@ namespace Moq.AutoMock
     public partial class AutoMocker
     {
         private readonly Dictionary<Type, IInstance> typeMap = new Dictionary<Type, IInstance>();
+        private readonly MockRepositoryShim mockRepository;
+        private readonly MethodInfo mockRepositoryCreateMethod;
 
         public AutoMocker()
             : this(MockBehavior.Default)
@@ -32,14 +34,17 @@ namespace Moq.AutoMock
 
         public AutoMocker(MockBehavior mockBehavior, DefaultValue defaultValue, bool callBase)
         {
-            this.MockBehavior = mockBehavior;
-            this.DefaultValue = defaultValue;
-            this.CallBase = callBase;
+            mockRepository = new MockRepositoryShim(mockBehavior)
+            {
+                DefaultValue = defaultValue,
+                CallBase = callBase
+            };
+            mockRepositoryCreateMethod = mockRepository.GetType().GetMethod("Create", new Type[] { });
         }
 
-        public MockBehavior MockBehavior { get; private set; }
-        public DefaultValue DefaultValue { get; private set; }
-        public bool CallBase { get; private set; }
+        public MockBehavior MockBehavior => this.mockRepository.MockBehavior;
+        public DefaultValue DefaultValue => this.mockRepository.DefaultValue;
+        public bool CallBase => this.mockRepository.CallBase;
 
         /// <summary>
         /// Constructs an instance from known services. Any dependancies (constructor arguments)
@@ -121,9 +126,8 @@ namespace Moq.AutoMock
         public T CreateSelfMock<T>(bool enablePrivate) where T : class
         {
             var arguments = CreateArguments<T>(GetBindingFlags(enablePrivate));
-            var mock = new Mock<T>(MockBehavior, arguments);
-            SetMockProperties(mock);
-            // TODO: add to typeMap?
+            var mock = mockRepository.Create<T>(arguments);
+            typeMap.Add(typeof(T), new MockInstance(mock));
             return mock.Object;
         }
 
@@ -158,16 +162,9 @@ namespace Moq.AutoMock
 
         private Mock CreateMockOf(Type type)
         {
-            var mockType = typeof(Mock<>).MakeGenericType(type);
-            var mock = (Mock)Activator.CreateInstance(mockType, MockBehavior);
-            SetMockProperties(mock);
+            MethodInfo generic = mockRepositoryCreateMethod.MakeGenericMethod(type);
+            var mock = (Mock)generic.Invoke(mockRepository, null);
             return mock;
-        }
-
-        private void SetMockProperties(Mock mock)
-        {
-            mock.DefaultValue = DefaultValue;
-            mock.CallBase = CallBase;
         }
 
         /// <summary>
@@ -187,6 +184,11 @@ namespace Moq.AutoMock
             if (type == null) throw new ArgumentNullException(nameof(type));
             if (service != null && !type.IsInstanceOfType(service))
                 throw new ArgumentException($"{nameof(service)} is not of type {type}");
+            Mock serviceMock = service as Mock;
+            if (serviceMock != null)
+            {
+                mockRepository.Add(serviceMock);
+            }
             typeMap[type] = new RealInstance(service);
         }
 
@@ -198,6 +200,7 @@ namespace Moq.AutoMock
         public void Use<TService>(Mock<TService> mockedService)
             where TService : class
         {
+            mockRepository.Add(mockedService);
             typeMap[typeof(TService)] = new MockInstance(mockedService);
         }
 
@@ -257,11 +260,7 @@ namespace Moq.AutoMock
         /// </summary>
         public void VerifyAll()
         {
-            foreach (var pair in typeMap)
-            {
-                if (pair.Value.IsMock)
-                    ((MockInstance)pair.Value).Mock.VerifyAll();
-            }
+            mockRepository.VerifyAll();
         }
 
         /// <summary>
@@ -269,11 +268,7 @@ namespace Moq.AutoMock
         /// </summary>
         public void Verify()
         {
-            foreach (var pair in typeMap)
-            {
-                if (pair.Value.IsMock)
-                    ((MockInstance)pair.Value).Mock.Verify();
-            }
+            mockRepository.Verify();
         }
 
         /// <summary>
