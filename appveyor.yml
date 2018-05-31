@@ -39,4 +39,5 @@ for:
   branches:
     except:
       - release
-  version: $(APPVEYOR_BUILD_VERSION)-pre
+  init:
+  - pwsh: appveyor UpdateBuild -Version "$env:APPVEYOR_BUILD_VERSION-pre"
