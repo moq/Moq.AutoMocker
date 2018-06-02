@@ -91,7 +91,7 @@ namespace Moq.AutoMock
             var arguments = CreateArguments(type, bindingFlags);
             try
             {
-                var ctor = ConstructorSelector.SelectFor(type, typeMap.Keys.ToArray(), bindingFlags);
+                var ctor = type.SelectCtor(typeMap.Keys.ToArray(), bindingFlags);
                 return ctor.Invoke(arguments);
             }
             catch (TargetInvocationException e)
@@ -110,7 +110,7 @@ namespace Moq.AutoMock
 
         private object[] CreateArguments(Type type, BindingFlags bindingFlags)
         {
-            var ctor = ConstructorSelector.SelectFor(type, typeMap.Keys.ToArray(), bindingFlags);
+            var ctor = type.SelectCtor(typeMap.Keys.ToArray(), bindingFlags);
             var arguments = ctor.GetParameters().Select(x => GetObjectFor(x.ParameterType)).ToArray();
             return arguments;
         }
