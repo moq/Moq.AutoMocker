@@ -32,14 +32,14 @@ namespace Moq.AutoMock
 
         public AutoMocker(MockBehavior mockBehavior, DefaultValue defaultValue, bool callBase)
         {
-            this.MockBehavior = mockBehavior;
-            this.DefaultValue = defaultValue;
-            this.CallBase = callBase;
+            MockBehavior = mockBehavior;
+            DefaultValue = defaultValue;
+            CallBase = callBase;
         }
 
-        public MockBehavior MockBehavior { get; private set; }
-        public DefaultValue DefaultValue { get; private set; }
-        public bool CallBase { get; private set; }
+        public MockBehavior MockBehavior { get; }
+        public DefaultValue DefaultValue { get; }
+        public bool CallBase { get; }
 
         /// <summary>
         /// Constructs an instance from known services. Any dependancies (constructor arguments)
@@ -123,10 +123,8 @@ namespace Moq.AutoMock
         /// </summary>
         /// <typeparam name="T">The instance that you want to build</typeparam>
         /// <returns>An instance with virtual and abstract members mocked</returns>
-        public T CreateSelfMock<T>() where T : class
-        {
-            return CreateSelfMock<T>(false);
-        }
+        public T CreateSelfMock<T>() where T : class 
+            => CreateSelfMock<T>(false);
 
         /// <summary>
         /// Constructs a self-mock from the services available in the container. A self-mock is
@@ -369,8 +367,9 @@ namespace Moq.AutoMock
 
         private static Mock As(Mock mock, Type forInterface)
         {
-            var genericMethodDef = mock.GetType().GetMethods().Where(x => x.Name == "As");
-            var method = genericMethodDef.First().MakeGenericMethod(forInterface);
+            var method = mock.GetType().GetMethods()
+                .First(x => x.Name == nameof(Mock.As))
+                .MakeGenericMethod(forInterface);
             return (Mock) method.Invoke(mock, null);
         }
 
