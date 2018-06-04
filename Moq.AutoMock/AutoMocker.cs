@@ -49,11 +49,8 @@ namespace Moq.AutoMock
         /// <typeparam name="T">A concrete type</typeparam>
         /// <returns>An instance of T with all constructor arguments derrived from services 
         /// setup in the container.</returns>
-        public T CreateInstance<T>()
-            where T : class
-        {
-            return CreateInstance<T>(false);
-        }
+        public T CreateInstance<T>() where T : class
+            => CreateInstance<T>(false);
 
         /// <summary>
         /// Constructs an instance from known services. Any dependancies (constructor arguments)
@@ -65,14 +62,37 @@ namespace Moq.AutoMock
         /// create mocks.</param>
         /// <returns>An instance of T with all constructor arguments derrived from services 
         /// setup in the container.</returns>
-        public T CreateInstance<T>(bool enablePrivate) where T : class
+        public T CreateInstance<T>(bool enablePrivate) where T : class 
+            => (T)CreateInstance(typeof(T), enablePrivate);
+
+        /// <summary>
+        /// Constructs an instance from known services. Any dependancies (constructor arguments)
+        /// are fulfilled by searching the container or, if not found, automatically generating
+        /// mocks.
+        /// </summary>
+        /// <param name="type">A concrete type</param>
+        /// <returns>An instance of type with all constructor arguments derived from services 
+        /// setup in the container.</returns>
+        public object CreateInstance(Type type) => CreateInstance(type, false);
+
+        /// <summary>
+        /// Constructs an instance from known services. Any dependancies (constructor arguments)
+        /// are fulfilled by searching the container or, if not found, automatically generating
+        /// mocks.
+        /// </summary>
+        /// <param name="type">A concrete type</param>
+        /// <param name="enablePrivate">When true, private constructors will also be used to
+        /// create mocks.</param>
+        /// <returns>An instance of type with all constructor arguments derived from services 
+        /// setup in the container.</returns>
+        public object CreateInstance(Type type, bool enablePrivate)
         {
             var bindingFlags = GetBindingFlags(enablePrivate);
-            var arguments = CreateArguments<T>(bindingFlags);
+            var arguments = CreateArguments(type, bindingFlags);
             try
             {
-                var ctor = ConstructorSelector.SelectFor(typeof(T), typeMap.Keys.ToArray(), bindingFlags);
-                return (T) ctor.Invoke(arguments);
+                var ctor = ConstructorSelector.SelectFor(type, typeMap.Keys.ToArray(), bindingFlags);
+                return ctor.Invoke(arguments);
             }
             catch (TargetInvocationException e)
             {
@@ -88,9 +108,9 @@ namespace Moq.AutoMock
             return bindingFlags;
         }
 
-        private object[] CreateArguments<T>(BindingFlags bindingFlags) where T : class
+        private object[] CreateArguments(Type type, BindingFlags bindingFlags)
         {
-            var ctor = ConstructorSelector.SelectFor(typeof(T), typeMap.Keys.ToArray(), bindingFlags);
+            var ctor = ConstructorSelector.SelectFor(type, typeMap.Keys.ToArray(), bindingFlags);
             var arguments = ctor.GetParameters().Select(x => GetObjectFor(x.ParameterType)).ToArray();
             return arguments;
         }
@@ -120,7 +140,7 @@ namespace Moq.AutoMock
         /// <returns>An instance with virtual and abstract members mocked</returns>
         public T CreateSelfMock<T>(bool enablePrivate) where T : class
         {
-            var arguments = CreateArguments<T>(GetBindingFlags(enablePrivate));
+            var arguments = CreateArguments(typeof(T), GetBindingFlags(enablePrivate));
             var mock = new Mock<T>(MockBehavior, arguments);
             SetMockProperties(mock);
             // TODO: add to typeMap?
