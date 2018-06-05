@@ -9,40 +9,6 @@ namespace Moq.AutoMock.Tests
     {
         private const BindingFlags DefaultBindingFlags = BindingFlags.Instance | BindingFlags.Public;
 
-        #region Types used for testing
-        class WithDefaultAndSingleParameter
-        {
-            public WithDefaultAndSingleParameter() { }
-            public WithDefaultAndSingleParameter(IService1 service1) { }
-        }
-
-        class With3Parameters
-        {
-            public With3Parameters() { }
-            public With3Parameters(IService1 service1) { }
-            public With3Parameters(IService1 service1, IService2 service2) { }
-        }
-
-        class WithSealedParameter
-        {
-            public WithSealedParameter() {}
-            public WithSealedParameter(string @sealed) {}
-        }
-
-        class WithArrayParameter
-        {
-            public WithArrayParameter() { }
-            public WithArrayParameter(string[] array) { }
-            public WithArrayParameter(string[] array, string @sealed) { }
-        }
-
-        class WithPrivateConstructor
-        {
-            public WithPrivateConstructor(IService1 service1) { }
-            private WithPrivateConstructor(IService1 service1, IService2 service2) { }
-        }
-        #endregion
-
         [TestMethod]
         public void It_chooses_the_ctor_with_arguments()
         {
