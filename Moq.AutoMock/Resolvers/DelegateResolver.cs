@@ -9,9 +9,8 @@ namespace Moq.AutoMock.Resolvers
     {
         public void Resolve(MockResolutionContext context)
         {
-            if (context == null) return;
+            var (am, serviceType, value) = context ?? throw new ArgumentNullException(nameof(context));
 
-            var (am, serviceType, value) = context;
             if (!typeof(Delegate).GetTypeInfo().IsAssignableFrom(serviceType.GetTypeInfo()))
                 return; //We aren't a delegate
 

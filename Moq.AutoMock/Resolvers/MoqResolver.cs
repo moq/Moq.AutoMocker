@@ -19,7 +19,8 @@ namespace Moq.AutoMock.Resolvers
 
         public void Resolve(MockResolutionContext context)
         {
-            if (context is null) return;
+            if (context is null) throw new ArgumentNullException(nameof(context));
+
             if (context.Value is null)
             {
                 var mockType = typeof(Mock<>).MakeGenericType(context.RequestType);

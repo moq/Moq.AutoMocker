@@ -51,25 +51,29 @@ namespace Moq.AutoMock
                 return instance;
             }
 
+            var resolved = Resolve(serviceType, null);
+            switch (resolved)
+            {
+                case Mock mock: return new MockInstance(mock);
+                case IInstance instance: return instance;
+                case object o: return new RealInstance(resolved);
+                default: return null;
+            }
+        }
+        private object Resolve(Type serviceType, object initialValue)
+        {
             var context = new MockResolutionContext
             {
                 AutoMocker = this,
                 RequestType = serviceType,
-                Value = null //or default to a Mock<T>? MoqResolver is our first Resolver and will create one
+                Value = initialValue
             };
 
             foreach (var r in Resolvers)
                 r.Resolve(context);
 
-            switch (context.Value)
-            {
-                case Mock mock: return new MockInstance(mock);
-                case IInstance instance: return instance;
-                case object o: return new RealInstance(o);
-                default: return null;
-            }
+            return context.Value;
         }
-
 
         #region Create Instance/SelfMock
 
@@ -157,18 +161,9 @@ namespace Moq.AutoMock
         public T CreateSelfMock<T>(bool enablePrivate) where T : class
         {
             var arguments = CreateArguments(typeof(T), GetBindingFlags(enablePrivate));
-            var context = new MockResolutionContext
-            {
-                AutoMocker = this,
-                RequestType = typeof(T),
-                Value = new Mock<T>(MockBehavior, arguments)
-            };
 
-            foreach (var r in Resolvers)
-                r.Resolve(context);
-
-            // TODO: add to typeMap?
-            return (context.Value as Mock<T>)?.Object;
+            var resolved = Resolve(typeof(T), new Mock<T>(MockBehavior, arguments));
+            return (resolved as Mock<T>)?.Object;
         }
 
         #endregion Create Instance/SelfMock
@@ -240,6 +235,8 @@ namespace Moq.AutoMock
             if (!typeMap.TryGetValue(serviceType, out var instance) || instance is null)
                 instance = typeMap[serviceType] = Resolve(serviceType);
 
+            if (instance == null)
+                throw new ArgumentException($"{serviceType} could not resolve to an object.", nameof(serviceType));
             return instance.Value;
         }
 
@@ -274,7 +271,7 @@ namespace Moq.AutoMock
             if (!typeMap.TryGetValue(serviceType, out var instance) || instance is null)
                 instance = typeMap[serviceType] = Resolve(serviceType);
 
-            if (!instance.IsMock)
+            if (instance == null || !instance.IsMock)
                 throw new ArgumentException($"Registered service `{Get(serviceType).GetType()}` was not a mock");
 
             var mockInstance = (MockInstance) instance;
