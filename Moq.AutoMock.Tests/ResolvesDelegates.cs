@@ -12,10 +12,10 @@ namespace Moq.AutoMock.Tests
         delegate object OneParamDelegate(int p);
         delegate long TwoParamDelegate(int p, object foo);
 
-        [DataTestMethod, DynamicData(nameof(Delegates))]
+        [DataTestMethod, DynamicData(nameof(Funcs))]
         public void ResolvesFuncReturningDefinedParameter(Type delegateType, object expected)
         {
-            var mocker = new AutoMocker { Resolvers = { new DelegateResolver() } };
+            var mocker = new AutoMocker { Resolvers = { new FuncResolver() } };
             mocker.Use(expected.GetType(), expected);
 
             var func = (Delegate)mocker.Get(delegateType);
@@ -24,7 +24,7 @@ namespace Moq.AutoMock.Tests
             var @params = new object[delegateType.GetMethod("Invoke").GetParameters().Length];
             Assert.AreEqual(expected, func.DynamicInvoke(@params));
         }
-        static IEnumerable<object[]> Delegates
+        static IEnumerable<object[]> Funcs
         {
             get
             {
@@ -33,9 +33,6 @@ namespace Moq.AutoMock.Tests
                 yield return new object[] { typeof(Func<object, string>), nameof(ResolvesDelegates) };
                 yield return new object[] { typeof(Func<object, ResolvesDelegates, string>), nameof(ResolvesDelegates) };
                 yield return new object[] { typeof(Func<string, int, Service2>), new Service2() };
-                yield return new object[] { typeof(ZeroParamDelegate), nameof(Service2) };
-                yield return new object[] { typeof(OneParamDelegate), new object() };
-                yield return new object[] { typeof(TwoParamDelegate), 42L };
             }
         }
     }
