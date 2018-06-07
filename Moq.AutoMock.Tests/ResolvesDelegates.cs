@@ -21,7 +21,7 @@ namespace Moq.AutoMock.Tests
             var func = (Delegate)mocker.Get(delegateType);
             Assert.IsNotNull(func);
 
-            var @params = new object[delegateType.GetMethod("Invoke").GetParameters().Length];
+            var @params = new object[delegateType.GetGenericArguments().Length - 1];
             Assert.AreEqual(expected, func.DynamicInvoke(@params));
         }
         static IEnumerable<object[]> Funcs
