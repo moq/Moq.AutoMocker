@@ -1,7 +1,9 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moq.AutoMock", "Moq.AutoMock\Moq.AutoMock.csproj", "{EEEF1922-71E6-443B-A86B-14742AB8E9C0}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2026
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.AutoMock", "Moq.AutoMock\Moq.AutoMock.csproj", "{EEEF1922-71E6-443B-A86B-14742AB8E9C0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{F30C4A7C-42F1-4A53-835B-C1481267D569}"
 	ProjectSection(SolutionItems) = preProject
@@ -9,7 +11,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{F30C4A
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moq.AutoMock.Tests", "Moq.AutoMock.Tests\Moq.AutoMock.Tests.csproj", "{EE94D503-6880-44FF-B23A-B11D521BAB7A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.AutoMock.Tests", "Moq.AutoMock.Tests\Moq.AutoMock.Tests.csproj", "{EE94D503-6880-44FF-B23A-B11D521BAB7A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5698188E-884A-49D3-A74B-FF98C782BF15}"
+	ProjectSection(SolutionItems) = preProject
+		appveyor.yml = appveyor.yml
+		LICENSE.md = LICENSE.md
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,5 +37,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1A499C6A-1AB1-4A04-A133-BBCF4759DACA}
 	EndGlobalSection
 EndGlobal
