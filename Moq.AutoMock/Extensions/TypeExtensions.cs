@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace Moq.AutoMock.Extensions
 {
-    public static class TypeExtensions
+    internal static class TypeExtensions
     {
         internal static bool TryCompileGetter(this AutoMocker autoMocker, Type funcType, out Delegate @delegate)
         {
