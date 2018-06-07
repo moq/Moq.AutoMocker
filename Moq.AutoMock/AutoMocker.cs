@@ -62,12 +62,7 @@ namespace Moq.AutoMock
         }
         private object Resolve(Type serviceType, object initialValue)
         {
-            var context = new MockResolutionContext
-            {
-                AutoMocker = this,
-                RequestType = serviceType,
-                Value = initialValue
-            };
+            var context = new MockResolutionContext(this, serviceType, initialValue);
 
             foreach (var r in Resolvers)
                 r.Resolve(context);
@@ -375,8 +370,8 @@ namespace Moq.AutoMock
         {
             foreach (var pair in typeMap)
             {
-                if (pair.Value.IsMock)
-                    ((MockInstance)pair.Value).Mock.VerifyAll();
+                if (pair.Value is MockInstance instance)
+                    instance.Mock.VerifyAll();
             }
         }
 
@@ -387,8 +382,8 @@ namespace Moq.AutoMock
         {
             foreach (var pair in typeMap)
             {
-                if (pair.Value.IsMock)
-                    ((MockInstance)pair.Value).Mock.Verify();
+                if (pair.Value is MockInstance instance)
+                    instance.Mock.Verify();
             }
         }
 
