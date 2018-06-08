@@ -21,16 +21,14 @@ namespace Moq.AutoMock.Resolvers
         {
             if (context is null) throw new ArgumentNullException(nameof(context));
 
-            if (context.Value is null)
-            {
-                var mockType = typeof(Mock<>).MakeGenericType(context.RequestType);
-                context.Value = Activator.CreateInstance(mockType, _mockBehavior);
-            }
+            if (!(context.Value is null)) return;
 
-            if (context.Value is Mock mock)
+            var mockType = typeof(Mock<>).MakeGenericType(context.RequestType);
+            if (Activator.CreateInstance(mockType, _mockBehavior) is Mock mock)
             {
                 mock.DefaultValue = _defaultValue;
                 mock.CallBase = _callBase;
+                context.Value = mock;
             }
         }
     }

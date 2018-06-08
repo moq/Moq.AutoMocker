@@ -34,11 +34,21 @@ namespace Moq.AutoMock
         public AutoMocker(MockBehavior mockBehavior, DefaultValue defaultValue, bool callBase)
         {
             MockBehavior = mockBehavior;
-            Resolvers.Add(new MoqResolver(mockBehavior, defaultValue, callBase));
+            DefaultValue = defaultValue;
+            CallBase = callBase;
+
+            Resolvers = new List<IMockResolver>
+            {
+                new MoqResolver(mockBehavior, defaultValue, callBase),
+                new FuncResolver(),
+                new LazyResolver()
+            };
         }
 
         public MockBehavior MockBehavior { get; }
-        public ICollection<IMockResolver> Resolvers { get; } = new List<IMockResolver>();
+        public DefaultValue DefaultValue { get; }
+        public bool CallBase { get; }
+        public ICollection<IMockResolver> Resolvers { get; }
 
         private IInstance Resolve(Type serviceType)
         {
@@ -157,7 +167,12 @@ namespace Moq.AutoMock
         {
             var arguments = CreateArguments(typeof(T), GetBindingFlags(enablePrivate));
 
-            var resolved = Resolve(typeof(T), new Mock<T>(MockBehavior, arguments));
+            var mock = new Mock<T>(MockBehavior, arguments)
+            {
+                DefaultValue = DefaultValue,
+                CallBase = CallBase
+            };
+            var resolved = Resolve(typeof(T), mock);
             return (resolved as Mock<T>)?.Object;
         }
 
