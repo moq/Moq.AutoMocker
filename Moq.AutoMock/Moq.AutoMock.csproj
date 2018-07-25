@@ -13,8 +13,8 @@
     <Authors>Tim Kellogg,Adam Hewitt,Kevin Bost</Authors>
     <PackageDescription>An auto-mocking container that generates mocks using Moq</PackageDescription>
     <Copyright>Copyright Tim Kellogg 2018</Copyright>
-    <PackageLicenseUrl>https://github.com/moq/Moq.AutoMocker/blob/master/License.md</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/moq/Moq.AutoMocker/Moq.AutoMocker</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/moq/Moq.AutoMocker/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/moq/Moq.AutoMocker</PackageProjectUrl>
     <Tags>moq;automocking;testing;TDD</Tags>
 
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
