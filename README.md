@@ -45,7 +45,7 @@ var mocker = new AutoMocker();
 mocker.Use<IDriveTrain>(x => x.Accelerate(42) == true);
 
 var car = mocker.CreateInstance<Car>();
-car.Accelarate(42);
+car.Accelerate(42);
 
 // Then extract & verify
 var driveTrainMock = mocker.GetMock<IDriveTrain>();
@@ -59,7 +59,7 @@ var mocker = new AutoMocker();
 mocker.Use<IDriveTrain>(x => x.Accelerate(42) == true);
 
 var car = mocker.CreateInstance<Car>();
-car.Accelarate(42);
+car.Accelerate(42);
 
 // This method verifies all mocks in the container
 mocker.VerifyAll();
