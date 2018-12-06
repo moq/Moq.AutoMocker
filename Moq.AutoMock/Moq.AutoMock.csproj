@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.4</TargetFramework>
+    <TargetFrameworks>net45;netstandard1.3</TargetFrameworks>
     <OutputType>Library</OutputType>
     <RootNamespace>Moq.AutoMock</RootNamespace>
     <AssemblyName>Moq.AutoMock</AssemblyName>
@@ -13,7 +13,7 @@
     <Authors>Tim Kellogg,Adam Hewitt,Kevin Bost</Authors>
     <PackageDescription>An auto-mocking container that generates mocks using Moq</PackageDescription>
     <Copyright>Copyright Tim Kellogg 2018</Copyright>
-    <PackageLicenseUrl>https://github.com/moq/Moq.AutoMocker/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/moq/Moq.AutoMocker</PackageProjectUrl>
     <Tags>moq;automocking;testing;TDD</Tags>
 
@@ -32,12 +32,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <!--<Compile Include="**\*.cs" Exclude="**\*.generated.cs"/>
-    <Compile Include="AutoMocker.Combine.cs.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>AutoMocker.Combine.cs.tt</DependentUpon>
-    </Compile>-->
+    <None Include="..\LICENSE" Pack="true" PackagePath="$(PackageLicenseFile)"/>
     <None Include="AutoMocker.Combine.cs.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AutoMocker.Combine.cs.generated.cs</LastGenOutput>
