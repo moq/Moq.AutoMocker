@@ -32,7 +32,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <None Include="..\LICENSE" Pack="true" PackagePath="$(PackageLicenseFile)"/>
+    <None Include="..\LICENSE" Pack="true" PackagePath=""/>
     <None Include="AutoMocker.Combine.cs.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AutoMocker.Combine.cs.generated.cs</LastGenOutput>
