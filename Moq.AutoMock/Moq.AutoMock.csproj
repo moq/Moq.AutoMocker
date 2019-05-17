@@ -17,6 +17,10 @@
     <PackageProjectUrl>https://github.com/moq/Moq.AutoMocker</PackageProjectUrl>
     <Tags>moq;automocking;testing;TDD</Tags>
 
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- Suppress CS1591: Missing XML comment for publicly visible type or member -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),CS1591</WarningsNotAsErrors>
+
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <DebugType>embedded</DebugType>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
