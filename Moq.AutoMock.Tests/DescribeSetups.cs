@@ -87,5 +87,19 @@ namespace Moq.AutoMock.Tests
 
             Assert.AreEqual("aname", mock.Name);
         }
+
+        [TestMethod]
+        public void You_can_setup_a_method_that_returns_diffrent_result_in_sequence()
+        {
+            var mocker = new AutoMocker();
+            mocker.SetupSequence<IService4, string>(p => p.MainMethodName(It.IsAny<string>()))
+                .Returns("t1")
+                .Returns("t2");
+
+            var mock = mocker.Get<IService4>();
+
+            Assert.AreEqual("t1", mock.MainMethodName("any"));
+            Assert.AreEqual("t2", mock.MainMethodName("any"));
+        }
     }
 }
