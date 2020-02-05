@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
+using Moq.Language;
 
 namespace Moq.AutoMock
 {
@@ -346,6 +347,18 @@ namespace Moq.AutoMock
             return mock;
         }
 
+        /// <summary>
+        /// Shortcut for mock.SetupSequence(), creating the mock when necessary
+        /// </summary>
+        /// <typeparam name="TService"></typeparam>
+        /// <typeparam name="TReturn"></typeparam>
+        /// <returns></returns>
+        public ISetupSequentialResult<TReturn> SetupSequence<TService, TReturn>(Expression<Func<TService, TReturn>> setup)
+            where TService : class
+        {
+            return Setup<ISetupSequentialResult<TReturn>, TService>(m => m.SetupSequence(setup));
+        }
+
         #endregion
 
         #region Combine
@@ -503,6 +516,5 @@ namespace Moq.AutoMock
         }
 
         #endregion
-
     }
 }
