@@ -96,7 +96,7 @@ namespace Moq.AutoMock.Tests
                 .Returns("t1")
                 .Returns("t2");
 
-            var mock = mocker.Get<IService4>();
+            var mock = mocker.Get<IService4>()!;
 
             Assert.AreEqual("t1", mock.MainMethodName("any"));
             Assert.AreEqual("t2", mock.MainMethodName("any"));
