@@ -27,7 +27,7 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
-        public void It_creates_a_mock_if_the_oject_is_missing()
+        public void It_creates_a_mock_if_the_object_is_missing()
         {
             var mocker = new AutoMocker();
             var mock = mocker.GetMock<IService1>();
@@ -52,7 +52,7 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
-        public void ExtractMock_throws_ArgumentException_when_object_isnt_A_mock()
+        public void ExtractMock_throws_ArgumentException_when_object_is_not_A_mock()
         {
             var mocker = new AutoMocker();
             mocker.Use<IService2>(new Service2());
