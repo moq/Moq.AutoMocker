@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <OutputType>Library</OutputType>
     <RootNamespace>Moq.AutoMock</RootNamespace>
     <AssemblyName>Moq.AutoMock</AssemblyName>
@@ -41,5 +41,6 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AutoMocker.Combine.cs.generated.cs</LastGenOutput>
     </None>
+    <Compile Include="..\System.Diagnostics.CodeAnalysis.cs" />
   </ItemGroup>
 </Project>
