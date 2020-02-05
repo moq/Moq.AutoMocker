@@ -18,7 +18,7 @@ namespace Moq.AutoMock.Tests
             var mocker = new AutoMocker { Resolvers = { new FuncResolver() } };
             mocker.Use(expected.GetType(), expected);
 
-            var func = (Delegate)mocker.Get(delegateType);
+            var func = (Delegate)mocker.Get(delegateType)!;
             Assert.IsNotNull(func);
 
             var @params = new object[delegateType.GetGenericArguments().Length - 1];

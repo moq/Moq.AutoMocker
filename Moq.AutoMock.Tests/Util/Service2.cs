@@ -2,11 +2,11 @@
 {
     public class Service2 : IService2
     {
-        public IService1 Other
+        public IService1? Other
         {
             get { return null; }
         }
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
     }
 }

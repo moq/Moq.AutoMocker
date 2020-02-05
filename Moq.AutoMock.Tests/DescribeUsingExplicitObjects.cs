@@ -29,7 +29,7 @@ namespace Moq.AutoMock.Tests
         public void Adding_an_instance_will_replace_existing_setups()
         {
             var mocker = new AutoMocker();
-            mocker.Use<IService2>(x => x.Other.ToString() == "kittens");
+            mocker.Use<IService2>(x => x.Other!.ToString() == "kittens");
             var otherService = Mock.Of<IService2>();
             mocker.Use(otherService);
             Assert.AreSame(otherService, mocker.Get<IService2>());

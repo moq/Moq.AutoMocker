@@ -1,18 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
 
   <PropertyGroup>
-    <TargetFrameworks>net45;netstandard1.3</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     <OutputType>Library</OutputType>
     <RootNamespace>Moq.AutoMock</RootNamespace>
     <AssemblyName>Moq.AutoMock</AssemblyName>
     <AssemblyTitle>Moq.AutoMocker</AssemblyTitle>
     <Product>Moq.AutoMocker</Product>
-    <Copyright>Copyright © 2018</Copyright>
+    <Copyright>Copyright © 2020</Copyright>
 
     <Version>0.5.0</Version>
     <Authors>Tim Kellogg,Adam Hewitt,Kevin Bost</Authors>
     <PackageDescription>An auto-mocking container that generates mocks using Moq</PackageDescription>
-    <Copyright>Copyright Tim Kellogg 2018</Copyright>
+    <Copyright>Copyright Tim Kellogg 2020</Copyright>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/moq/Moq.AutoMocker</PackageProjectUrl>
     <Tags>moq;automocking;testing;TDD</Tags>
@@ -31,12 +31,12 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-62925-02" PrivateAssets="All" />
-    <PackageReference Include="Moq" version="4.8.2" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
+    <PackageReference Include="Moq" version="4.13.1" />
   </ItemGroup>
   
   <ItemGroup>
-    <None Include="..\LICENSE" Pack="true" PackagePath=""/>
+    <None Include="..\LICENSE" Pack="true" PackagePath="" />
     <None Include="AutoMocker.Combine.cs.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AutoMocker.Combine.cs.generated.cs</LastGenOutput>

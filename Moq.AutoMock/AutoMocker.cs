@@ -62,16 +62,15 @@ namespace Moq.AutoMock
                 return instance;
             }
 
-            var resolved = Resolve(serviceType, null);
-            switch (resolved)
+            object? resolved = Resolve(serviceType, null);
+            return resolved switch
             {
-                case Mock mock: return new MockInstance(mock);
-                case IInstance instance: return instance;
-                case object _: return new RealInstance(resolved);
-                default: return null;
-            }
+                Mock mock => new MockInstance(mock),
+                IInstance instance => instance,
+                _ => new RealInstance(resolved),
+            };
         }
-        private object Resolve(Type serviceType, object initialValue)
+        private object? Resolve(Type serviceType, object? initialValue)
         {
             var context = new MockResolutionContext(this, serviceType, initialValue);
 
@@ -134,6 +133,9 @@ namespace Moq.AutoMock
             try
             {
                 var ctor = type.SelectCtor(typeMap.Keys.ToArray(), bindingFlags);
+                if (ctor is null)
+                    throw new ArgumentException($"`{type}` does not have an acceptable constructor.", nameof(type));
+
                 return ctor.Invoke(arguments);
             }
             catch (TargetInvocationException e)
@@ -151,7 +153,7 @@ namespace Moq.AutoMock
         /// </summary>
         /// <typeparam name="T">The instance that you want to build</typeparam>
         /// <returns>An instance with virtual and abstract members mocked</returns>
-        public T CreateSelfMock<T>() where T : class
+        public T? CreateSelfMock<T>() where T : class 
             => CreateSelfMock<T>(false);
 
         /// <summary>
@@ -164,7 +166,7 @@ namespace Moq.AutoMock
         /// <param name="enablePrivate">When true, private constructors will also be used to
         /// create mocks.</param>
         /// <returns>An instance with virtual and abstract members mocked</returns>
-        public T CreateSelfMock<T>(bool enablePrivate) where T : class
+        public T? CreateSelfMock<T>(bool enablePrivate) where T : class
         {
             var arguments = CreateArguments(typeof(T), GetBindingFlags(enablePrivate));
 
@@ -173,6 +175,7 @@ namespace Moq.AutoMock
                 DefaultValue = DefaultValue,
                 CallBase = CallBase
             };
+            
             var resolved = Resolve(typeof(T), mock);
             return (resolved as Mock<T>)?.Object;
         }
@@ -186,7 +189,7 @@ namespace Moq.AutoMock
         /// </summary>
         /// <typeparam name="TService">The type that the instance will be registered as</typeparam>
         /// <param name="service"></param>
-        public void Use<TService>(TService service) => Use(typeof(TService), service);
+        public void Use<TService>(TService service) => Use(typeof(TService), service!);
 
         /// <summary>
         /// Adds an instance to the container.
@@ -209,7 +212,7 @@ namespace Moq.AutoMock
         public void Use<TService>(Mock<TService> mockedService)
             where TService : class
         {
-            typeMap[typeof(TService)] = new MockInstance(mockedService);
+            typeMap[typeof(TService)] = new MockInstance(mockedService ?? throw new ArgumentNullException(nameof(mockedService)));
         }
 
         /// <summary>
@@ -233,7 +236,8 @@ namespace Moq.AutoMock
         /// </summary>
         /// <typeparam name="TService">The class or interface to search on</typeparam>
         /// <returns>The object that implements TService</returns>
-        public TService Get<TService>() => (TService)Get(typeof(TService));
+        public TService? Get<TService>() where TService : class
+            => Get(typeof(TService)) as TService;
 
         /// <summary>
         /// Searches and retrieves an object from the container that matches the serviceType. This can be
@@ -241,7 +245,7 @@ namespace Moq.AutoMock
         /// </summary>
         /// <param name="serviceType">The type of service to retrieve</param>
         /// <returns></returns>
-        public object Get(Type serviceType)
+        public object? Get(Type serviceType)
         {
             if (!typeMap.TryGetValue(serviceType, out var instance) || instance is null)
                 instance = typeMap[serviceType] = Resolve(serviceType);
@@ -282,7 +286,7 @@ namespace Moq.AutoMock
                 instance = typeMap[serviceType] = Resolve(serviceType);
 
             if (instance == null || !instance.IsMock)
-                throw new ArgumentException($"Registered service `{Get(serviceType).GetType()}` was not a mock");
+                throw new ArgumentException($"Registered service `{Get(serviceType)?.GetType()}` was not a mock");
 
             var mockInstance = (MockInstance)instance;
             return mockInstance.Mock;
@@ -496,9 +500,12 @@ namespace Moq.AutoMock
             return bindingFlags;
         }
 
-        private object[] CreateArguments(Type type, BindingFlags bindingFlags)
+        private object?[] CreateArguments(Type type, BindingFlags bindingFlags)
         {
             var ctor = type.SelectCtor(typeMap.Keys.ToArray(), bindingFlags);
+            if (ctor is null)
+                throw new ArgumentException($"`{type}` does not have an acceptable constructor.", nameof(type));
+
             var arguments = ctor.GetParameters().Select(x => Get(x.ParameterType)).ToArray();
             return arguments;
         }

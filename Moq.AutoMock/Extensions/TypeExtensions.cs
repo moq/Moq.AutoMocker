@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -9,7 +8,7 @@ namespace Moq.AutoMock.Extensions
 {
     internal static class TypeExtensions
     {
-        internal static bool TryCompileGetter(this AutoMocker autoMocker, Type funcType, out Delegate @delegate)
+        internal static bool TryCompileGetter(this AutoMocker autoMocker, Type funcType, out Delegate? @delegate)
         {
             @delegate = null;
             var stInfo = funcType.GetTypeInfo();
