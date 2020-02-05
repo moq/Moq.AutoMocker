@@ -410,7 +410,6 @@ namespace Moq.AutoMock
         /// <param name="expression"></param>
         public void Verify<T, TResult>(Expression<Func<T, TResult>> expression)
             where T : class
-            where TResult : struct
         {
             var mock = GetMock<T>();
             mock.Verify(expression);
@@ -425,7 +424,6 @@ namespace Moq.AutoMock
         /// <param name="times"></param>
         public void Verify<T, TResult>(Expression<Func<T, TResult>> expression, Times times)
             where T : class
-            where TResult : struct
         {
             var mock = GetMock<T>();
             mock.Verify(expression, times);
@@ -440,7 +438,6 @@ namespace Moq.AutoMock
         /// <param name="times"></param>
         public void Verify<T, TResult>(Expression<Func<T, TResult>> expression, Func<Times> times)
             where T : class
-            where TResult : struct
         {
             var mock = GetMock<T>();
             
@@ -456,7 +453,6 @@ namespace Moq.AutoMock
         /// <param name="failMessage"></param>
         public void Verify<T, TResult>(Expression<Func<T, TResult>> expression, String failMessage)
             where T : class
-            where TResult : struct
         {
             var mock = GetMock<T>();
             mock.Verify(expression, failMessage);
@@ -472,7 +468,6 @@ namespace Moq.AutoMock
         /// <param name="failMessage"></param>
         public void Verify<T, TResult>(Expression<Func<T, TResult>> expression, Times times, String failMessage)
             where T : class
-            where TResult : struct
         {
             var mock = GetMock<T>();
             mock.Verify(expression, times, failMessage);
