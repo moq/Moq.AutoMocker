@@ -128,6 +128,8 @@ namespace Moq.AutoMock
         /// setup in the container.</returns>
         public object CreateInstance(Type type, bool enablePrivate)
         {
+            if (type is null) throw new ArgumentNullException(nameof(type));
+
             var bindingFlags = GetBindingFlags(enablePrivate);
             var arguments = CreateArguments(type, bindingFlags);
             try
@@ -247,6 +249,8 @@ namespace Moq.AutoMock
         /// <returns></returns>
         public object? Get(Type serviceType)
         {
+            if (serviceType is null) throw new ArgumentNullException(nameof(serviceType));
+
             if (!typeMap.TryGetValue(serviceType, out var instance) || instance is null)
                 instance = typeMap[serviceType] = Resolve(serviceType);
 
@@ -375,6 +379,8 @@ namespace Moq.AutoMock
         /// </summary>
         public void Combine(Type type, params Type[] forwardTo)
         {
+            if (type is null) throw new ArgumentNullException(nameof(type));
+
             if (!(Resolve(type) is MockInstance mockObject))
                 throw new ArgumentException($"{type} did not resolve to a Mock", nameof(type));
 
