@@ -2,6 +2,7 @@ name: .NET Core
 
 on: [push]
 
+
 jobs:
 
   build:
@@ -12,6 +13,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
@@ -22,3 +24,12 @@ jobs:
 
     - name: Test
       run: dotnet test --configuration Release
+
+    - name: Pack
+      env:
+        VersionSuffix: ${{ github.run_number }}
+      run: >- 
+        dotnet pack --configuration release
+          --include-symbols
+          --output .
+      # --version-suffix '-ci$GITHUB_RUN_NUMBER'
