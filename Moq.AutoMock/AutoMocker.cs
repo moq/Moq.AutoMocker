@@ -1,4 +1,5 @@
 ﻿using Moq.AutoMock.Resolvers;
+using Moq.Language;
 using Moq.Language.Flow;
 using System;
 using System.Collections.Generic;
@@ -6,7 +7,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
-using Moq.Language;
 
 namespace Moq.AutoMock
 {
@@ -155,7 +155,7 @@ namespace Moq.AutoMock
         /// </summary>
         /// <typeparam name="T">The instance that you want to build</typeparam>
         /// <returns>An instance with virtual and abstract members mocked</returns>
-        public T? CreateSelfMock<T>() where T : class 
+        public T? CreateSelfMock<T>() where T : class
             => CreateSelfMock<T>(false);
 
         /// <summary>
@@ -177,7 +177,7 @@ namespace Moq.AutoMock
                 DefaultValue = DefaultValue,
                 CallBase = CallBase
             };
-            
+
             var resolved = Resolve(typeof(T), mock);
             return (resolved as Mock<T>)?.Object;
         }
@@ -307,7 +307,9 @@ namespace Moq.AutoMock
         public ISetup<TService, object> Setup<TService>(Expression<Func<TService, object>> setup)
             where TService : class
         {
+#pragma warning disable CA1303 // Do not pass literals as localized parameters
             throw new NotSupportedException("No longer supported in Moq 4.8 and later. Use Setup<TService, TReturn> instead.");
+#pragma warning restore CA1303 // Do not pass literals as localized parameters
         }
 
         /// <summary>
@@ -388,7 +390,7 @@ namespace Moq.AutoMock
             foreach (var serviceType in forwardTo.Concat(new[] { type }))
                 typeMap[serviceType] = mockObject;
 
-            Mock As(Mock mock, Type forInterface)
+            static Mock As(Mock mock, Type forInterface)
             {
                 var method = mock.GetType().GetMethods().First(x => x.Name == nameof(Mock.As))
                     .MakeGenericMethod(forInterface);
@@ -502,7 +504,7 @@ namespace Moq.AutoMock
         private static BindingFlags GetBindingFlags(bool enablePrivate)
         {
             var bindingFlags = BindingFlags.Instance | BindingFlags.Public;
-            if (enablePrivate) bindingFlags = bindingFlags | BindingFlags.NonPublic;
+            if (enablePrivate) bindingFlags |= BindingFlags.NonPublic;
             return bindingFlags;
         }
 
