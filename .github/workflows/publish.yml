@@ -16,14 +16,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.100
-        source-url: https://nuget.org
+        source-url: https://api.nuget.org/v3/index.json
 
     - name: Pack
       run: dotnet pack --configuration release --include-symbols --output .
 
     - name: Publish GitHub Packages
-      run: dotnet nuget push *.nupkg
+      run: dotnet nuget push *.nupkg --api-key ${{ secrets.NUGET_TOKEN }}
