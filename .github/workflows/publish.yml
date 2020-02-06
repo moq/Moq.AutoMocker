@@ -26,5 +26,5 @@ jobs:
     - name: Pack
       run: dotnet pack --configuration release --include-symbols --output .
 
-    - name: Publish GitHub Packages
-      run: dotnet nuget push *.nupkg --api-key ${{ secrets.NUGET_TOKEN }}
+    - name: Publish
+      run: dotnet nuget push *.nupkg --api-key ${{ secrets.NUGET_TOKEN }} --skip-duplicate
