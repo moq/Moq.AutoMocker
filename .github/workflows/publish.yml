@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - master
-      # TODO - release
+      - release
 
 jobs:
 
@@ -20,9 +20,9 @@ jobs:
       with:
         dotnet-version: 3.1.100
 
-    - name: Set version
+    - name: Set CI Version
+      if: github.ref != 'refs/heads/release'
       run: echo "::set-env name=VersionSuffix::ci${{ github.run_number }}"
-      if: github.ref#refs/heads/ != 'release'
 
     - name: Pack
       run: dotnet pack --configuration release --include-symbols --output .
