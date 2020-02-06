@@ -18,7 +18,7 @@ jobs:
 
     - name: Set version
       run: echo "::set-env name=VersionSuffix::ci${{ github.run_number }}"
-      if: ${GITHUB_REF#refs/heads/} != 'release'
+      if: github.ref != 'refs/heads/release'
 
     - name: Build
       run: dotnet build --configuration Release
