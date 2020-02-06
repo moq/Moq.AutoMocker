@@ -3,8 +3,8 @@ name: .NET Core
 on: [push]
 
 jobs:
-  build:
 
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -12,6 +12,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 2.2.108
+        dotnet-version: 3.1.100
+
     - name: Build with dotnet
       run: dotnet build --configuration Release
