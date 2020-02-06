@@ -1,0 +1,29 @@
+name: Publish to NuGet
+on:
+  push:
+    branches:
+      - master
+      # TODO - release
+
+jobs:
+
+  publish:
+    runs-on: ubuntu-latest
+
+    env:
+      VersionSuffix: ci${{ github.run_number }}
+      NUGET_AUTH_TOKEN: ${{ secrets.NUGET_TOKEN }}
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.100
+        source-url: https://nuget.org
+
+    - name: Pack
+      run: dotnet pack --configuration release --include-symbols --output .
+
+    - name: Publish GitHub Packages
+      run: dotnet nuget push *.nupkg

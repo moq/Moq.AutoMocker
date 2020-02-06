@@ -11,10 +11,6 @@ jobs:
       matrix:
         os: [macOS-latest, ubuntu-latest, windows-2019]
 
-    env:
-      VersionSuffix: ci${{ github.run_number }}
-      NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
     steps:
     - uses: actions/checkout@v2
 
@@ -22,15 +18,9 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.100
-        source-url: https://nuget.pkg.github.com/moq/index.json
 
     - name: Build
       run: dotnet build --configuration Release
 
     - name: Test
       run: dotnet test --configuration Release
-
-    - name: Pack
-      run: dotnet pack --configuration release --include-symbols --output .
-    - name: Publish GitHub Packages
-      run: dotnet nuget push *.nupkg
