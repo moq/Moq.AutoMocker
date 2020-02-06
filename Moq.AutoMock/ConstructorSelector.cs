@@ -6,7 +6,7 @@ namespace Moq.AutoMock
 {
     internal static class ConstructorSelector
     {
-        public static ConstructorInfo? SelectCtor(this Type type, Type[] existingTypes, BindingFlags bindingFlags)
+        public static ConstructorInfo SelectCtor(this Type type, Type[] existingTypes, BindingFlags bindingFlags)
         {
             ConstructorInfo? best = null;
             foreach (var constructor in type.GetConstructors(bindingFlags))
@@ -14,7 +14,8 @@ namespace Moq.AutoMock
                 if (isBetterChoice(constructor))
                     best = constructor;
             }
-            return best;
+
+            return best ?? throw new ArgumentException($"Did not find a best constructor for `{type}`", nameof(type));
 
             bool isBetterChoice(ConstructorInfo candidate)
             {

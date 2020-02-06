@@ -17,21 +17,33 @@ namespace Moq.AutoMock
     {
         private readonly Dictionary<Type, IInstance> typeMap = new Dictionary<Type, IInstance>();
 
+        /// <summary>
+        /// Creates a new instance of AutoMocker.
+        /// </summary>
         public AutoMocker()
             : this(MockBehavior.Default)
         {
         }
 
+        /// <summary>
+        /// Creates a new instance of AutoMocker.
+        /// </summary>
         public AutoMocker(MockBehavior mockBehavior)
             : this(mockBehavior, DefaultValue.Empty)
         {
         }
 
+        /// <summary>
+        /// Creates a new instance of AutoMocker.
+        /// </summary>
         public AutoMocker(MockBehavior mockBehavior, DefaultValue defaultValue)
             : this(mockBehavior, defaultValue, callBase: false)
         {
         }
 
+        /// <summary>
+        /// Creates a new instance of AutoMocker.
+        /// </summary>
         public AutoMocker(MockBehavior mockBehavior, DefaultValue defaultValue, bool callBase)
         {
             MockBehavior = mockBehavior;
@@ -46,9 +58,22 @@ namespace Moq.AutoMock
             };
         }
 
+        /// <summary>
+        /// Gets the behavior of created Mocks.
+        /// </summary>
         public MockBehavior MockBehavior { get; }
+
+        /// <summary>
+        /// Specifies the behavior to use when returning default values for unexpected invocations on loose mocks.
+        /// </summary>
         public DefaultValue DefaultValue { get; }
+        /// <summary>
+        /// Whether the base member virtual implementation will be called for mocked classes if no setup is matched.
+        /// </summary>
         public bool CallBase { get; }
+        /// <summary>
+        /// A collection of resolvers that are used to resolve services.
+        /// </summary>
         public ICollection<IMockResolver> Resolvers { get; }
 
         private IInstance Resolve(Type serviceType)
@@ -191,14 +216,14 @@ namespace Moq.AutoMock
         /// </summary>
         /// <typeparam name="TService">The type that the instance will be registered as</typeparam>
         /// <param name="service"></param>
-        public void Use<TService>(TService service) => Use(typeof(TService), service!);
+        public void Use<TService>(TService service) => Use(typeof(TService), service);
 
         /// <summary>
         /// Adds an instance to the container.
         /// </summary>
         /// <param name="type">The type of service to use</param>
         /// <param name="service">The service to use</param>
-        public void Use(Type type, object service)
+        public void Use(Type type, object? service)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
             if (service != null && !type.IsInstanceOfType(service))
@@ -299,18 +324,6 @@ namespace Moq.AutoMock
         #endregion GetMock
 
         #region Setup
-
-        /// <summary>
-        /// Shortcut for mock.Setup(...), creating the mock when necessary.
-        /// </summary>
-        [Obsolete("No longer supported with Moq 4.8 and later. Use Setup<TService, TReturn> instead.", true)]
-        public ISetup<TService, object> Setup<TService>(Expression<Func<TService, object>> setup)
-            where TService : class
-        {
-#pragma warning disable CA1303 // Do not pass literals as localized parameters
-            throw new NotSupportedException("No longer supported in Moq 4.8 and later. Use Setup<TService, TReturn> instead.");
-#pragma warning restore CA1303 // Do not pass literals as localized parameters
-        }
 
         /// <summary>
         /// Shortcut for mock.Setup(...), creating the mock when necessary.
