@@ -11,6 +11,9 @@ jobs:
       matrix:
         os: [macOS-latest, ubuntu-latest, windows-2019]
 
+    env:
+      VersionSuffix: ci${{ github.run_number }}
+
     steps:
     - uses: actions/checkout@v2
 
@@ -26,8 +29,6 @@ jobs:
       run: dotnet test --configuration Release
 
     - name: Pack
-      env:
-        VersionSuffix: ${{ github.run_number }}
       run: >- 
         dotnet pack --configuration release
           --include-symbols
