@@ -19,7 +19,7 @@ namespace Moq.AutoMock.Tests
 
             var lazy = mocker.Get<Lazy<T>>();
             Assert.IsNotNull(lazy);
-            Assert.AreEqual(expected, lazy!.Value);
+            Assert.AreEqual(expected, lazy.Value);
         }
     }
 }

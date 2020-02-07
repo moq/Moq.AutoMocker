@@ -180,7 +180,7 @@ namespace Moq.AutoMock
         /// </summary>
         /// <typeparam name="T">The instance that you want to build</typeparam>
         /// <returns>An instance with virtual and abstract members mocked</returns>
-        public T? CreateSelfMock<T>() where T : class
+        public T CreateSelfMock<T>() where T : class?
             => CreateSelfMock<T>(false);
 
         /// <summary>
@@ -193,7 +193,7 @@ namespace Moq.AutoMock
         /// <param name="enablePrivate">When true, private constructors will also be used to
         /// create mocks.</param>
         /// <returns>An instance with virtual and abstract members mocked</returns>
-        public T? CreateSelfMock<T>(bool enablePrivate) where T : class
+        public T CreateSelfMock<T>(bool enablePrivate) where T : class?
         {
             var arguments = CreateArguments(typeof(T), GetBindingFlags(enablePrivate));
 
@@ -204,7 +204,10 @@ namespace Moq.AutoMock
             };
 
             var resolved = Resolve(typeof(T), mock);
-            return (resolved as Mock<T>)?.Object;
+            if (resolved is Mock<T> m)
+                return m.Object;
+            
+            return default(T)!;
         }
 
         #endregion Create Instance/SelfMock
@@ -263,8 +266,8 @@ namespace Moq.AutoMock
         /// </summary>
         /// <typeparam name="TService">The class or interface to search on</typeparam>
         /// <returns>The object that implements TService</returns>
-        public TService? Get<TService>() where TService : class
-            => Get(typeof(TService)) as TService;
+        public TService Get<TService>() where TService : class?
+            => Get(typeof(TService)) is TService service ? service : default!;
 
         /// <summary>
         /// Searches and retrieves an object from the container that matches the serviceType. This can be

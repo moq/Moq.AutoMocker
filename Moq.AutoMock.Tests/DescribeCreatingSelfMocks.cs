@@ -10,7 +10,7 @@ namespace Moq.AutoMock.Tests
         {
             var mocker = new AutoMocker();
             var selfMock = mocker.CreateSelfMock<InsecureAboutSelf>();
-            selfMock!.TellJoke();
+            selfMock.TellJoke();
             Assert.IsFalse(selfMock.SelfDepricated);
         }
 
@@ -19,7 +19,7 @@ namespace Moq.AutoMock.Tests
         {
             var mocker = new AutoMocker();
             var selfMock = mocker.CreateSelfMock<WithService>();
-            Assert.IsNotNull(selfMock!.Service);
+            Assert.IsNotNull(selfMock.Service);
             Assert.IsNotNull(Mock.Get(selfMock.Service));
         }
     }

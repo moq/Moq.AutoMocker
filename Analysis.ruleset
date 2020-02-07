@@ -3,6 +3,7 @@
   <Rules AnalyzerId="Microsoft.CodeQuality.Analyzers" RuleNamespace="Microsoft.CodeQuality.Analyzers">
 
     <Rule Id="CA1303" Action="Info" /><!-- Method '...' passes a literal string as parameter '...' of a call to '...'. Retrieve the following string(s) from a resource table instead: "..." -->
+    <Rule Id="CS1591" Action="Warning" /><!-- Missing XML comment for publicly visible type or member '...' -->
 
   </Rules>
 </RuleSet>
