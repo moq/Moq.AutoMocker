@@ -3,6 +3,7 @@ using Moq.Language;
 using Moq.Language.Flow;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -28,7 +29,7 @@ namespace Moq.AutoMock
         /// <summary>
         /// Initializes an instance of AutoMockers.
         /// </summary>
-        /// <param name="mockBehavior">The behaivor to use for created mocks.</param>
+        /// <param name="mockBehavior">The behavior to use for created mocks.</param>
         public AutoMocker(MockBehavior mockBehavior)
             : this(mockBehavior, DefaultValue.Empty)
         {
@@ -37,7 +38,7 @@ namespace Moq.AutoMock
         /// <summary>
         /// Initializes an instance of AutoMockers.
         /// </summary>
-        /// <param name="mockBehavior">The behaivor to use for created mocks.</param>
+        /// <param name="mockBehavior">The behavior to use for created mocks.</param>
         /// <param name="defaultValue">The default value to use for created mocks.</param>
         public AutoMocker(MockBehavior mockBehavior, DefaultValue defaultValue)
             : this(mockBehavior, defaultValue, callBase: false)
@@ -47,7 +48,7 @@ namespace Moq.AutoMock
         /// <summary>
         /// Initializes an instance of AutoMockers.
         /// </summary>
-        /// <param name="mockBehavior">The behaivor to use for created mocks.</param>
+        /// <param name="mockBehavior">The behavior to use for created mocks.</param>
         /// <param name="defaultValue">The default value to use for created mocks.</param>
         /// <param name="callBase">Whether to call the base virtual implementation for created mocks.</param>
         public AutoMocker(MockBehavior mockBehavior, DefaultValue defaultValue, bool callBase)
@@ -90,7 +91,7 @@ namespace Moq.AutoMock
         {
             if (serviceType.IsArray)
             {
-                Type elmType = serviceType.GetElementType();
+                Type elmType = serviceType.GetElementType() ?? throw new InvalidOperationException($"Could not determine element type for '{serviceType}'");
                 MockArrayInstance instance = new MockArrayInstance(elmType);
                 if (_typeMap.TryGetValue(elmType, out var element))
                     instance.Add(element);
@@ -171,14 +172,11 @@ namespace Moq.AutoMock
             try
             {
                 var ctor = type.SelectCtor(_typeMap.Keys.ToArray(), bindingFlags);
-                if (ctor is null)
-                    throw new ArgumentException($"`{type}` does not have an acceptable constructor.", nameof(type));
-
                 return ctor.Invoke(arguments);
             }
             catch (TargetInvocationException e)
             {
-                ExceptionDispatchInfo.Capture(e.InnerException).Throw();
+                ExceptionDispatchInfo.Capture(e.InnerException ?? e).Throw();
                 throw;  //Not really reachable either way, but I like this better than return default(T)
             }
         }
