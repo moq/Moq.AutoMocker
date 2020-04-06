@@ -19,7 +19,7 @@ namespace Moq.AutoMock.Tests
         private static void Resolves<T>(T expected)
         {
             var mocker = new AutoMocker { Resolvers = { new LazyResolver() } };
-            mocker.Use(expected);
+            mocker.Use(typeof(T), expected!);
 
             var lazy = mocker.Get<Lazy<T>>();
             Assert.IsNotNull(lazy);
