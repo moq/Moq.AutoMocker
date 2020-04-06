@@ -1,6 +1,7 @@
 ﻿namespace Moq.AutoMock.Tests
 {
-    class WithDefaultAndSingleParameter
+#pragma warning disable CA1801, CA1812  //is an internal class that is apparently never instantiated
+    internal class WithDefaultAndSingleParameter
     {
         public WithDefaultAndSingleParameter() { }
         public WithDefaultAndSingleParameter(IService1 service1) { }

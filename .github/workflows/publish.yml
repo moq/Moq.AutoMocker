@@ -1,0 +1,31 @@
+name: Publish to NuGet
+on:
+  push:
+    branches:
+      - master
+      - release
+
+jobs:
+
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      NUGET_AUTH_TOKEN: ${{ secrets.NUGET_TOKEN }}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.100
+
+    - name: Set CI Version
+      if: github.ref != 'refs/heads/release'
+      run: echo "::set-env name=VersionSuffix::ci${{ github.run_number }}"
+
+    - name: Pack
+      run: dotnet pack --configuration release --include-symbols --output .
+
+    - name: Publish
+      run: dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN }} --skip-duplicate

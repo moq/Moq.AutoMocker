@@ -21,7 +21,10 @@ namespace Moq.AutoMock.Tests
         public void It_extracts_instances_that_were_setup_with_Use()
         {
             var mocker = new AutoMocker();
+#pragma warning disable CA1820 // Test for empty strings using string length
             mocker.Use<IService1>(x => x.ToString() == "");
+#pragma warning restore CA1820 // Test for empty strings using string length
+                              
             // Assert does not throw
             mocker.GetMock<IService1>();
         }

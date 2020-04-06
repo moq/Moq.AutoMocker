@@ -6,7 +6,7 @@ namespace Moq.AutoMock.Tests
     {
         public ConstructorThrows()
         {
-            throw new ArgumentException();
+            throw new ArgumentException(string.Empty);
         }
     }
 }

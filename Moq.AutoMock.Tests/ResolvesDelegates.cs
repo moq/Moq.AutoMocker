@@ -15,10 +15,13 @@ namespace Moq.AutoMock.Tests
         [DataTestMethod, DynamicData(nameof(Funcs))]
         public void ResolvesFuncReturningDefinedParameter(Type delegateType, object expected)
         {
+            if (delegateType is null) throw new ArgumentNullException(nameof(delegateType));
+            if (expected is null) throw new ArgumentNullException(nameof(expected));
+
             var mocker = new AutoMocker { Resolvers = { new FuncResolver() } };
             mocker.Use(expected.GetType(), expected);
 
-            var func = (Delegate)mocker.Get(delegateType);
+            var func = (Delegate)mocker.Get(delegateType)!;
             Assert.IsNotNull(func);
 
             var @params = new object[delegateType.GetGenericArguments().Length - 1];
