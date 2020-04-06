@@ -20,7 +20,7 @@ namespace Moq.AutoMock.Extensions
 
             var genericArgs = funcType.GetGenericArguments();
             var @params = genericArgs.Take(genericArgs.Length - 1)
-                .Select(t => Expression.Parameter(t));
+                .Select(Expression.Parameter);
             var returnType = genericArgs.Last();
 
             Expression call = Expression.Call(Expression.Constant(autoMocker), nameof(AutoMocker.Get), null, Expression.Constant(returnType, typeof(Type)));

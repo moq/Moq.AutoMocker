@@ -2,17 +2,18 @@
 using Moq.AutoMock.Resolvers;
 using System;
 using System.Collections.Generic;
+using Moq.AutoMock.Tests.Util;
 
 namespace Moq.AutoMock.Tests
 {
     [TestClass]
     public class ResolvesDelegates
     {
-        delegate string ZeroParamDelegate();
-        delegate object OneParamDelegate(int p);
-        delegate long TwoParamDelegate(int p, object foo);
+        //delegate string ZeroParamDelegate();
+        //delegate object OneParamDelegate(int p);
+        //delegate long TwoParamDelegate(int p, object foo);
 
-        [DataTestMethod, DynamicData(nameof(Funcs))]
+        [DataTestMethod, DynamicData(nameof(DelegateTypes))]
         public void ResolvesFuncReturningDefinedParameter(Type delegateType, object expected)
         {
             if (delegateType is null) throw new ArgumentNullException(nameof(delegateType));
@@ -27,8 +28,11 @@ namespace Moq.AutoMock.Tests
             var @params = new object[delegateType.GetGenericArguments().Length - 1];
             Assert.AreEqual(expected, func.DynamicInvoke(@params));
         }
-        static IEnumerable<object[]> Funcs
+
+
+        static IEnumerable<object[]> DelegateTypes
         {
+            // ReSharper disable once UnusedMember.Local
             get
             {
                 yield return new[] { typeof(Func<object>), new object() };
@@ -36,6 +40,9 @@ namespace Moq.AutoMock.Tests
                 yield return new object[] { typeof(Func<object, string>), nameof(ResolvesDelegates) };
                 yield return new object[] { typeof(Func<object, ResolvesDelegates, string>), nameof(ResolvesDelegates) };
                 yield return new object[] { typeof(Func<string, int, Service2>), new Service2() };
+                //yield return new object[] { typeof(ZeroParamDelegate), "" };
+                //yield return new [] { typeof(OneParamDelegate), new object() };
+                //yield return new object[] { typeof(TwoParamDelegate), 0L };
             }
         }
     }

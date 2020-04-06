@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq.AutoMock.Tests.Util;
 
 namespace Moq.AutoMock.Tests
 {
@@ -56,7 +57,7 @@ namespace Moq.AutoMock.Tests
 
             //a method with parameters
             mocker.Setup<IServiceWithPrimitives, string>(s => s.ReturnsAReferenceWithParameter(It.IsAny<string>()))
-                    .Returns<string>(s => s += "2");
+                    .Returns<string>(s => s + "2");
 
             var mock = mocker.Get<IServiceWithPrimitives>();
             Assert.AreEqual("blah2", mock!.ReturnsAReferenceWithParameter("blah"));

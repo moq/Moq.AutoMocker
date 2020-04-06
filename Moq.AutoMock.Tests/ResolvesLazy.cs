@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq.AutoMock.Resolvers;
 using System;
-using System.Collections.Generic;
 
 namespace Moq.AutoMock.Tests
 {
