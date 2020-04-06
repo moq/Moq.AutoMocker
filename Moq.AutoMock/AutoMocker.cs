@@ -41,7 +41,7 @@ namespace Moq.AutoMock
         /// <param name="mockBehavior">The behavior to use for created mocks.</param>
         /// <param name="defaultValue">The default value to use for created mocks.</param>
         public AutoMocker(MockBehavior mockBehavior, DefaultValue defaultValue)
-            : this(mockBehavior, defaultValue, false)
+            : this(mockBehavior, defaultValue, callBase: false)
         {
         }
 
