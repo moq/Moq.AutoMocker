@@ -7,19 +7,17 @@
     <AssemblyName>Moq.AutoMock</AssemblyName>
     <AssemblyTitle>Moq.AutoMocker</AssemblyTitle>
     <Product>Moq.AutoMocker</Product>
-    <Copyright>Copyright © 2020</Copyright>
+    <Copyright>Copyright © $([System.DateTime]::UtcNow.ToString("yyyy"))</Copyright>
 
     <VersionPrefix>2.0.0</VersionPrefix>
     <Authors>Tim Kellogg,Adam Hewitt,Kevin Bost</Authors>
     <PackageDescription>An auto-mocking container that generates mocks using Moq</PackageDescription>
-    <Copyright>Copyright Tim Kellogg 2020</Copyright>
+    <Copyright>Copyright Tim Kellogg $([System.DateTime]::UtcNow.ToString("yyyy"))</Copyright>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/moq/Moq.AutoMocker</PackageProjectUrl>
     <Tags>moq;automocking;testing;TDD</Tags>
 
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <!-- Suppress CS1591: Missing XML comment for publicly visible type or member -->
-    <WarningsNotAsErrors>$(WarningsNotAsErrors),CS1591</WarningsNotAsErrors>
 
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <DebugType>embedded</DebugType>

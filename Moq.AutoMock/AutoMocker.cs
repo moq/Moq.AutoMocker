@@ -18,7 +18,7 @@ namespace Moq.AutoMock
         private readonly Dictionary<Type, IInstance> _typeMap = new Dictionary<Type, IInstance>();
 
         /// <summary>
-        /// Creates a new instance of AutoMocker.
+        /// Initializes an instance of AutoMockers.
         /// </summary>
         public AutoMocker()
             : this(MockBehavior.Default)
@@ -26,24 +26,30 @@ namespace Moq.AutoMock
         }
 
         /// <summary>
-        /// Creates a new instance of AutoMocker.
+        /// Initializes an instance of AutoMockers.
         /// </summary>
+        /// <param name="mockBehavior">The behaivor to use for created mocks.</param>
         public AutoMocker(MockBehavior mockBehavior)
             : this(mockBehavior, DefaultValue.Empty)
         {
         }
 
         /// <summary>
-        /// Creates a new instance of AutoMocker.
+        /// Initializes an instance of AutoMockers.
         /// </summary>
+        /// <param name="mockBehavior">The behaivor to use for created mocks.</param>
+        /// <param name="defaultValue">The default value to use for created mocks.</param>
         public AutoMocker(MockBehavior mockBehavior, DefaultValue defaultValue)
             : this(mockBehavior, defaultValue, callBase: false)
         {
         }
 
         /// <summary>
-        /// Creates a new instance of AutoMocker.
+        /// Initializes an instance of AutoMockers.
         /// </summary>
+        /// <param name="mockBehavior">The behaivor to use for created mocks.</param>
+        /// <param name="defaultValue">The default value to use for created mocks.</param>
+        /// <param name="callBase">Whether to call the base virtual implementation for created mocks.</param>
         public AutoMocker(MockBehavior mockBehavior, DefaultValue defaultValue, bool callBase)
         {
             MockBehavior = mockBehavior;
@@ -52,27 +58,31 @@ namespace Moq.AutoMock
 
             Resolvers = new List<IMockResolver>
             {
-                new MoqResolver(mockBehavior, defaultValue, callBase),
+                new MockResolver(mockBehavior, defaultValue, callBase),
                 new FuncResolver(),
                 new LazyResolver()
             };
         }
 
         /// <summary>
-        /// Gets the behavior of created Mocks.
+        /// Behavior of created mocks, according to the value set in the constructor.
         /// </summary>
         public MockBehavior MockBehavior { get; }
 
         /// <summary>
-        /// Specifies the behavior to use when returning default values for unexpected invocations on loose mocks.
+        /// Specifies the behavior to use when returning default values for 
+        /// unexpected invocations on loose mocks created by this instance.
         /// </summary>
         public DefaultValue DefaultValue { get; }
+        
         /// <summary>
-        /// Whether the base member virtual implementation will be called for mocked classes if no setup is matched.
+        /// Whether the base member virtual implementation will be called 
+        /// for created mocks if no setup is matched. Defaults to <c>false</c>.
         /// </summary>
         public bool CallBase { get; }
+
         /// <summary>
-        /// A collection of resolvers that are used to resolve services.
+        /// A collection of resolves determining how a given dependency will be resolved.
         /// </summary>
         public ICollection<IMockResolver> Resolvers { get; }
 
