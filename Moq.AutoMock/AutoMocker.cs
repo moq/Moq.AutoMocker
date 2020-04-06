@@ -269,7 +269,7 @@ namespace Moq.AutoMock
         /// </summary>
         /// <typeparam name="TService">The class or interface to search on</typeparam>
         /// <returns>The object that implements TService</returns>
-        public TService Get<TService>() where TService : class?
+        public TService? Get<TService>() where TService : class
             => Get(typeof(TService)) is TService service ? service : null;
 
         /// <summary>
