@@ -12,7 +12,7 @@
     <Version>0.5.0</Version>
     <Authors>Tim Kellogg,Adam Hewitt,Kevin Bost</Authors>
     <PackageDescription>An auto-mocking container that generates mocks using Moq</PackageDescription>
-    <Copyright>Copyright Tim Kellogg 2020</Copyright>
+    <Copyright>Copyright Tim Kellogg $([System.DateTime]::UtcNow.ToString("yyyy"))</Copyright>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/moq/Moq.AutoMocker</PackageProjectUrl>
     <Tags>moq;automocking;testing;TDD</Tags>
