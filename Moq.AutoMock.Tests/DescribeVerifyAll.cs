@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq.AutoMock.Tests.Util;
 
 namespace Moq.AutoMock.Tests
 {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Moq.AutoMock.Tests
+namespace Moq.AutoMock.Tests.Util
 {
     public class ConstructorThrows
     {

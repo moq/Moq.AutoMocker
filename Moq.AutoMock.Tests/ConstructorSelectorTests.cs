@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Reflection;
+using Moq.AutoMock.Tests.Util;
 
 namespace Moq.AutoMock.Tests
 {
@@ -40,7 +41,7 @@ namespace Moq.AutoMock.Tests
         [TestMethod]
         public void It_will_select_if_an_argument_is_sealed_and_supplied()
         {
-            var ctor = typeof(WithSealedParameter).SelectCtor(new Type[] { typeof(string) }, DefaultBindingFlags);
+            var ctor = typeof(WithSealedParameter).SelectCtor(new [] { typeof(string) }, DefaultBindingFlags);
             Assert.AreEqual(1, ctor.GetParameters().Length);
         }
 

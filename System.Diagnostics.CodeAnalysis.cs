@@ -6,58 +6,74 @@
 
 namespace System.Diagnostics.CodeAnalysis
 {
-    [System.AttributeUsageAttribute(System.AttributeTargets.Field | System.AttributeTargets.Parameter | System.AttributeTargets.Property, Inherited = false)]
-    internal sealed partial class AllowNullAttribute : System.Attribute
+    // ReSharper disable UnusedType.Global
+    // ReSharper disable UnusedParameter.Local
+
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property, Inherited = false)]
+    internal sealed class AllowNullAttribute : Attribute
     {
-        public AllowNullAttribute() { }
     }
-    [System.AttributeUsageAttribute(System.AttributeTargets.Field | System.AttributeTargets.Parameter | System.AttributeTargets.Property, Inherited = false)]
-    internal sealed partial class DisallowNullAttribute : System.Attribute
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property, Inherited = false)]
+    internal sealed class DisallowNullAttribute : Attribute
     {
-        public DisallowNullAttribute() { }
     }
-    [System.AttributeUsageAttribute(System.AttributeTargets.Method, Inherited = false)]
-    internal sealed partial class DoesNotReturnAttribute : System.Attribute
+    [AttributeUsage(AttributeTargets.Method, Inherited = false)]
+    internal sealed class DoesNotReturnAttribute : Attribute
     {
-        public DoesNotReturnAttribute() { }
     }
-    [System.AttributeUsageAttribute(System.AttributeTargets.Parameter, Inherited = false)]
-    internal sealed partial class DoesNotReturnIfAttribute : System.Attribute
+    [AttributeUsage(AttributeTargets.Parameter)]
+    internal sealed class DoesNotReturnIfAttribute : Attribute
     {
         public DoesNotReturnIfAttribute(bool parameterValue) { }
+
+        // ReSharper disable ArrangeAccessorOwnerBody
+        // ReSharper disable PossibleNullReferenceException
         public bool ParameterValue { get { throw null!; } }
+        // ReSharper restore PossibleNullReferenceException
+        // ReSharper restore ArrangeAccessorOwnerBody
     }
-    [System.AttributeUsageAttribute(System.AttributeTargets.Assembly | System.AttributeTargets.Class | System.AttributeTargets.Constructor | System.AttributeTargets.Event | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
-    internal sealed partial class ExcludeFromCodeCoverageAttribute : System.Attribute
+    [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Constructor | AttributeTargets.Event | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
+    internal sealed class ExcludeFromCodeCoverageAttribute : Attribute
     {
-        public ExcludeFromCodeCoverageAttribute() { }
     }
-    [System.AttributeUsageAttribute(System.AttributeTargets.Field | System.AttributeTargets.Parameter | System.AttributeTargets.Property | System.AttributeTargets.ReturnValue, Inherited = false)]
-    internal sealed partial class MaybeNullAttribute : System.Attribute
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, Inherited = false)]
+    internal sealed class MaybeNullAttribute : Attribute
     {
-        public MaybeNullAttribute() { }
     }
-    [System.AttributeUsageAttribute(System.AttributeTargets.Parameter, Inherited = false)]
-    internal sealed partial class MaybeNullWhenAttribute : System.Attribute
+    [AttributeUsage(AttributeTargets.Parameter)]
+    internal sealed class MaybeNullWhenAttribute : Attribute
     {
         public MaybeNullWhenAttribute(bool returnValue) { }
+        // ReSharper disable ArrangeAccessorOwnerBody
+        // ReSharper disable PossibleNullReferenceException
         public bool ReturnValue { get { throw null!; } }
+        // ReSharper restore PossibleNullReferenceException
+        // ReSharper restore ArrangeAccessorOwnerBody
     }
-    [System.AttributeUsageAttribute(System.AttributeTargets.Field | System.AttributeTargets.Parameter | System.AttributeTargets.Property | System.AttributeTargets.ReturnValue, Inherited = false)]
-    internal sealed partial class NotNullAttribute : System.Attribute
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, Inherited = false)]
+    internal sealed class NotNullAttribute : Attribute
     {
-        public NotNullAttribute() { }
     }
-    [System.AttributeUsageAttribute(System.AttributeTargets.Parameter | System.AttributeTargets.Property | System.AttributeTargets.ReturnValue, AllowMultiple = true, Inherited = false)]
-    internal sealed partial class NotNullIfNotNullAttribute : System.Attribute
+    [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, AllowMultiple = true, Inherited = false)]
+    internal sealed class NotNullIfNotNullAttribute : Attribute
     {
         public NotNullIfNotNullAttribute(string parameterName) { }
+        // ReSharper disable ArrangeAccessorOwnerBody
+        // ReSharper disable PossibleNullReferenceException
         public string ParameterName { get { throw null!; } }
+        // ReSharper restore PossibleNullReferenceException
+        // ReSharper restore ArrangeAccessorOwnerBody
     }
-    [System.AttributeUsageAttribute(System.AttributeTargets.Parameter, Inherited = false)]
-    internal sealed partial class NotNullWhenAttribute : System.Attribute
+    [AttributeUsage(AttributeTargets.Parameter)]
+    internal sealed class NotNullWhenAttribute : Attribute
     {
         public NotNullWhenAttribute(bool returnValue) { }
+        // ReSharper disable ArrangeAccessorOwnerBody
+        // ReSharper disable PossibleNullReferenceException
         public bool ReturnValue { get { throw null!; } }
+        // ReSharper restore PossibleNullReferenceException
+        // ReSharper restore ArrangeAccessorOwnerBody
     }
+    // ReSharper restore UnusedParameter.Local
+    // ReSharper restore UnusedType.Global
 }
