@@ -13,7 +13,7 @@ namespace Moq.AutoMock.Resolvers
         /// <param name="autoMocker">The <c>AutoMocker</c> instance.</param>
         /// <param name="requestType">The requested type to resolve.</param>
         /// <param name="initialValue">The initial value to use.</param>
-        public MockResolutionContext(AutoMocker autoMocker, Type requestType, object initialValue)
+        public MockResolutionContext(AutoMocker autoMocker, Type requestType, object? initialValue)
         {
             AutoMocker = autoMocker ?? throw new ArgumentNullException(nameof(autoMocker));
             RequestType = requestType ?? throw new ArgumentNullException(nameof(requestType));
@@ -33,7 +33,7 @@ namespace Moq.AutoMock.Resolvers
         /// <summary>
         /// The value to use from the resolution.
         /// </summary>
-        public object Value { get; set; }
+        public object? Value { get; set; }
 
         /// <summary>
         /// Deconstruct this instance into its individual properties.
@@ -41,7 +41,7 @@ namespace Moq.AutoMock.Resolvers
         /// <param name="autoMocker">The <c>AutoMocker</c> instance.</param>
         /// <param name="type">The requested type to resolve.</param>
         /// <param name="value">The value to use for the requested type.</param>
-        public void Deconstruct(out AutoMocker autoMocker, out Type type, out object value)
+        public void Deconstruct(out AutoMocker autoMocker, out Type type, out object? value)
         {
             autoMocker = AutoMocker;
             type = RequestType;
