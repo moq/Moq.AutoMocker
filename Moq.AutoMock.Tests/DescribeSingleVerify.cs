@@ -1,5 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using Moq.AutoMock.Tests.Util;
 
 namespace Moq.AutoMock.Tests
 {
@@ -12,8 +13,8 @@ namespace Moq.AutoMock.Tests
             var mocker = new AutoMocker();
             var mock = new Mock<IService2>();
             mocker.Use(mock);
-            var name = mock.Object.Name;
-            mocker.Verify<IService2>(x => x.Name);
+            var _ = mock.Object.Name;
+            mocker.Verify<IService2>(x => x.Name!);
         }
 
         [TestMethod]

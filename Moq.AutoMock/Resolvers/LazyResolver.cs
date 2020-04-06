@@ -1,16 +1,22 @@
 ﻿using Moq.AutoMock.Extensions;
 using System;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 
 namespace Moq.AutoMock.Resolvers
 {
+    /// <summary>
+    /// A resolver that resolves Lazy&lt;T&gt; requested types.
+    /// </summary>
     public class LazyResolver : IMockResolver
     {
+        /// <summary>
+        /// Resolves Lazy&lt;T&gt; types.
+        /// </summary>
+        /// <param name="context">The resolution context.</param>
         public void Resolve(MockResolutionContext context)
         {
-            var (am, serviceType, value) = context ?? throw new ArgumentNullException(nameof(context));
+            var (am, serviceType, _) = context ?? throw new ArgumentNullException(nameof(context));
 
             if (!serviceType.GetTypeInfo().IsGenericType || serviceType.GetGenericTypeDefinition() != typeof(Lazy<>))
                 return;

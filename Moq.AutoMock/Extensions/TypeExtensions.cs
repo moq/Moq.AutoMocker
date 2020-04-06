@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -9,7 +9,7 @@ namespace Moq.AutoMock.Extensions
 {
     internal static class TypeExtensions
     {
-        internal static bool TryCompileGetter(this AutoMocker autoMocker, Type funcType, out Delegate @delegate)
+        internal static bool TryCompileGetter(this AutoMocker autoMocker, Type funcType, [NotNullWhen(true)] out Delegate? @delegate)
         {
             @delegate = null;
             var stInfo = funcType.GetTypeInfo();
@@ -20,7 +20,7 @@ namespace Moq.AutoMock.Extensions
 
             var genericArgs = funcType.GetGenericArguments();
             var @params = genericArgs.Take(genericArgs.Length - 1)
-                .Select(t => Expression.Parameter(t));
+                .Select(Expression.Parameter);
             var returnType = genericArgs.Last();
 
             Expression call = Expression.Call(Expression.Constant(autoMocker), nameof(AutoMocker.Get), null, Expression.Constant(returnType, typeof(Type)));

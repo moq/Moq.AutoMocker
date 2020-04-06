@@ -1,4 +1,4 @@
-﻿namespace Moq.AutoMock.Tests
+﻿namespace Moq.AutoMock.Tests.Util
 {
     public interface IService2
     {

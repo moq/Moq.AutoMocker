@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq.AutoMock.Tests.Util;
 
 namespace Moq.AutoMock.Tests
 {
@@ -12,7 +13,7 @@ namespace Moq.AutoMock.Tests
         public void You_can_setup_a_mock_using_the_classic_Setup_style()
         {
             var mocker = new AutoMocker();
-            mocker.Setup<IService2, IService1>(x => x.Other).Returns(Mock.Of<IService1>());
+            mocker.Setup<IService2, IService1?>(x => x.Other).Returns(Mock.Of<IService1>());
             var mock = mocker.Get<IService2>();
             Assert.IsNotNull(mock);
             Assert.IsNotNull(mock.Other);
@@ -22,8 +23,8 @@ namespace Moq.AutoMock.Tests
         public void You_can_do_multiple_setups_on_a_single_interface()
         {
             var mocker = new AutoMocker();
-            mocker.Setup<IService2, IService1>(x => x.Other).Returns(Mock.Of<IService1>());
-            mocker.Setup<IService2, string>(x => x.Name).Returns("pure awesomeness");
+            mocker.Setup<IService2, IService1?>(x => x.Other).Returns(Mock.Of<IService1>());
+            mocker.Setup<IService2, string?>(x => x.Name).Returns("pure awesomeness");
             var mock = mocker.Get<IService2>();
             Assert.AreEqual("pure awesomeness", mock.Name);
             Assert.IsNotNull(mock.Other);
@@ -56,7 +57,7 @@ namespace Moq.AutoMock.Tests
 
             //a method with parameters
             mocker.Setup<IServiceWithPrimitives, string>(s => s.ReturnsAReferenceWithParameter(It.IsAny<string>()))
-                    .Returns<string>(s => s += "2");
+                    .Returns<string>(s => s + "2");
 
             var mock = mocker.Get<IServiceWithPrimitives>();
             Assert.AreEqual("blah2", mock.ReturnsAReferenceWithParameter("blah"));
@@ -86,6 +87,20 @@ namespace Moq.AutoMock.Tests
             mock.Name = "aname";
 
             Assert.AreEqual("aname", mock.Name);
+        }
+
+        [TestMethod]
+        public void You_can_setup_a_method_that_returns_diffrent_result_in_sequence()
+        {
+            var mocker = new AutoMocker();
+            mocker.SetupSequence<IService4, string>(p => p.MainMethodName(It.IsAny<string>()))
+                .Returns("t1")
+                .Returns("t2");
+
+            var mock = mocker.Get<IService4>();
+
+            Assert.AreEqual("t1", mock.MainMethodName("any"));
+            Assert.AreEqual("t2", mock.MainMethodName("any"));
         }
     }
 }

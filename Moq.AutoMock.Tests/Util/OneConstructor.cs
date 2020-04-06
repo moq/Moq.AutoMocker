@@ -1,8 +1,8 @@
-﻿namespace Moq.AutoMock.Tests
+﻿namespace Moq.AutoMock.Tests.Util
 {
     public class OneConstructor
     {
-        public Empty Empty;
+        public Empty Empty { get; }
 
         public OneConstructor(Empty empty)
         {

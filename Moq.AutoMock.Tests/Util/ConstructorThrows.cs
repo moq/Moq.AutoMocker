@@ -1,12 +1,12 @@
 ﻿using System;
 
-namespace Moq.AutoMock.Tests
+namespace Moq.AutoMock.Tests.Util
 {
     public class ConstructorThrows
     {
         public ConstructorThrows()
         {
-            throw new ArgumentException();
+            throw new ArgumentException(string.Empty);
         }
     }
 }

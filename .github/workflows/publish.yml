@@ -1,0 +1,32 @@
+name: Publish to NuGet
+on:
+  push:
+    branches:
+      - master
+      - release
+
+jobs:
+
+  publish:
+    runs-on: windows-2019
+    env:
+      NUGET_AUTH_TOKEN: ${{ secrets.NUGET_TOKEN }}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.102
+
+    - name: Set CI Version
+      if: github.ref != 'refs/heads/release'
+      run: echo "::set-env name=VersionSuffix::ci$([string]::Format('{0:0000}', [int]'${{ github.run_number }}'))"
+      shell: pwsh
+
+    - name: Pack
+      run: dotnet pack --configuration release --include-symbols --output .
+
+    - name: Publish
+      run: dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN }} --skip-duplicate
