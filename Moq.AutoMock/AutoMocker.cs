@@ -228,7 +228,7 @@ namespace Moq.AutoMock
         /// </summary>
         /// <typeparam name="TService">The type that the instance will be registered as</typeparam>
         /// <param name="service"></param>
-        public void Use<TService>(TService service) where TService : class
+        public void Use<TService>([DisallowNull] TService service)
             => Use(typeof(TService), service);
 
         /// <summary>
