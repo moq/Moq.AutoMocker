@@ -7,7 +7,7 @@
     <AssemblyName>Moq.AutoMock</AssemblyName>
     <AssemblyTitle>Moq.AutoMocker</AssemblyTitle>
     <Product>Moq.AutoMocker</Product>
-    <Copyright>Copyright © 2020</Copyright>
+    <Copyright>Copyright © $([System.DateTime]::UtcNow.ToString("yyyy"))</Copyright>
 
     <Version>0.5.0</Version>
     <Authors>Tim Kellogg,Adam Hewitt,Kevin Bost</Authors>
