@@ -9,10 +9,6 @@ namespace Moq.AutoMock.Tests
     [TestClass]
     public class ResolvesDelegates
     {
-        //delegate string ZeroParamDelegate();
-        //delegate object OneParamDelegate(int p);
-        //delegate long TwoParamDelegate(int p, object foo);
-
         [DataTestMethod, DynamicData(nameof(DelegateTypes))]
         public void ResolvesFuncReturningDefinedParameter(Type delegateType, object expected)
         {
@@ -40,9 +36,6 @@ namespace Moq.AutoMock.Tests
                 yield return new object[] { typeof(Func<object, string>), nameof(ResolvesDelegates) };
                 yield return new object[] { typeof(Func<object, ResolvesDelegates, string>), nameof(ResolvesDelegates) };
                 yield return new object[] { typeof(Func<string, int, Service2>), new Service2() };
-                //yield return new object[] { typeof(ZeroParamDelegate), "" };
-                //yield return new [] { typeof(OneParamDelegate), new object() };
-                //yield return new object[] { typeof(TwoParamDelegate), 0L };
             }
         }
     }
