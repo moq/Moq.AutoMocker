@@ -277,9 +277,8 @@ namespace Moq.AutoMock
         /// </summary>
         /// <typeparam name="TService">The class or interface to search on</typeparam>
         /// <returns>The object that implements TService</returns>
-        [return:MaybeNull]
-        public TService Get<TService>()
-            => Get(typeof(TService)) is TService service ? service : default;
+        public TService? Get<TService>() where TService : class
+            => Get(typeof(TService)) is TService service ? service : null;
 
         /// <summary>
         /// Searches and retrieves an object from the container that matches the serviceType. This can be
