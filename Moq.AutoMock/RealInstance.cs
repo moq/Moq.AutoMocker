@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace Moq.AutoMock
+﻿namespace Moq.AutoMock
 {
 
     internal sealed class RealInstance : IInstance

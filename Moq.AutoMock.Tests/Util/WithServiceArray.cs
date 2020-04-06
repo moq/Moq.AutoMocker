@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Moq.AutoMock.Tests
+namespace Moq.AutoMock.Tests.Util
 {
     public class WithServiceArray
     {
