@@ -2,7 +2,7 @@
 {
     public class OneConstructor
     {
-        public Empty Empty;
+        public Empty Empty { get; }
 
         public OneConstructor(Empty empty)
         {

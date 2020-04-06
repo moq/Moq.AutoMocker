@@ -2,7 +2,7 @@
 {
     internal interface IInstance
     {
-        object Value { get; }
+        object? Value { get; }
         bool IsMock { get; }
     }
 }

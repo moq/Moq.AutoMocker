@@ -8,13 +8,14 @@ namespace Moq.AutoMock
     {
         public static ConstructorInfo SelectCtor(this Type type, Type[] existingTypes, BindingFlags bindingFlags)
         {
-            ConstructorInfo best = null;
+            ConstructorInfo? best = null;
             foreach (var constructor in type.GetConstructors(bindingFlags))
             {
                 if (isBetterChoice(constructor))
                     best = constructor;
             }
-            return best;
+
+            return best ?? throw new ArgumentException($"Did not find a best constructor for `{type}`", nameof(type));
 
             bool isBetterChoice(ConstructorInfo candidate)
             {

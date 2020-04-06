@@ -13,8 +13,11 @@ namespace Moq.AutoMock
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public static bool DoesContainCastToObject<TService>(Expression<Func<Mock<TService>, ISetup<TService, object>>> expression) where TService : class
+        public static bool DoesContainCastToObject<TService>(Expression<Func<Mock<TService>, ISetup<TService, object>>> expression) 
+            where TService : class
         {
+            if (expression is null) throw new ArgumentNullException(nameof(expression));
+
             //expression is assumed to be a lambda so the cast here would cause an exception if it was not the expected format
             var lambdaExpression = (LambdaExpression)expression;
 
@@ -45,6 +48,8 @@ namespace Moq.AutoMock
         public static bool DoesReturnPrimitive<TService>(Expression<Func<TService, object>> expression)
             where TService : class
         {
+            if (expression is null) throw new ArgumentNullException(nameof(expression));
+
             //expression is assumed to be a lambda so the cast here would cause an exception if it was not the expected format
             var lambdaExpression = (LambdaExpression)expression;
 

@@ -4,9 +4,9 @@
     {
         public IService1 Other
         {
-            get { return null; }
+            get { return null!; }
         }
 
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
     }
 }
