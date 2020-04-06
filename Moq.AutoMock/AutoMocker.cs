@@ -230,14 +230,15 @@ namespace Moq.AutoMock
         /// </summary>
         /// <typeparam name="TService">The type that the instance will be registered as</typeparam>
         /// <param name="service"></param>
-        public void Use<TService>(TService service) => Use(typeof(TService), service);
+        public void Use<TService>(TService service) where TService : class
+            => Use(typeof(TService), service);
 
         /// <summary>
         /// Adds an instance to the container.
         /// </summary>
         /// <param name="type">The type of service to use</param>
         /// <param name="service">The service to use</param>
-        public void Use(Type type, object? service)
+        public void Use(Type type, object service)
         {
             if (type is null) throw new ArgumentNullException(nameof(type));
             if (service != null && !type.IsInstanceOfType(service))
@@ -279,8 +280,13 @@ namespace Moq.AutoMock
         /// </summary>
         /// <typeparam name="TService">The class or interface to search on</typeparam>
         /// <returns>The object that implements TService</returns>
-        public TService? Get<TService>() where TService : class
-            => Get(typeof(TService)) is TService service ? service : null;
+        public TService Get<TService>() where TService : class?
+        {
+            if (Get(typeof(TService)) is TService service)
+                return service;
+
+            return null!;
+        }
 
         /// <summary>
         /// Searches and retrieves an object from the container that matches the serviceType. This can be
@@ -288,7 +294,7 @@ namespace Moq.AutoMock
         /// </summary>
         /// <param name="serviceType">The type of service to retrieve</param>
         /// <returns></returns>
-        public object? Get(Type serviceType)
+        public object Get(Type serviceType)
         {
             if (serviceType is null) throw new ArgumentNullException(nameof(serviceType));
 
@@ -297,7 +303,7 @@ namespace Moq.AutoMock
 
             if (instance is null)
                 throw new ArgumentException($"{serviceType} could not resolve to an object.", nameof(serviceType));
-            return instance.Value;
+            return instance.Value!; //Should generally not be null, unless the caller has forced a null in with Use
         }
 
         #endregion Get
