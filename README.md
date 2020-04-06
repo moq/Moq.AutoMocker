@@ -64,3 +64,7 @@ car.Accelerate(42);
 // This method verifies all mocks in the container
 mocker.VerifyAll();
 ```
+
+## Rider plugin
+
+[JetBtains Rider](https://www.jetbrains.com/rider/) plugin [MoqComplete](https://plugins.jetbrains.com/plugin/12659-moqcomplete) implement autocomplete for your Setup, Callback and Return methods
