@@ -7,7 +7,7 @@ namespace Moq.AutoMock.Tests
     [TestClass]
     public class ResolvesLazy
     {
-        [TestMethod] 
+        [TestMethod]
         public void ResolvesLazyObjectFromContainer() => Resolves(new object());
         
         [TestMethod] 
@@ -19,11 +19,11 @@ namespace Moq.AutoMock.Tests
         private static void Resolves<T>(T expected)
         {
             var mocker = new AutoMocker { Resolvers = { new LazyResolver() } };
-            mocker.Use(expected);
+            mocker.Use(expected!);
 
             var lazy = mocker.Get<Lazy<T>>();
             Assert.IsNotNull(lazy);
-            Assert.AreEqual(expected, lazy!.Value);
+            Assert.AreEqual(expected, lazy.Value);
         }
     }
 }

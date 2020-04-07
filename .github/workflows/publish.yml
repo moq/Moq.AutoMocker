@@ -18,11 +18,12 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.100
+        dotnet-version: 3.1.102
 
     - name: Set CI Version
       if: github.ref != 'refs/heads/release'
-      run: echo "::set-env name=VersionSuffix::ci${{ github.run_number }}"
+      run: echo "::set-env name=VersionSuffix::ci$([string]::Format('{0:0000}', [int]'${{ github.run_number }}'))"
+      shell: pwsh
 
     - name: Pack
       run: dotnet pack --configuration release --include-symbols --output .

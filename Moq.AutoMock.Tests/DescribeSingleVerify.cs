@@ -24,7 +24,7 @@ namespace Moq.AutoMock.Tests
             mocker.Setup<IServiceWithPrimitives, long>(s => s.ReturnsALong()).Returns(100L);
 
             var mock = mocker.Get<IServiceWithPrimitives>();
-            Assert.AreEqual(100L, mock!.ReturnsALong());
+            Assert.AreEqual(100L, mock.ReturnsALong());
 
             mocker.Verify<IServiceWithPrimitives, long>(s => s.ReturnsALong(), Times.Once());
         }
@@ -36,7 +36,7 @@ namespace Moq.AutoMock.Tests
             mocker.Setup<IService1>(x => x.Void()).Verifiable();
             mocker.Setup<IService5, string>(x => x.Name).Returns("Test");
 
-            mocker.Get<IService1>()!.Void();
+            mocker.Get<IService1>().Void();
 
             mocker.Verify();
         }

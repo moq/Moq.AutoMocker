@@ -12,3 +12,5 @@ packages/
 *.user
 *.trx
 *.coverage
+*.nupkg
+*.snupkg

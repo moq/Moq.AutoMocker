@@ -16,7 +16,7 @@ namespace Moq.AutoMock.Tests
             mocker.Setup<IService2, IService1?>(x => x.Other).Returns(Mock.Of<IService1>());
             var mock = mocker.Get<IService2>();
             Assert.IsNotNull(mock);
-            Assert.IsNotNull(mock!.Other);
+            Assert.IsNotNull(mock.Other);
         }
 
         [TestMethod]
@@ -26,7 +26,7 @@ namespace Moq.AutoMock.Tests
             mocker.Setup<IService2, IService1?>(x => x.Other).Returns(Mock.Of<IService1>());
             mocker.Setup<IService2, string?>(x => x.Name).Returns("pure awesomeness");
             var mock = mocker.Get<IService2>();
-            Assert.AreEqual("pure awesomeness", mock!.Name);
+            Assert.AreEqual("pure awesomeness", mock.Name);
             Assert.IsNotNull(mock.Other);
         }
 
@@ -36,7 +36,7 @@ namespace Moq.AutoMock.Tests
             var x = 0;
             var mocker = new AutoMocker();
             mocker.Setup<IService1>(_ => _.Void()).Callback(() => x++);
-            mocker.Get<IService1>()!.Void();
+            mocker.Get<IService1>().Void();
             Assert.AreEqual(1, x);
         }
 
@@ -47,7 +47,7 @@ namespace Moq.AutoMock.Tests
             mocker.Setup<IServiceWithPrimitives, long>(s => s.ReturnsALong()).Returns(100L);
 
             var mock = mocker.Get<IServiceWithPrimitives>();
-            Assert.AreEqual(100L, mock!.ReturnsALong());
+            Assert.AreEqual(100L, mock.ReturnsALong());
         }
 
         [TestMethod]
@@ -60,7 +60,7 @@ namespace Moq.AutoMock.Tests
                     .Returns<string>(s => s + "2");
 
             var mock = mocker.Get<IServiceWithPrimitives>();
-            Assert.AreEqual("blah2", mock!.ReturnsAReferenceWithParameter("blah"));
+            Assert.AreEqual("blah2", mock.ReturnsAReferenceWithParameter("blah"));
         }
 
         [TestMethod]
@@ -73,7 +73,7 @@ namespace Moq.AutoMock.Tests
                     .Returns<string>(s => s + "2");
 
             var mock = mocker.Get<IService4>();
-            Assert.AreEqual("2", mock!.MainMethodName(WithStatic.Get()));
+            Assert.AreEqual("2", mock.MainMethodName(WithStatic.Get()));
         }
 
         [TestMethod]
@@ -84,7 +84,7 @@ namespace Moq.AutoMock.Tests
 
             var mock = mocker.Get<IService5>();
 
-            mock!.Name = "aname";
+            mock.Name = "aname";
 
             Assert.AreEqual("aname", mock.Name);
         }
@@ -99,7 +99,7 @@ namespace Moq.AutoMock.Tests
 
             var mock = mocker.Get<IService4>();
 
-            Assert.AreEqual("t1", mock!.MainMethodName("any"));
+            Assert.AreEqual("t1", mock.MainMethodName("any"));
             Assert.AreEqual("t2", mock.MainMethodName("any"));
         }
     }
