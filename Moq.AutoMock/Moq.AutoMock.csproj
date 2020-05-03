@@ -30,7 +30,9 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" >
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Moq" Version="4.13.1" />
   </ItemGroup>
   
