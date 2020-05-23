@@ -1,0 +1,13 @@
+// For format details, see https://aka.ms/vscode-remote/devcontainer.json or this file's README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.117.1/containers/codespaces-linux
+{
+    "name": "Codespaces",
+    "image": "mcr.microsoft.com/vscode/devcontainers/universal:linux",
+
+    "extensions": [
+        "ms-vsonline.vsonline",
+        "GitHub.vscode-pull-request-github",
+        "MS-vsliveshare.vsliveshare",
+        "VisualStudioExptTeam.vscodeintellicode"
+    ]
+}
