@@ -1,16 +1,12 @@
-name: Publish to NuGet
-on:
-  push:
-    branches:
-      - master
-      - release
+name: Publish
+
+on: 
+  release:
+    types: [ prereleased, released ]
 
 jobs:
-
-  publish:
-    runs-on: windows-2019
-    env:
-      NUGET_AUTH_TOKEN: ${{ secrets.NUGET_TOKEN }}
+  build:
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
@@ -18,15 +14,15 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.102
+        dotnet-version: 3.1.101
 
-    - name: Set CI Version
-      if: github.ref != 'refs/heads/release'
+    - name: Set VersionSuffix
+      if: ${{ github.event.release.prerelease }}
       run: echo "::set-env name=VersionSuffix::ci$([string]::Format('{0:0000}', [int]'${{ github.run_number }}'))"
       shell: pwsh
 
-    - name: Pack
-      run: dotnet pack --configuration release --include-symbols --output .
+    - name: Build
+      run: dotnet pack --configuration Release --verbosity normal --output .
 
     - name: Publish
       run: dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN }} --skip-duplicate
