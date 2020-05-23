@@ -1,4 +1,4 @@
-# Moq.AutoMock  ![.NET Core](https://github.com/moq/Moq.AutoMocker/workflows/.NET%20Core/badge.svg) [![NuGet Status](https://img.shields.io/nuget/v/Moq.AutoMock.svg?style=flat)](https://www.nuget.org/packages/Moq.AutoMock)
+# Moq.AutoMock  ![Continuous](https://github.com/moq/Moq.AutoMocker/workflows/Continuous/badge.svg) [![NuGet Status](https://img.shields.io/nuget/v/Moq.AutoMock.svg?style=flat)](https://www.nuget.org/packages/Moq.AutoMock)
 
 An automocking container for Moq. Use this if you're invested in your IoC
 container and want to decouple your unit tests from changes to their 

@@ -9,7 +9,7 @@
     <Product>Moq.AutoMocker</Product>
     <Copyright>Copyright © $([System.DateTime]::UtcNow.ToString("yyyy"))</Copyright>
 
-    <VersionPrefix>2.0.0</VersionPrefix>
+    <VersionPrefix>2.0.1</VersionPrefix>
     <Authors>Tim Kellogg,Adam Hewitt,Kevin Bost</Authors>
     <PackageDescription>An auto-mocking container that generates mocks using Moq</PackageDescription>
     <Copyright>Copyright Tim Kellogg $([System.DateTime]::UtcNow.ToString("yyyy"))</Copyright>
@@ -30,7 +30,9 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" >
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Moq" Version="4.13.1" />
   </ItemGroup>
   
