@@ -27,7 +27,7 @@ namespace Moq.AutoMock.Resolvers
         }
 
         /// <summary>
-        /// Resolves requsted types with Mock instances.
+        /// Resolves requested types with Mock instances.
         /// </summary>
         /// <param name="context">The resolution context.</param>
         public void Resolve(MockResolutionContext context)
@@ -37,7 +37,30 @@ namespace Moq.AutoMock.Resolvers
             if (!(context.Value is null)) return;
 
             var mockType = typeof(Mock<>).MakeGenericType(context.RequestType);
-            if (Activator.CreateInstance(mockType, _mockBehavior) is Mock mock)
+
+            bool mayHaveDependencies = context.RequestType.IsClass 
+                                       && !typeof(Delegate).IsAssignableFrom(context.RequestType);
+            
+            object?[] constructorArgs;
+            if (mayHaveDependencies)
+            {
+                constructorArgs = context.AutoMocker.CreateArguments(context.RequestType);
+            }
+            else
+            {
+#pragma warning disable CA1825
+                // Compiler complains about empty array literal, but I can't find an alternative that will compile.
+                constructorArgs = new object[0];
+#pragma warning restore CA1825
+            }
+
+            // Create single params argument to appease the compiler. If we don't do this, the
+            // compiler will try to pass an object[] to the constructor, which probably won't work.
+            var args = new object[constructorArgs.Length + 1];
+            args[0] = _mockBehavior;
+            constructorArgs.CopyTo(args, 1);
+
+            if (Activator.CreateInstance(mockType, args) is Mock mock)
             {
                 mock.DefaultValue = _defaultValue;
                 mock.CallBase = _callBase;

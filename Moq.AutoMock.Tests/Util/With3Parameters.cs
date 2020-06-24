@@ -1,7 +1,7 @@
 ﻿namespace Moq.AutoMock.Tests.Util
 {
 #pragma warning disable CA1801, CA1812  //is an internal class that is apparently never instantiated
-    internal class With3Parameters
+    public class With3Parameters
     {
         // ReSharper disable UnusedMember.Global
         // ReSharper disable UnusedParameter.Local

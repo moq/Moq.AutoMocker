@@ -555,6 +555,11 @@ namespace Moq.AutoMock
             return bindingFlags;
         }
 
+        internal object?[] CreateArguments(Type type)
+        {
+            return CreateArguments(type, GetBindingFlags(false));
+        }
+        
         private object?[] CreateArguments(Type type, BindingFlags bindingFlags)
         {
             ConstructorInfo ctor = type.SelectCtor(_typeMap.Keys.ToArray(), bindingFlags);
