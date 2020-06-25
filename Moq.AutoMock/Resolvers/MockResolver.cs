@@ -41,21 +41,17 @@ namespace Moq.AutoMock.Resolvers
             bool mayHaveDependencies = context.RequestType.IsClass
                                        && !typeof(Delegate).IsAssignableFrom(context.RequestType);
 
-            //Invoke the Mock<T>(MockBehavior, params object[]) constructor
-            object?[] constructorArgs = new object?[2];
-            constructorArgs[0] = _mockBehavior;
-
+            object?[] constructorArgs;
             if (mayHaveDependencies)
             {
-                constructorArgs[1] = context.AutoMocker.CreateArguments(context.RequestType);
+                constructorArgs = context.AutoMocker.CreateArguments(context.RequestType);
             }
             else
             {
-                // Compiler complains about empty array literal, but I can't find an alternative that will compile.
-                constructorArgs[1] = Array.Empty<object>();
+                constructorArgs = Array.Empty<object>();
             }
 
-            if (Activator.CreateInstance(mockType, constructorArgs) is Mock mock)
+            if (Activator.CreateInstance(mockType, _mockBehavior, constructorArgs) is Mock mock)
             {
                 mock.DefaultValue = _defaultValue;
                 mock.CallBase = _callBase;
