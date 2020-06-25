@@ -138,5 +138,15 @@ namespace Moq.AutoMock.Tests
             // Questionable if this is the correct behavior, but it is the current behavior.
             Assert.AreSame(dependency, mocker.Get<WithService>());
         }
+
+        [TestMethod]
+        public void It_creates_object_with_recursive_dependency()
+        {
+            var mocker = new AutoMocker();
+            // I could see this changing to something else in the future, like null. Right now, it seems
+            // best to cause early failure to clarify what went wrong. Also, returning null "allows" the
+            // behavior, so it's easier to move that direction later without breaking backward compatibility.
+            Assert.ThrowsException<InvalidOperationException>(mocker.CreateInstance<WithRecursiveDependency>);
+        }
     }
 }

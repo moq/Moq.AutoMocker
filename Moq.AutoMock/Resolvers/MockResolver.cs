@@ -44,7 +44,7 @@ namespace Moq.AutoMock.Resolvers
             object?[] constructorArgs;
             if (mayHaveDependencies)
             {
-                constructorArgs = context.AutoMocker.CreateArguments(context.RequestType);
+                constructorArgs = context.AutoMocker.CreateArguments(context.RequestType, context.ObjectGraphContext);
             }
             else
             {
