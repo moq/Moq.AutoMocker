@@ -22,7 +22,7 @@ namespace Moq.AutoMock.Resolvers
             AutoMocker = autoMocker ?? throw new ArgumentNullException(nameof(autoMocker));
             RequestType = requestType ?? throw new ArgumentNullException(nameof(requestType));
             Value = initialValue;
-            ObjectGraphContext = objectGraphContext;
+            ObjectGraphContext = objectGraphContext ?? throw new ArgumentNullException(nameof(objectGraphContext));
         }
 
         /// <summary>

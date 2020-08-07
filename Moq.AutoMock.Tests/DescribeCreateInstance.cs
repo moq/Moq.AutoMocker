@@ -140,7 +140,7 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
-        public void It_creates_object_with_recursive_dependency()
+        public void It_throws_when_creating_object_with_recursive_dependency()
         {
             var mocker = new AutoMocker();
             // I could see this changing to something else in the future, like null. Right now, it seems
