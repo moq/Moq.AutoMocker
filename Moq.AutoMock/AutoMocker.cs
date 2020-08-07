@@ -87,7 +87,7 @@ namespace Moq.AutoMock
         /// </summary>
         public ICollection<IMockResolver> Resolvers { get; }
 
-        private IInstance Resolve(Type serviceType, ResolutionContext resolutionContext)
+        private IInstance Resolve(Type serviceType, ObjectGraphContext resolutionContext)
         {
             if (serviceType.IsArray)
             {
@@ -107,12 +107,15 @@ namespace Moq.AutoMock
             };
         }
 
-        private object? Resolve(Type serviceType, object? initialValue, ResolutionContext resolutionContext)
+        private object? Resolve(Type serviceType, object? initialValue, ObjectGraphContext resolutionContext)
         {
             if (resolutionContext.VisitedTypes.Contains(serviceType))
             {
-                throw new InvalidOperationException("Class could not be constructed because it appears to " +
-                                                    $"be used recursively: '{serviceType}'");
+                var message = string.Join(Environment.NewLine,
+                     $"Class could not be constructed because it appears to be used recursively: '{serviceType}'",
+                     string.Join($"{Environment.NewLine} --> ", resolutionContext.VisitedTypes)
+                );
+                throw new InvalidOperationException(message);
             }
 
             resolutionContext.VisitedTypes.Add(serviceType);
@@ -174,7 +177,7 @@ namespace Moq.AutoMock
         {
             if (type is null) throw new ArgumentNullException(nameof(type));
 
-            var context = new ResolutionContext(enablePrivate);
+            var context = new ObjectGraphContext(enablePrivate);
             object?[] arguments = CreateArguments(type, context);
             try
             {
@@ -211,7 +214,7 @@ namespace Moq.AutoMock
         /// <returns>An instance with virtual and abstract members mocked</returns>
         public T CreateSelfMock<T>(bool enablePrivate) where T : class?
         {
-            var context = new ResolutionContext(enablePrivate);
+            var context = new ObjectGraphContext(enablePrivate);
             var arguments = CreateArguments(typeof(T), context);
 
             var mock = new Mock<T>(MockBehavior, arguments)
@@ -302,10 +305,10 @@ namespace Moq.AutoMock
         /// <returns></returns>
         public object Get(Type serviceType)
         {
-            return Get(serviceType, new ResolutionContext(false));
+            return Get(serviceType, new ObjectGraphContext(false));
         }
         
-        private object Get(Type serviceType, ResolutionContext context)
+        private object Get(Type serviceType, ObjectGraphContext context)
         {
             if (serviceType is null) throw new ArgumentNullException(nameof(serviceType));
 
@@ -345,7 +348,7 @@ namespace Moq.AutoMock
         private Mock GetMockImplementation(Type serviceType)
         {
             if (!_typeMap.TryGetValue(serviceType, out var instance) || instance is null)
-                instance = _typeMap[serviceType] = Resolve(serviceType, new ResolutionContext(false));
+                instance = _typeMap[serviceType] = Resolve(serviceType, new ObjectGraphContext(false));
 
             if (instance == null || !instance.IsMock)
                 throw new ArgumentException($"Registered service `{Get(serviceType)?.GetType()}` was not a mock");
@@ -431,7 +434,7 @@ namespace Moq.AutoMock
         {
             if (type is null) throw new ArgumentNullException(nameof(type));
 
-            if (!(Resolve(type, new ResolutionContext(false)) is MockInstance mockObject))
+            if (!(Resolve(type, new ObjectGraphContext(false)) is MockInstance mockObject))
                 throw new ArgumentException($"{type} did not resolve to a Mock", nameof(type));
 
             forwardTo.Aggregate(mockObject.Mock, As);
@@ -561,7 +564,7 @@ namespace Moq.AutoMock
 
         #region Utilities
 
-        internal object?[] CreateArguments(Type type, ResolutionContext context)
+        internal object?[] CreateArguments(Type type, ObjectGraphContext context)
         {
             ConstructorInfo ctor = type.SelectCtor(_typeMap.Keys.ToArray(), context.BindingFlags);
             if (ctor is null)
@@ -573,7 +576,7 @@ namespace Moq.AutoMock
         private Mock GetOrMakeMockFor(Type type)
         {
             if (!_typeMap.TryGetValue(type, out var instance) || !instance.IsMock)
-                instance = Resolve(type, new ResolutionContext(false));
+                instance = Resolve(type, new ObjectGraphContext(false));
 
             if (!(instance is MockInstance mockInstance))
                 throw new ArgumentException($"{type} does not resolve to a Mock");

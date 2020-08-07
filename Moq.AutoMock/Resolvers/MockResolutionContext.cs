@@ -17,7 +17,7 @@ namespace Moq.AutoMock.Resolvers
         /// Context within the object graph being created. This differs from the MockResolutionContext which is
         /// only relevant for a single object creation.
         /// </param>
-        public MockResolutionContext(AutoMocker autoMocker, Type requestType, object? initialValue, ResolutionContext objectGraphContext)
+        public MockResolutionContext(AutoMocker autoMocker, Type requestType, object? initialValue, ObjectGraphContext objectGraphContext)
         {
             AutoMocker = autoMocker ?? throw new ArgumentNullException(nameof(autoMocker));
             RequestType = requestType ?? throw new ArgumentNullException(nameof(requestType));
@@ -44,7 +44,7 @@ namespace Moq.AutoMock.Resolvers
         /// Context within the object graph being created. This differs from the MockResolutionContext which is
         /// only relevant for a single object creation.
         /// </summary>
-        public ResolutionContext ObjectGraphContext { get; }
+        public ObjectGraphContext ObjectGraphContext { get; }
 
         /// <summary>
         /// Deconstruct this instance into its individual properties.

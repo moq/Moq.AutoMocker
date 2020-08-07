@@ -1,8 +1,6 @@
 namespace Moq.AutoMock.Tests.Util
 {
-#pragma warning disable CA1812  //is an internal class that is apparently never instantiated
-    internal class With2ClassDependencies
-#pragma warning restore CA1812
+    public class With2ClassDependencies
     {
         public WithService WithService { get; }
         public With3Parameters With3Parameters { get; }
