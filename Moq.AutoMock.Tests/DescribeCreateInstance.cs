@@ -95,5 +95,58 @@ namespace Moq.AutoMock.Tests
             ArgumentException exception = Assert.ThrowsException<ArgumentException>(() => mocker.CreateInstance<ConstructorThrows>());
             StringAssert.Contains(exception.StackTrace, typeof(ConstructorThrows).Name);
         }
+
+        [TestMethod]
+        public void It_creates_object_when_first_level_dependencies_are_classes()
+        {
+            var mocker = new AutoMocker();
+            HasClassDependency instance = mocker.CreateInstance<HasClassDependency>();
+            var dependency = instance.WithService;
+            Assert.IsNotNull(dependency);
+            Assert.IsInstanceOfType(dependency, typeof(WithService));
+            Assert.IsInstanceOfType(Mock.Get(dependency), typeof(Mock<WithService>));
+            Assert.AreSame(dependency, mocker.Get<WithService>());
+        }
+
+        [TestMethod]
+        public void It_creates_object_with_2_first_level_dependencies()
+        {
+            var mocker = new AutoMocker();
+            var instance = mocker.CreateInstance<With2ClassDependencies>();
+            
+            var dependency1 = instance.WithService;
+            Assert.IsNotNull(dependency1);
+            Assert.IsInstanceOfType(dependency1, typeof(WithService));
+            Assert.IsInstanceOfType(Mock.Get(dependency1), typeof(Mock<WithService>));
+            Assert.AreSame(dependency1, mocker.Get<WithService>());
+            
+            var dependency2 = instance.With3Parameters;
+            Assert.IsNotNull(dependency2);
+            Assert.IsInstanceOfType(dependency2, typeof(With3Parameters));
+            Assert.IsInstanceOfType(Mock.Get(dependency2), typeof(Mock<With3Parameters>));
+        }
+
+        [TestMethod]
+        public void Second_level_dependencies_act_same_as_if_they_were_target()
+        {
+            var mocker = new AutoMocker();
+            var instance = mocker.CreateInstance<HasFuncDependencies>();
+            var dependency = instance.WithServiceFactory();
+            Assert.IsNotNull(dependency);
+            Assert.IsInstanceOfType(dependency, typeof(WithService));
+            Assert.IsInstanceOfType(Mock.Get(dependency), typeof(Mock<WithService>));
+            // Questionable if this is the correct behavior, but it is the current behavior.
+            Assert.AreSame(dependency, mocker.Get<WithService>());
+        }
+
+        [TestMethod]
+        public void It_throws_when_creating_object_with_recursive_dependency()
+        {
+            var mocker = new AutoMocker();
+            // I could see this changing to something else in the future, like null. Right now, it seems
+            // best to cause early failure to clarify what went wrong. Also, returning null "allows" the
+            // behavior, so it's easier to move that direction later without breaking backward compatibility.
+            Assert.ThrowsException<InvalidOperationException>(mocker.CreateInstance<WithRecursiveDependency>);
+        }
     }
 }
