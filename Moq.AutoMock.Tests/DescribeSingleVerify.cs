@@ -1,11 +1,11 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using Moq.AutoMock.Tests.Util;
+using VerifyMSTest;
 
 namespace Moq.AutoMock.Tests
 {
     [TestClass]
-    public class DescribeSingleVerify
+    public class DescribeSingleVerify : VerifyBase
     {
         [TestMethod]
         public void You_can_verify_a_single_method_call_directly()
@@ -47,8 +47,7 @@ namespace Moq.AutoMock.Tests
             var mocker = new AutoMocker();
 
             //a method without parameters
-            var ex = Assert.ThrowsException<NotSupportedException>(() => mocker.Verify<IServiceWithPrimitives>(s => s.ReturnsALong(), Times.Once()));
-            Assert.AreEqual("Use the Verify overload that allows specifying TReturn if the setup returns a value type", ex.Message);
+            Throws(() => mocker.Verify<IServiceWithPrimitives>(s => s.ReturnsALong(), Times.Once()));
         }
     }
 }
