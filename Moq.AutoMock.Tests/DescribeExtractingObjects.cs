@@ -1,11 +1,13 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Threading.Tasks;
 using Moq.AutoMock.Tests.Util;
+using VerifyMSTest;
 
 namespace Moq.AutoMock.Tests
 {
     [TestClass]
-    public class DescribeExtractingObjects
+    public class DescribeExtractingObjects : VerifyBase
     {
         [TestMethod]
         public void It_extracts_instances_that_were_placed_with_Use()
@@ -25,7 +27,7 @@ namespace Moq.AutoMock.Tests
 #pragma warning disable CA1820 // Test for empty strings using string length
             mocker.Use<IService1>(x => x.ToString() == "");
 #pragma warning restore CA1820 // Test for empty strings using string length
-                              
+
             // Assert does not throw
             mocker.GetMock<IService1>();
         }
@@ -56,11 +58,11 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
-        public void ExtractMock_throws_ArgumentException_when_object_is_not_A_mock()
+        public Task ExtractMock_throws_ArgumentException_when_object_is_not_A_mock()
         {
             var mocker = new AutoMocker();
             mocker.Use<IService2>(new Service2());
-            Assert.ThrowsException<ArgumentException>(() => mocker.GetMock<IService2>());
+            return Throws(() => mocker.GetMock<IService2>());
         }
     }
 }
