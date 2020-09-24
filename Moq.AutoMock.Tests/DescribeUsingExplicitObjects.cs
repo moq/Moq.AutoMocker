@@ -1,10 +1,11 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq.AutoMock.Tests.Util;
+using VerifyMSTest;
 
 namespace Moq.AutoMock.Tests
 {
     [TestClass]
-    public class DescribeUsingExplicitObjects
+    public class DescribeUsingExplicitObjects : VerifyBase
     {
         [TestMethod]
         public void You_can_Use_an_instance_as_an_argument_to_GetInstance()
