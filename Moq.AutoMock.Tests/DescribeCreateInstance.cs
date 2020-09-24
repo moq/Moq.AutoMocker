@@ -1,12 +1,14 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Moq.AutoMock.Tests.Util;
+using VerifyMSTest;
 
 namespace Moq.AutoMock.Tests
 {
     [TestClass]
-    public class DescribeCreateInstance
+    public class DescribeCreateInstance : VerifyBase
     {
         [TestMethod]
         public void It_creates_object_with_no_constructor()
@@ -82,10 +84,10 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
-        public void It_throws_original_exception_caught_whilst_creating_object()
+        public Task It_throws_original_exception_caught_whilst_creating_object()
         {
             var mocker = new AutoMocker();
-            Assert.ThrowsException<ArgumentException>(mocker.CreateInstance<ConstructorThrows>);
+            return Throws(mocker.CreateInstance<ConstructorThrows>);
         }
 
         [TestMethod]
@@ -140,13 +142,13 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
-        public void It_throws_when_creating_object_with_recursive_dependency()
+        public Task It_throws_when_creating_object_with_recursive_dependency()
         {
             var mocker = new AutoMocker();
             // I could see this changing to something else in the future, like null. Right now, it seems
             // best to cause early failure to clarify what went wrong. Also, returning null "allows" the
             // behavior, so it's easier to move that direction later without breaking backward compatibility.
-            Assert.ThrowsException<InvalidOperationException>(mocker.CreateInstance<WithRecursiveDependency>);
+            return Throws(mocker.CreateInstance<WithRecursiveDependency>);
         }
     }
 }
