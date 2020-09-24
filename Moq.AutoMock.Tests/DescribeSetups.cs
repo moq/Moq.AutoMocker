@@ -1,10 +1,11 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq.AutoMock.Tests.Util;
+using VerifyMSTest;
 
 namespace Moq.AutoMock.Tests
 {
     [TestClass]
-    public class DescribeSetups
+    public class DescribeSetups : VerifyBase
     {
         /// <summary>
         /// Some people find this more comfortable than the Mock.Of() style
