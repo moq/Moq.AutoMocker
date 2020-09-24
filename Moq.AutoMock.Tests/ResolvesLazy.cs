@@ -1,19 +1,20 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq.AutoMock.Resolvers;
 using System;
+using VerifyMSTest;
 
 namespace Moq.AutoMock.Tests
 {
     [TestClass]
-    public class ResolvesLazy
+    public class ResolvesLazy : VerifyBase
     {
         [TestMethod]
         public void ResolvesLazyObjectFromContainer() => Resolves(new object());
-        
-        [TestMethod] 
+
+        [TestMethod]
         public void ResolvesLazyNumberFromContainer() => Resolves(42L);
-        
-        [TestMethod] 
+
+        [TestMethod]
         public void ResolvesLazyStringFromContainer() => Resolves(nameof(ResolvesLazy));
 
         private static void Resolves<T>(T expected)

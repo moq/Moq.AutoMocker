@@ -3,11 +3,12 @@ using Moq.AutoMock.Resolvers;
 using System;
 using System.Collections.Generic;
 using Moq.AutoMock.Tests.Util;
+using VerifyMSTest;
 
 namespace Moq.AutoMock.Tests
 {
     [TestClass]
-    public class ResolvesDelegates
+    public class ResolvesDelegates : VerifyBase
     {
         [DataTestMethod, DynamicData(nameof(DelegateTypes))]
         public void ResolvesFuncReturningDefinedParameter(Type delegateType, object expected)

@@ -1,11 +1,12 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq.AutoMock.Tests.Util;
+using VerifyMSTest;
 
 namespace Moq.AutoMock.Tests
 {
 
     [TestClass]
-    public class DescribeVerifyAll
+    public class DescribeVerifyAll : VerifyBase
     {
         [TestMethod]
         public void It_calls_VerifyAll_on_all_objects_that_are_mocks()
