@@ -9,28 +9,35 @@ Usage
 
 Simplest usage is to build an instance that you can unit test.
 
-```csharp
+<!-- snippet: Usasge -->
+<a id='snippet-usasge'></a>
+```cs
 var mocker = new AutoMocker();
 var car = mocker.CreateInstance<Car>();
-
-car.DriveTrain.ShouldNotBeNull();
-car.DriveTrain.ShouldImplement<IDriveTrain>();
+Assert.IsNotNull(car.DriveTrain);
+Assert.IsInstanceOfType(car.DriveTrain, typeof(IDriveTrain));
 Mock<IDriveTrain> mock = Mock.Get(car.DriveTrain);
 ```
+<sup><a href='/Moq.AutoMock.Tests/Snippets.cs#L10-L18' title='File snippet `usasge` was extracted from'>snippet source</a> | <a href='#snippet-usasge' title='Navigate to start of snippet `usasge`'>anchor</a></sup>
+<!-- endSnippet -->
 
 If you have a special instance that you need to use, you can register it
 with `.Use(...)`. This is very similar to registrations in a regular IoC
 container (i.e. `For<IService>().Use(x)` in StructureMap).
 
-```csharp
+<!-- snippet: Register -->
+<a id='snippet-register'></a>
+```cs
 var mocker = new AutoMocker();
 
 mocker.Use<IDriveTrain>(new DriveTrain());
 // OR, setup a Mock
-mocker.Use<IDriveTrain>(x => x.Shaft.Length == 5);
+mocker.Use<IDriveTrain>(x => x.ShaftLength == 5);
 
 var car = mocker.CreateInstance<Car>();
 ```
+<sup><a href='/Moq.AutoMock.Tests/Snippets.cs#L23-L33' title='File snippet `register` was extracted from'>snippet source</a> | <a href='#snippet-register' title='Navigate to start of snippet `register`'>anchor</a></sup>
+<!-- endSnippet -->
 
 Extracting Mocks
 ----------------
@@ -38,7 +45,9 @@ Extracting Mocks
 At some point you might need to get to a mock that was auto-generated. For
 this, use the `.Get<>()` or `.GetMock<>()` methods.
 
-```csharp
+<!-- snippet: Extract -->
+<a id='snippet-extract'></a>
+```cs
 var mocker = new AutoMocker();
 
 // Let's say you have a setup that needs verifying
@@ -51,10 +60,14 @@ car.Accelerate(42);
 var driveTrainMock = mocker.GetMock<IDriveTrain>();
 driveTrainMock.VerifyAll();
 ```
+<sup><a href='/Moq.AutoMock.Tests/Snippets.cs#L38-L52' title='File snippet `extract` was extracted from'>snippet source</a> | <a href='#snippet-extract' title='Navigate to start of snippet `extract`'>anchor</a></sup>
+<!-- endSnippet -->
 
 Alternately, there's an even faster way to verify all mocks in the container:
 
-```csharp
+<!-- snippet: VerifyAll -->
+<a id='snippet-verifyall'></a>
+```cs
 var mocker = new AutoMocker();
 mocker.Use<IDriveTrain>(x => x.Accelerate(42) == true);
 
@@ -64,3 +77,5 @@ car.Accelerate(42);
 // This method verifies all mocks in the container
 mocker.VerifyAll();
 ```
+<sup><a href='/Moq.AutoMock.Tests/Snippets.cs#L57-L68' title='File snippet `verifyall` was extracted from'>snippet source</a> | <a href='#snippet-verifyall' title='Navigate to start of snippet `verifyall`'>anchor</a></sup>
+<!-- endSnippet -->
