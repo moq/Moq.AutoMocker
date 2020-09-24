@@ -1,10 +1,11 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq.AutoMock.Tests.Util;
+using VerifyMSTest;
 
 namespace Moq.AutoMock.Tests
 {
     [TestClass]
-    public class DescribeCombiningTypes
+    public class DescribeCombiningTypes : VerifyBase
     {
         [TestMethod]
         public void It_uses_the_same_mock_for_all_instances()
