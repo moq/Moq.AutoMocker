@@ -2,14 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <RootNamespace>Moq.AutoMock.Tests</RootNamespace>
-    <AssemblyName>Moq.AutoMock.Tests</AssemblyName>
     <Copyright>Copyright © 2020</Copyright>
 
     <IsPackable>false</IsPackable>
     <NoWarn>$(NoWarn),CA1707</NoWarn>
   </PropertyGroup>
-  
+
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
