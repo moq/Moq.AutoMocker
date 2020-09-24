@@ -1,10 +1,11 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq.AutoMock.Tests.Util;
+using VerifyMSTest;
 
 namespace Moq.AutoMock.Tests
 {
     [TestClass]
-    public class DescribeCreatingSelfMocks
+    public class DescribeCreatingSelfMocks : VerifyBase
     {
         [TestMethod]
         public void Self_mocks_are_useful_for_testing_most_of_class()
