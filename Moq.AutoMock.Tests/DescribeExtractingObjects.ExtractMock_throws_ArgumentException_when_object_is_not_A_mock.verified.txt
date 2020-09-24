@@ -1,0 +1,4 @@
+{
+  Type: 'ArgumentException',
+  Message: 'Registered service `Moq.AutoMock.Tests.Util.Service2` was not a mock'
+}

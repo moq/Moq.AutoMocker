@@ -91,7 +91,7 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
-        public void You_can_setup_a_method_that_returns_diffrent_result_in_sequence()
+        public void You_can_setup_a_method_that_returns_different_result_in_sequence()
         {
             var mocker = new AutoMocker();
             mocker.SetupSequence<IService4, string>(p => p.MainMethodName(It.IsAny<string>()))

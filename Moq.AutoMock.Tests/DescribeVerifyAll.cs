@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq.AutoMock.Tests.Util;
 using VerifyMSTest;
@@ -9,13 +10,12 @@ namespace Moq.AutoMock.Tests
     public class DescribeVerifyAll : VerifyBase
     {
         [TestMethod]
-        public void It_calls_VerifyAll_on_all_objects_that_are_mocks()
+        public Task It_calls_VerifyAll_on_all_objects_that_are_mocks()
         {
             var mocker = new AutoMocker();
             mocker.Use<IService2>(x => x.Other == Mock.Of<IService1>());
             var _ = mocker.CreateInstance<WithService>();
-            var ex = Assert.ThrowsException<MockException>(() => mocker.VerifyAll());
-            Assert.IsTrue(ex.IsVerificationError);
+            return Throws(() => mocker.VerifyAll());
         }
 
         [TestMethod]

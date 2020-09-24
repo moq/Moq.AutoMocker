@@ -14,3 +14,5 @@ packages/
 *.coverage
 *.nupkg
 *.snupkg
+
+*.received.*

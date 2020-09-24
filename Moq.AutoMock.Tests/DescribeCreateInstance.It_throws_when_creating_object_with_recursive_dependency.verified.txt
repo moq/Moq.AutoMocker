@@ -1,0 +1,4 @@
+{
+  Type: 'InvalidOperationException',
+  Message: "Class could not be constructed because it appears to be used recursively: 'Moq.AutoMock.Tests.Util.WithRecursiveDependency'\nMoq.AutoMock.Tests.Util.WithRecursiveDependency"
+}

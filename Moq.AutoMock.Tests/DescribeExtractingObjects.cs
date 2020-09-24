@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.Threading.Tasks;
 using Moq.AutoMock.Tests.Util;
 using VerifyMSTest;

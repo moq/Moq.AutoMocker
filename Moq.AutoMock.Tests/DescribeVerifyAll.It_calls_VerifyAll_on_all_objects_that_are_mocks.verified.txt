@@ -1,0 +1,5 @@
+{
+  Type: 'MockException',
+  IsVerificationError: true,
+  Message: 'Mock<IService2:13>:\nThis mock failed verification due to the following:\n\n   IService2 mock => mock.Other:\n   This setup was not matched.'
+}
