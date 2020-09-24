@@ -1,10 +1,11 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq.AutoMock.Tests.Util;
+using VerifyMSTest;
 
 namespace Moq.AutoMock.Tests
 {
     [TestClass]
-    public class DescribeGetMock
+    public class DescribeGetMock : VerifyBase
     {
         [TestMethod]
         public void It_creates_mock_from_interface_from_generic_type_parameter()
