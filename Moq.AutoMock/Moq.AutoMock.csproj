@@ -3,10 +3,6 @@
   <PropertyGroup>
     <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
     <OutputType>Library</OutputType>
-    <RootNamespace>Moq.AutoMock</RootNamespace>
-    <AssemblyName>Moq.AutoMock</AssemblyName>
-    <AssemblyTitle>Moq.AutoMocker</AssemblyTitle>
-    <Product>Moq.AutoMocker</Product>
     <Copyright>Copyright © $([System.DateTime]::UtcNow.ToString("yyyy"))</Copyright>
 
     <VersionPrefix>2.1.0</VersionPrefix>
@@ -35,7 +31,7 @@
     </PackageReference>
     <PackageReference Include="Moq" Version="4.13.1" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <None Include="..\LICENSE" Pack="true" PackagePath="" />
     <None Include="AutoMocker.Combine.cs.tt">
