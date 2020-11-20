@@ -54,7 +54,7 @@ jobs:
         <# Every build should have the revision set #>
         Add-Content 'Revision=${{ github.run_number }}' $env:GITHUB_ENV -Encoding utf8
 
-        Get-Content $env:GITHUB_ENV | Out-Host
+        echo (Get-Content $env:GITHUB_ENV)
 
 
   # Package Release
