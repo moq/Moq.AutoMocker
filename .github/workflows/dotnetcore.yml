@@ -17,6 +17,9 @@ on:
     tags:
     - 'v*'
 
+defaults:
+  run:
+    shell: pwsh
 
 jobs:
   build:
@@ -34,7 +37,6 @@ jobs:
 
   # Set build properties
     - name: Set build version
-      shell: pwsh
       run: |
         # If we're a tag, force VersionPrefix to the tag value
         if ('${{ github.ref }}' -match '^refs/tags/v') {
@@ -56,10 +58,18 @@ jobs:
 
   # Package Release
     - name: Pack
-      run: |
-        dotnet pack --configuration Release --verbosity normal --output .
-        dotnet nuget push *.nupkg --source "github"
+      run: dotnet pack --configuration Release --verbosity normal --output .
+
     - name: Publish
-      if: github.event_name == 'push'
-      run: dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN }} --skip-duplicate
+      # if: github.event_name == 'push'
+      run: |
+        # dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN }} --skip-duplicate
+
+        dotnet new nugetconfig
+        dotnet nuget add source `
+          --name 'github' `
+          --username '${{ github.actor }}' `
+          --password '${{ github.token }}' `
+          --configfile 'nuget.config' 'https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json'
+        dotnet nuget push *.nupkg --source "github"
 
