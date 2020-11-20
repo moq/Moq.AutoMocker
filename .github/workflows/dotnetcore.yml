@@ -35,32 +35,25 @@ jobs:
     - name: Test
       run: dotnet test --configuration Release --verbosity normal
 
-  # Set build properties
-    - name: Set build version
+  # Package Release
+    - name: Pack
       run: |
         <# If we're a tag, force VersionPrefix to the tag value #>
         if ('${{ github.ref }}' -match '^refs/tags/v') {
           if ($match = [regex]::Match('${{ github.ref }}', '^refs/tags/v([0-9]+(\.[0-9]+){1,2})') -and $match.Success) {
-            Add-Content "VersionPrefix=$($match.Groups[1].Value)" $env:GITHUB_ENV -Encoding utf8
+            $env:VersionPrefix = $match.Groups[1].Value
           } else {
             throw 'Invalid tag version: ${{ github.ref }}'
           }
         }
         else {
           <# All other pushes get a CI suffix #>
-          Add-Content 'VersionSuffix=ci' $env:GITHUB_ENV -Encoding utf8
+          $env:VersionSuffix = 'ci'
         }
 
         <# Every build should have the revision set #>
-        Add-Content 'Revision=${{ github.run_number }}' $env:GITHUB_ENV -Encoding utf8
+        $env:Revision = '${{ github.run_number }}'
 
-        echo (Get-Content $env:GITHUB_ENV)
-
-
-  # Package Release
-    - name: Pack
-      run: |
-        Write-Host "${{ env.VersionPrefix }}.${{ env.Revision }}-${{ env.VersionSuffix }}"
         dotnet pack --configuration Release --verbosity normal --output .
 
   # Publish to NuGet and GitHub Packages
