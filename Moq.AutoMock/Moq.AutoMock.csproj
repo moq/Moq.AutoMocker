@@ -4,10 +4,11 @@
     <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
     <OutputType>Library</OutputType>
     <Copyright>Copyright © $([System.DateTime]::UtcNow.ToString("yyyy"))</Copyright>
-    <VersionPrefix>2.1.0</VersionPrefix>
+
+    <VersionPrefix Condition=" '$(VersionPrefix)' == '' " >2.1.0</VersionPrefix>
     <VersionPrefix Condition=" '$(Revision)' != '' ">$(VersionPrefix).$(Revision)</VersionPrefix>
 
-    <Authors>Tim Kellogg,Adam Hewitt,Kevin Bost</Authors>
+    <Authors>Tim Kellogg, Adam Hewitt, Kevin Bost</Authors>
     <PackageDescription>An auto-mocking container that generates mocks using Moq</PackageDescription>
     <Copyright>Copyright Tim Kellogg $([System.DateTime]::UtcNow.ToString("yyyy"))</Copyright>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>

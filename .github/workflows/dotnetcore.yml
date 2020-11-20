@@ -1,15 +1,16 @@
 name: Continuous
 
 on:
-  push:
-    branches: 
-      - master
-      - develop
   pull_request:
+  push:
+    branches: [ master ]
+    tags:
+    - 'v*'
+    paths:
+    - '!README.md'
+    - '!docs/**'
 
 jobs:
-
-# Continuous Integration
   build:
     runs-on: windows-latest
     steps:
@@ -18,55 +19,44 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.404
+
+  # Run unit tests
     - name: Test
       run: dotnet test --configuration Release --verbosity normal
 
   # Set build properties
-    - name: Set Revision
-      run: echo "::set-env name=Revision::${{ github.run_number }}"
-    - name: Set VersionSuffix
-      if: github.ref == 'refs/heads/develop'
-      run: echo "::set-env name=VersionSuffix::ci"
-
-    - name: Echo Tag Name
+    - name: Set build version
       shell: pwsh
       run: |
-        $prefix = $(([xml](Get-Content .\Moq.AutoMock\Moq.AutoMock.csproj)).Project.PropertyGroup.VersionPrefix[0])
-        echo "::set-env name=TagName::v$prefix.${{ env.Revision }}$('${{ env.VersionSuffix }}' -replace '^.','-$0')"
+        # If we're a tag, force VersionPrefix to the tag value
+        if ($match = [regex]::Match('${{ github.ref }}', '^refs/tags/v([0-9]+\.[0-9]+\.[0-9]+)')) {
+          if (-not $match.Success) { throw "Invalid tag: ${{ github.ref }}" }
+          Add-Content "VersionPrefix=$($match.Groups[1])"" $env:GITHUB_ENV -Encoding utf8
+        }
 
+        # Pushes on master get a CI suffix
+        if ('${{ github.ref }}' -eq 'refs/heads/master') {
+          Add-Content 'VersionSuffix=ci' $env:GITHUB_ENV -Encoding utf8
+        }
 
-# Publish to NuGet
-  publish:
-    runs-on: windows-latest
-    if: github.event_name == 'push'
-    needs: build
-    steps:
-  # Configure repository
-    - uses: actions/checkout@v2
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 3.1.404
-
-  # Set build properties
-    - name: Set Revision
-      run: echo "::set-env name=Revision::${{ github.run_number }}"
-    - name: Set VersionSuffix
-      if: github.ref == 'refs/heads/develop'
-      run: echo "::set-env name=VersionSuffix::ci"
+        # Every build should have the revision set
+        Add-Content 'Revision=${{ github.run_number }}' $env:GITHUB_ENV -Encoding utf8
 
   # NuGet Release
     - name: Pack
+      if: github.event_name == 'push'
       run: dotnet pack --configuration Release --verbosity normal --output .
     - name: Publish
+      if: github.event_name == 'push'
       run: dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN }} --skip-duplicate
 
   # GitHub Releases
-    - name: Create Release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      with:
-        tag_name: ${{ env.TagName }}
-        release_name: ${{ env.TagName }}
-        prerelease: ${{ github.ref != 'refs/heads/master' }}
+  # - name: Create Release
+  #   if: github.event_name == 'push'
+  #   uses: actions/create-release@v1
+  #   env:
+  #     GITHUB_TOKEN: ${{ github.token }}
+  #   with:
+  #     tag_name: ${{ env.TagName }}
+  #     release_name: ${{ env.TagName }}
+  #     prerelease: ${{ github.ref == 'refs/heads/master' }}
