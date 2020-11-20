@@ -46,9 +46,8 @@ jobs:
             throw 'Invalid tag version: ${{ github.ref }}'
           }
         }
-
-        # Pushes to a branch get a CI suffix
-        if ('${{ github.ref }}' -match '^refs/heads/') {
+        else {
+          # All other pushes get a CI suffix
           Add-Content 'VersionSuffix=ci' $env:GITHUB_ENV -Encoding utf8
         }
 
@@ -59,11 +58,16 @@ jobs:
   # Package Release
     - name: Pack
       run: dotnet pack --configuration Release --verbosity normal --output .
+      env:
+        VersionPrefix: ${{ env.VersionPrefix }}
+        VersionSuffix: ${{ env.VersionSuffix }}
+        Revision: ${{ env.Revision }}
 
+  # Publish to NuGet and GitHub Packages
     - name: Publish
-      # if: github.event_name == 'push'
+      if: github.event_name == 'push'
       run: |
-        # dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN }} --skip-duplicate
+        dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN }} --skip-duplicate
 
         dotnet new nugetconfig
         dotnet nuget add source `
@@ -72,4 +76,3 @@ jobs:
           --password '${{ github.token }}' `
           --configfile 'nuget.config' 'https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json'
         dotnet nuget push *.nupkg --source "github"
-
