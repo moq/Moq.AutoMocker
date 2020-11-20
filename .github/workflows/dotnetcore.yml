@@ -29,18 +29,22 @@ jobs:
       shell: pwsh
       run: |
         # If we're a tag, force VersionPrefix to the tag value
-        if ($match = [regex]::Match('${{ github.ref }}', '^refs/tags/v([0-9]+\.[0-9]+\.[0-9]+)')) {
-          if (-not $match.Success) { throw "Invalid tag: ${{ github.ref }}" }
-          Add-Content "VersionPrefix=$($match.Groups[1])"" $env:GITHUB_ENV -Encoding utf8
+        if ('${{ github.ref }}' -match '^refs/tags/v') {
+          if ($match = [regex]::Match('${{ github.ref }}', '^refs/tags/v([0-9]+(\.[0-9]+){1,2})') -and $match.Success) {
+            Add-Content "VersionPrefix=$($match.Groups[1].Value)" $env:GITHUB_ENV -Encoding utf8
+          } else {
+            throw 'Invalid tag version: ${{ github.ref }}'
+          }
         }
 
-        # Pushes on master get a CI suffix
-        if ('${{ github.ref }}' -eq 'refs/heads/master') {
+        # Pushes to a branch get a CI suffix
+        if ('${{ github.ref }}' -match '^refs/heads/') {
           Add-Content 'VersionSuffix=ci' $env:GITHUB_ENV -Encoding utf8
         }
 
         # Every build should have the revision set
         Add-Content 'Revision=${{ github.run_number }}' $env:GITHUB_ENV -Encoding utf8
+
 
   # NuGet Release
     - name: Pack
@@ -51,12 +55,12 @@ jobs:
       run: dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN }} --skip-duplicate
 
   # GitHub Releases
-  # - name: Create Release
-  #   if: github.event_name == 'push'
-  #   uses: actions/create-release@v1
-  #   env:
-  #     GITHUB_TOKEN: ${{ github.token }}
-  #   with:
-  #     tag_name: ${{ env.TagName }}
-  #     release_name: ${{ env.TagName }}
-  #     prerelease: ${{ github.ref == 'refs/heads/master' }}
+    - name: Create Release
+      if: github.event_name == 'push' 
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: ${{ github.ref }}
+        prerelease: ${{ env.VersionSuffix != '' }}
