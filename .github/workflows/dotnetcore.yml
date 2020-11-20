@@ -2,19 +2,71 @@ name: Continuous
 
 on:
   push:
-    branches: [ master ]
+    branches: 
+      - master
+      - develop
   pull_request:
 
 jobs:
+
+# Continuous Integration
   build:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
-    
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.102
-
+        dotnet-version: 3.1.404
     - name: Test
       run: dotnet test --configuration Release --verbosity normal
+
+  # Set build properties
+    - name: Set Revision
+      run: echo "::set-env name=Revision::${{ github.run_number }}"
+    - name: Set VersionSuffix
+      if: github.ref == 'refs/heads/develop'
+      run: echo "::set-env name=VersionSuffix::ci"
+
+    - name: Echo Tag Name
+      shell: pwsh
+      run: |
+        $prefix = $(([xml](Get-Content .\Moq.AutoMock\Moq.AutoMock.csproj)).Project.PropertyGroup.VersionPrefix[0])
+        echo "::set-env name=TagName::v$prefix.${{ env.Revision }}$('${{ env.VersionSuffix }}' -replace '^.','-$0')"
+
+
+# Publish to NuGet
+  publish:
+    runs-on: windows-latest
+    if: github.event_name == 'push'
+    needs: build
+    steps:
+  # Configure repository
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.404
+
+  # Set build properties
+    - name: Set Revision
+      run: echo "::set-env name=Revision::${{ github.run_number }}"
+    - name: Set VersionSuffix
+      if: github.ref == 'refs/heads/develop'
+      run: echo "::set-env name=VersionSuffix::ci"
+
+  # NuGet Release
+    - name: Pack
+      run: dotnet pack --configuration Release --verbosity normal --output .
+    - name: Publish
+      run: dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN }} --skip-duplicate
+
+  # GitHub Releases
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        tag_name: ${{ env.TagName }}
+        release_name: ${{ env.TagName }}
+        prerelease: ${{ github.ref != 'refs/heads/master' }}
