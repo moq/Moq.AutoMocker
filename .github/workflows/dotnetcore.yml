@@ -46,21 +46,12 @@ jobs:
         Add-Content 'Revision=${{ github.run_number }}' $env:GITHUB_ENV -Encoding utf8
 
 
-  # NuGet Release
+  # Package Release
     - name: Pack
-      if: github.event_name == 'push'
-      run: dotnet pack --configuration Release --verbosity normal --output .
+      run: 
+        dotnet pack --configuration Release --verbosity normal --output .
+        dotnet nuget push *.nupkg --source "github"
     - name: Publish
       if: github.event_name == 'push'
       run: dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN }} --skip-duplicate
 
-  # GitHub Releases
-    - name: Create Release
-      if: github.event_name == 'push' 
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: ${{ github.ref }}
-        prerelease: ${{ env.VersionSuffix != '' }}
