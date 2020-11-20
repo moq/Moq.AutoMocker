@@ -1,14 +1,22 @@
 name: Continuous
 
 on:
+  # PRs will be built, and a package posted to GH Packages
   pull_request:
+  
   push:
-    branches: [ master ]
-    tags:
-    - 'v*'
     paths:
     - '!README.md'
     - '!docs/**'
+
+    # We'll build, pack, and push a pre-release to NuGet on master
+    branches: [ master ]
+
+    # Tagging with v* will build that version number and push a release to Nuget
+    #   e.g. v1.2, v3.4.5, etc.
+    tags:
+    - 'v*'
+
 
 jobs:
   build:
@@ -48,7 +56,7 @@ jobs:
 
   # Package Release
     - name: Pack
-      run: 
+      run: |
         dotnet pack --configuration Release --verbosity normal --output .
         dotnet nuget push *.nupkg --source "github"
     - name: Publish
