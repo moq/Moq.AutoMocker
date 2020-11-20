@@ -54,14 +54,14 @@ jobs:
         # Every build should have the revision set
         Add-Content 'Revision=${{ github.run_number }}' $env:GITHUB_ENV -Encoding utf8
 
+        Get-Content $env:GITHUB_ENV | Out-Host
+
 
   # Package Release
     - name: Pack
-      run: dotnet pack --configuration Release --verbosity normal --output .
-      env:
-        VersionPrefix: ${{ env.VersionPrefix }}
-        VersionSuffix: ${{ env.VersionSuffix }}
-        Revision: ${{ env.Revision }}
+      run: |
+        Write-Host "${{ env.VersionPrefix }}.${{ env.Revision }}-${{ env.VersionSuffix }}"
+        dotnet pack --configuration Release --verbosity normal --output .
 
   # Publish to NuGet and GitHub Packages
     - name: Publish
