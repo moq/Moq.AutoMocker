@@ -8,6 +8,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
+#if NET45
+using Array = Moq.AutoMock.Resolvers.Array;
+#endif
 
 namespace Moq.AutoMock
 {
@@ -224,7 +227,7 @@ namespace Moq.AutoMock
             if (resolved is Mock<T> m)
                 return m.Object;
             
-            return default(T)!;
+            return default!;
         }
 
         #endregion Create Instance/SelfMock
@@ -481,10 +484,10 @@ namespace Moq.AutoMock
         {
             if (type is null) throw new ArgumentNullException(nameof(type));
 
-            if (!(Resolve(type, new ObjectGraphContext(false)) is MockInstance mockObject))
+            if (Resolve(type, new ObjectGraphContext(false)) is not MockInstance mockObject)
                 throw new ArgumentException($"{type} did not resolve to a Mock", nameof(type));
 
-            forwardTo.Aggregate(mockObject.Mock, As);
+            _ = forwardTo.Aggregate(mockObject.Mock, As);
             foreach (var serviceType in forwardTo.Concat(new[] { type }))
                 _typeMap[serviceType] = mockObject;
 
@@ -492,7 +495,7 @@ namespace Moq.AutoMock
             {
                 var method = mock.GetType().GetMethods().First(x => x.Name == nameof(Mock.As))
                     .MakeGenericMethod(forInterface);
-                return (Mock)method.Invoke(mock, null);
+                return (Mock)method.Invoke(mock, Array.Empty<object>())!;
             }
         }
 
@@ -625,7 +628,7 @@ namespace Moq.AutoMock
             if (!_typeMap.TryGetValue(type, out var instance) || !instance.IsMock)
                 instance = Resolve(type, new ObjectGraphContext(false));
 
-            if (!(instance is MockInstance mockInstance))
+            if (instance is not MockInstance mockInstance)
                 throw new ArgumentException($"{type} does not resolve to a Mock");
 
             _typeMap[type] = mockInstance;
