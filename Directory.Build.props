@@ -4,7 +4,6 @@
     <LangVersion>8.0</LangVersion>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors Condition=" '$(BuildingForLiveUnitTesting)' == '' ">true</TreatWarningsAsErrors>
-    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)Analysis.ruleset</CodeAnalysisRuleSet>
  </PropertyGroup>
 
   <ItemGroup>

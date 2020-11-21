@@ -2,13 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-#pragma warning disable CA1801, CA1822
-
 namespace System.Diagnostics.CodeAnalysis
 {
-    // ReSharper disable UnusedType.Global
-    // ReSharper disable UnusedParameter.Local
-
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property, Inherited = false)]
     internal sealed class AllowNullAttribute : Attribute
     {
@@ -24,13 +19,8 @@ namespace System.Diagnostics.CodeAnalysis
     [AttributeUsage(AttributeTargets.Parameter)]
     internal sealed class DoesNotReturnIfAttribute : Attribute
     {
-        public DoesNotReturnIfAttribute(bool parameterValue) { }
-
-        // ReSharper disable ArrangeAccessorOwnerBody
-        // ReSharper disable PossibleNullReferenceException
-        public bool ParameterValue { get { throw null!; } }
-        // ReSharper restore PossibleNullReferenceException
-        // ReSharper restore ArrangeAccessorOwnerBody
+        public DoesNotReturnIfAttribute(bool parameterValue) => ParameterValue = parameterValue;
+        public bool ParameterValue { get; }
     }
     [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Constructor | AttributeTargets.Event | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
     internal sealed class ExcludeFromCodeCoverageAttribute : Attribute
@@ -43,12 +33,8 @@ namespace System.Diagnostics.CodeAnalysis
     [AttributeUsage(AttributeTargets.Parameter)]
     internal sealed class MaybeNullWhenAttribute : Attribute
     {
-        public MaybeNullWhenAttribute(bool returnValue) { }
-        // ReSharper disable ArrangeAccessorOwnerBody
-        // ReSharper disable PossibleNullReferenceException
-        public bool ReturnValue { get { throw null!; } }
-        // ReSharper restore PossibleNullReferenceException
-        // ReSharper restore ArrangeAccessorOwnerBody
+        public MaybeNullWhenAttribute(bool returnValue) => ReturnValue = returnValue;
+        public bool ReturnValue { get; }
     }
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, Inherited = false)]
     internal sealed class NotNullAttribute : Attribute
@@ -57,23 +43,13 @@ namespace System.Diagnostics.CodeAnalysis
     [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, AllowMultiple = true, Inherited = false)]
     internal sealed class NotNullIfNotNullAttribute : Attribute
     {
-        public NotNullIfNotNullAttribute(string parameterName) { }
-        // ReSharper disable ArrangeAccessorOwnerBody
-        // ReSharper disable PossibleNullReferenceException
-        public string ParameterName { get { throw null!; } }
-        // ReSharper restore PossibleNullReferenceException
-        // ReSharper restore ArrangeAccessorOwnerBody
+        public NotNullIfNotNullAttribute(string parameterName) => ParameterName = parameterName;
+        public string ParameterName { get; }
     }
     [AttributeUsage(AttributeTargets.Parameter)]
     internal sealed class NotNullWhenAttribute : Attribute
     {
-        public NotNullWhenAttribute(bool returnValue) { }
-        // ReSharper disable ArrangeAccessorOwnerBody
-        // ReSharper disable PossibleNullReferenceException
-        public bool ReturnValue { get { throw null!; } }
-        // ReSharper restore PossibleNullReferenceException
-        // ReSharper restore ArrangeAccessorOwnerBody
+        public NotNullWhenAttribute(bool returnValue) => ReturnValue = returnValue;
+        public bool ReturnValue { get; }
     }
-    // ReSharper restore UnusedParameter.Local
-    // ReSharper restore UnusedType.Global
 }

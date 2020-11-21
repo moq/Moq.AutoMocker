@@ -5,9 +5,9 @@ on:
   pull_request:
   
   push:
-    paths:
-    - '!README.md'
-    - '!docs/**'
+    paths-ignore:
+    - 'README.md'
+    - 'docs/**'
 
     # We'll build, pack, and push a pre-release to NuGet on master
     branches: [ master ]

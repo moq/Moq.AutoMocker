@@ -4,8 +4,9 @@
     <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
     <OutputType>Library</OutputType>
     <Copyright>Copyright © $([System.DateTime]::UtcNow.ToString("yyyy"))</Copyright>
+    <NeutralLanguage>en-US</NeutralLanguage>
 
-    <VersionPrefix Condition=" '$(VersionPrefix)' == '' " >2.1.0</VersionPrefix>
+    <VersionPrefix Condition=" '$(VersionPrefix)' == '' ">2.1.0</VersionPrefix>
     <VersionPrefix Condition=" '$(Revision)' != '' ">$(VersionPrefix).$(Revision)</VersionPrefix>
 
     <Authors>Tim Kellogg, Adam Hewitt, Kevin Bost</Authors>
@@ -41,5 +42,15 @@
       <LastGenOutput>AutoMocker.Combine.cs.generated.cs</LastGenOutput>
     </None>
     <Compile Include="..\System.Diagnostics.CodeAnalysis.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Strings.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <StronglyTypedNamespace>Resources</StronglyTypedNamespace>
+      <StronglyTypedClassName>Strings</StronglyTypedClassName>
+      <StronglyTypedFileName>$(IntermediateOutputPath)\Strings.Designer.cs</StronglyTypedFileName>
+      <StronglyTypedLanguage>CSharp</StronglyTypedLanguage>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>
