@@ -61,11 +61,7 @@ jobs:
       if: github.event_name == 'push'
       run: |
         dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN }} --skip-duplicate
-
-        dotnet new nugetconfig
-        dotnet nuget add source `
-          --name 'github' `
-          --username '${{ github.actor }}' `
-          --password '${{ github.token }}' `
-          --configfile 'nuget.config' 'https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json'
-        dotnet nuget push *.nupkg --source "github"
+        dotnet nuget push *.nupkg `
+          --source 'https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json' `
+          --api-key '${{ github.token }}' `
+          --skip-duplicate
