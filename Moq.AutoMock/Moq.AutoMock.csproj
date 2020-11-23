@@ -47,7 +47,7 @@
   <ItemGroup>
     <EmbeddedResource Update="Resources\Strings.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <StronglyTypedNamespace>Resources</StronglyTypedNamespace>
+      <StronglyTypedNamespace>$(AssemblyName).Resources</StronglyTypedNamespace>
       <StronglyTypedClassName>Strings</StronglyTypedClassName>
       <StronglyTypedFileName>$(IntermediateOutputPath)\Strings.Designer.cs</StronglyTypedFileName>
       <StronglyTypedLanguage>CSharp</StronglyTypedLanguage>

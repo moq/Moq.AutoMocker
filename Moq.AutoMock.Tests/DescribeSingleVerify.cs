@@ -48,7 +48,7 @@ namespace Moq.AutoMock.Tests
 
             //a method without parameters
             var ex = Assert.ThrowsException<NotSupportedException>(() => mocker.Verify<IServiceWithPrimitives>(s => s.ReturnsALong(), Times.Once()));
-            Assert.AreEqual("Use the Verify overload that allows specifying TReturn if the setup returns a value type", ex.Message);
+            Assert.AreEqual(Resources.Strings.VerifyWithValueReturn, ex.Message);
         }
     }
 }

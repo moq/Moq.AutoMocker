@@ -13,3 +13,4 @@ packages/
 *.coverage
 *.nupkg
 *.snupkg
+*.Designer.cs
