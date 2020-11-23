@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#pragma warning disable CA1801, CA1822
+
 namespace System.Diagnostics.CodeAnalysis
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property, Inherited = false)]
@@ -19,8 +21,8 @@ namespace System.Diagnostics.CodeAnalysis
     [AttributeUsage(AttributeTargets.Parameter)]
     internal sealed class DoesNotReturnIfAttribute : Attribute
     {
-        public DoesNotReturnIfAttribute(bool parameterValue) => ParameterValue = parameterValue;
-        public bool ParameterValue { get; }
+        public DoesNotReturnIfAttribute(bool parameterValue) { }
+        public bool ParameterValue { get { throw null!; } }
     }
     [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Constructor | AttributeTargets.Event | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
     internal sealed class ExcludeFromCodeCoverageAttribute : Attribute
@@ -33,8 +35,8 @@ namespace System.Diagnostics.CodeAnalysis
     [AttributeUsage(AttributeTargets.Parameter)]
     internal sealed class MaybeNullWhenAttribute : Attribute
     {
-        public MaybeNullWhenAttribute(bool returnValue) => ReturnValue = returnValue;
-        public bool ReturnValue { get; }
+        public MaybeNullWhenAttribute(bool returnValue) { }
+        public bool ReturnValue { get { throw null!; } }
     }
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, Inherited = false)]
     internal sealed class NotNullAttribute : Attribute
@@ -43,13 +45,13 @@ namespace System.Diagnostics.CodeAnalysis
     [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, AllowMultiple = true, Inherited = false)]
     internal sealed class NotNullIfNotNullAttribute : Attribute
     {
-        public NotNullIfNotNullAttribute(string parameterName) => ParameterName = parameterName;
-        public string ParameterName { get; }
+        public NotNullIfNotNullAttribute(string parameterName) { }
+        public string ParameterName { get { throw null!; } }
     }
     [AttributeUsage(AttributeTargets.Parameter)]
     internal sealed class NotNullWhenAttribute : Attribute
     {
-        public NotNullWhenAttribute(bool returnValue) => ReturnValue = returnValue;
-        public bool ReturnValue { get; }
+        public NotNullWhenAttribute(bool returnValue) { }
+        public bool ReturnValue { get { throw null!; } }
     }
 }
