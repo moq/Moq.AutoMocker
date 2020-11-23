@@ -41,7 +41,7 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AutoMocker.Combine.cs.generated.cs</LastGenOutput>
     </None>
-    <Compile Include="..\System.Diagnostics.CodeAnalysis.cs" Condition=" '$(TargetFramework)' != 'net5.0' " />
+    <Compile Include="..\System.Diagnostics.CodeAnalysis.cs" />
   </ItemGroup>
 
   <ItemGroup>
