@@ -41,15 +41,9 @@ namespace Moq.AutoMock.Resolvers
             bool mayHaveDependencies = context.RequestType.IsClass
                                        && !typeof(Delegate).IsAssignableFrom(context.RequestType);
 
-            object?[] constructorArgs;
-            if (mayHaveDependencies)
-            {
-                constructorArgs = context.AutoMocker.CreateArguments(context.RequestType, context.ObjectGraphContext);
-            }
-            else
-            {
-                constructorArgs = Array.Empty<object>();
-            }
+            object?[] constructorArgs = mayHaveDependencies
+                ? context.AutoMocker.CreateArguments(context.RequestType, context.ObjectGraphContext)
+                : Array.Empty<object>();
 
             if (Activator.CreateInstance(mockType, _mockBehavior, constructorArgs) is Mock mock)
             {

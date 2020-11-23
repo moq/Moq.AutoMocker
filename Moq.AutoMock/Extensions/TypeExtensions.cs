@@ -14,7 +14,7 @@ namespace Moq.AutoMock.Extensions
             @delegate = null;
             var stInfo = funcType.GetTypeInfo();
             if (!typeof(Delegate).IsAssignableFrom(funcType)
-                || !stInfo.IsGenericType || !(funcType.GetGenericTypeDefinition() is Type td)
+                || !stInfo.IsGenericType || funcType.GetGenericTypeDefinition() is not Type td
                 || td.Namespace != nameof(System) || !Regex.IsMatch(td.Name, $"^{nameof(Func<object>)}\\b"))
                 return false;
 
