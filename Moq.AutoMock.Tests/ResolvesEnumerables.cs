@@ -17,6 +17,23 @@ namespace Moq.AutoMock.Tests
         [TestMethod]
         public void ResolvesStringEnumerableFromContainer() => Resolves(nameof(ResolvesEnumerables));
 
+        [TestMethod]
+        public void ResolvesIntEnumerableEnumerableFromContainer()
+        {
+            var mocker = new AutoMocker { Resolvers = { new EnumerableResolver() } };
+            mocker.Use(42);
+
+            var enumerable = mocker.Get<IEnumerable<IEnumerable<int>>>();
+            
+            Assert.IsNotNull(enumerable);
+
+            var outerArray = enumerable.ToArray();
+            Assert.AreEqual(1, outerArray.Length);
+
+            var innerArray = outerArray[0].ToArray();
+            CollectionAssert.AreEquivalent(innerArray, new[] { 42 });
+        }
+
         private static void Resolves<T>(T expected)
         {
             var mocker = new AutoMocker { Resolvers = { new EnumerableResolver() } };
