@@ -146,7 +146,7 @@ namespace Moq.AutoMock
         /// mocks.
         /// </summary>
         /// <typeparam name="T">A concrete type</typeparam>
-        /// <param name="enablePrivate">When true, private constructors will also be used to create mocks.</param>
+        /// <param name="enablePrivate">When true, non-public constructors will also be used to create mocks.</param>
         /// <returns>An instance of T with all constructor arguments derived from services 
         /// setup in the container.</returns>
         public T CreateInstance<T>(bool enablePrivate) where T : class
@@ -168,7 +168,7 @@ namespace Moq.AutoMock
         /// mocks.
         /// </summary>
         /// <param name="type">A concrete type</param>
-        /// <param name="enablePrivate">When true, private constructors will also be used to create mocks.</param>
+        /// <param name="enablePrivate">When true, non-public constructors will also be used to create mocks.</param>
         /// <returns>An instance of type with all constructor arguments derived from services 
         /// setup in the container.</returns>
         public object CreateInstance(Type type, bool enablePrivate)
@@ -207,7 +207,7 @@ namespace Moq.AutoMock
         /// abstract classes, or avoiding breaking cohesion even further with a non-abstract class.
         /// </summary>
         /// <typeparam name="T">The instance that you want to build</typeparam>
-        /// <param name="enablePrivate">When true, private constructors will also be used to create mocks.</param>
+        /// <param name="enablePrivate">When true, non-public constructors will also be used to create mocks.</param>
         /// <returns>An instance with virtual and abstract members mocked</returns>
         public T CreateSelfMock<T>(bool enablePrivate) where T : class?
         {
@@ -299,7 +299,7 @@ namespace Moq.AutoMock
         /// a service setup explicitly via `.Use()` or implicitly with `.CreateInstance()`.
         /// </summary>
         /// <typeparam name="TService">The class or interface to search on</typeparam>
-        /// <param name="enablePrivate">When true, private constructors will also be used to create mocks.</param>
+        /// <param name="enablePrivate">When true, non-public constructors will also be used to create mocks.</param>
         /// <returns>The object that implements TService</returns>
         public TService Get<TService>(bool enablePrivate) where TService : class?
         {
@@ -325,7 +325,7 @@ namespace Moq.AutoMock
         /// a service setup explicitly via `.Use()` or implicitly with `.CreateInstance()`.
         /// </summary>
         /// <param name="serviceType">The type of service to retrieve</param>
-        /// <param name="enablePrivate">When true, private constructors will also be used to create mocks.</param>
+        /// <param name="enablePrivate">When true, non-public constructors will also be used to create mocks.</param>
         /// <returns></returns>
         public object Get(Type serviceType, bool enablePrivate)
         {
@@ -361,7 +361,7 @@ namespace Moq.AutoMock
         /// Searches and retrieves the mock that the container uses for TService.
         /// </summary>
         /// <typeparam name="TService">The class or interface to search on</typeparam>
-        /// <param name="enablePrivate">When true, private constructors will also be used to create mocks.</param>
+        /// <param name="enablePrivate">When true, non-public constructors will also be used to create mocks.</param>
         /// <exception cref="ArgumentException">if the requested object wasn't a Mock</exception>
         /// <returns>A mock of TService</returns>
         public Mock<TService> GetMock<TService>(bool enablePrivate) where TService : class
@@ -383,7 +383,7 @@ namespace Moq.AutoMock
         /// Searches and retrieves the mock that the container uses for serviceType.
         /// </summary>
         /// <param name="serviceType">The type of service to retrieve</param>
-        /// <param name="enablePrivate">When true, private constructors will also be used to create mocks.</param>
+        /// <param name="enablePrivate">When true, non-public constructors will also be used to create mocks.</param>
         /// <returns>A mock of serviceType</returns>
         public Mock GetMock(Type serviceType, bool enablePrivate)
         {
