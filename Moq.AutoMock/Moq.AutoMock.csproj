@@ -6,7 +6,7 @@
     <Copyright>Copyright © $([System.DateTime]::UtcNow.ToString("yyyy"))</Copyright>
     <NeutralLanguage>en-US</NeutralLanguage>
 
-    <VersionPrefix Condition=" '$(VersionPrefix)' == '' ">2.1.0</VersionPrefix>
+    <VersionPrefix Condition=" '$(VersionPrefix)' == '' ">2.2.0</VersionPrefix>
     <VersionPrefix Condition=" '$(Revision)' != '' ">$(VersionPrefix).$(Revision)</VersionPrefix>
 
     <Authors>Tim Kellogg, Adam Hewitt, Kevin Bost</Authors>

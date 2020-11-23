@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq.AutoMock.Tests.Util;
 
 namespace Moq.AutoMock.Tests
@@ -36,6 +37,39 @@ namespace Moq.AutoMock.Tests
             var mocker = new AutoMocker();
             Mock<Empty>? mock = mocker.GetMock(typeof(Empty)) as Mock<Empty>;
             Assert.IsNotNull(mock);
+        }
+
+
+        [TestMethod]
+        public void It_fails_mocking_abstract_with_protected_ctor()
+        {
+            var mocker = new AutoMocker();
+            Assert.ThrowsException<ArgumentException>(() => mocker.GetMock<ProtectedConstructor>());
+        }
+
+        [TestMethod]
+        public void It_allows_protected_abstract_mock_when_overriden()
+        {
+            var mocker = new AutoMocker();
+            var mock = mocker.GetMock<ProtectedConstructor>(enablePrivate: true);
+            Assert.IsNotNull(mock);
+            Assert.IsInstanceOfType(mock.Object, typeof(ProtectedConstructor));
+        }
+
+        [TestMethod]
+        public void It_fails_getting_mocked_object_with_protected_ctor()
+        {
+            var mocker = new AutoMocker();
+            Assert.ThrowsException<ArgumentException>(() => mocker.Get<ProtectedConstructor>());
+        }
+
+        [TestMethod]
+        public void It_allows_getting_mocked_object_when_overriden()
+        {
+            var mocker = new AutoMocker();
+            var @protected = mocker.Get<ProtectedConstructor>(enablePrivate: true);
+            Assert.IsNotNull(@protected);
+            Assert.IsInstanceOfType(@protected, typeof(ProtectedConstructor));
         }
     }
 }
