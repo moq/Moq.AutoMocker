@@ -36,7 +36,7 @@ namespace Moq.AutoMock.Tests
 
         private static void Resolves<T>(T expected)
         {
-            var mocker = new AutoMocker { Resolvers = { new EnumerableResolver() } };
+            var mocker = new AutoMocker();
             mocker.Use(expected!);
 
             var enumerable = mocker.Get<IEnumerable<T>>();
