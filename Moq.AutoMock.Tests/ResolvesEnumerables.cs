@@ -20,7 +20,7 @@ namespace Moq.AutoMock.Tests
         [TestMethod]
         public void ResolvesIntEnumerableEnumerableFromContainer()
         {
-            var mocker = new AutoMocker { Resolvers = { new EnumerableResolver() } };
+            var mocker = new AutoMocker();
             mocker.Use(42);
 
             var enumerable = mocker.Get<IEnumerable<IEnumerable<int>>>();
