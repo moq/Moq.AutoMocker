@@ -64,7 +64,8 @@ namespace Moq.AutoMock
             {
                 new MockResolver(mockBehavior, defaultValue, callBase),
                 new FuncResolver(),
-                new LazyResolver()
+                new LazyResolver(),
+                new EnumerableResolver()
             };
         }
 
