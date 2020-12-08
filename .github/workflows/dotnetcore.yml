@@ -40,7 +40,8 @@ jobs:
       run: |
         <# If we're a tag, force VersionPrefix to the tag value #>
         if ('${{ github.ref }}' -match '^refs/tags/v') {
-          if ($match = [regex]::Match('${{ github.ref }}', '^refs/tags/v([0-9]+(\.[0-9]+){1,2})') -and $match.Success) {
+          $match = [regex]::Match('${{ github.ref }}', '^refs/tags/v([0-9]+(\.[0-9]+){1,2})')
+          if ($match.Success) {
             $env:VersionPrefix = $match.Groups[1].Value
           } else {
             throw 'Invalid tag version: ${{ github.ref }}'
