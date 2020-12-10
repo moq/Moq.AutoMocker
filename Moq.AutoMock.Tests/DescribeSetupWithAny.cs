@@ -9,7 +9,7 @@ namespace Moq.AutoMock.Tests
     public class DescribeSetupWithAny
     {
         [TestMethod]
-        public void You_can_setup_all_on_a_method_with_a_return_value()
+        public void You_can_setup_with_any_on_a_method_with_a_return_value()
         {
             string expected = "SomeValue";
             Mock<IService4> mock = new();
@@ -23,7 +23,7 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
-        public void You_can_setup_all_on_a_void_method()
+        public void You_can_setup_with_any_on_a_void_method()
         {
             Mock<IService6> mock = new();
 
@@ -71,7 +71,7 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
-        public void You_can_setup_all_on_a_method_with_a_return_value_using_AutoMocker()
+        public void You_can_setup_with_any_on_a_method_with_a_return_value_using_AutoMocker()
         {
             string expected = "SomeValue";
             AutoMocker mocker = new();
@@ -85,7 +85,7 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
-        public void You_can_setup_all_on_a_method_with_a_return_value_using_AutoMocker_with_cached_mock()
+        public void You_can_setup_with_any_on_a_method_with_a_return_value_using_AutoMocker_with_cached_mock()
         {
             string expected = "SomeValue";
             AutoMocker mocker = new();
@@ -101,7 +101,7 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
-        public void You_can_setup_all_on_a_void_method_using_AutoMocker()
+        public void You_can_setup_with_any_on_a_void_method_using_AutoMocker()
         {
             AutoMocker mocker = new();
 
@@ -114,7 +114,7 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
-        public void You_can_setup_all_on_a_void_method_using_AutoMocker_with_cached_mock()
+        public void You_can_setup_with_any_on_a_void_method_using_AutoMocker_with_cached_mock()
         {
             AutoMocker mocker = new();
             Mock<IService6> mock = new();
