@@ -5,7 +5,7 @@ using System;
 namespace Moq.AutoMock.Tests
 {
     [TestClass]
-    public class DescribeSetupAll
+    public class DescribeSetupWithAny
     {
         [TestMethod]
         public void You_can_setup_all_on_a_method_with_a_return_value()
@@ -33,5 +33,24 @@ namespace Moq.AutoMock.Tests
 
             mock.VerifyAll();
         }
+
+        [TestMethod]
+        public void When_method_is_not_found_it_throws()
+        {
+            Mock<IService1> mock = new();
+
+            string expectedMessage = 
+                new MissingMethodException(typeof(IService1).Name, "Unknown Method").Message;
+            try
+            {
+                mock.SetupWithAny("Unknown Method");
+
+            }
+            catch (MissingMethodException ex) 
+                when (ex.Message == expectedMessage)
+            { }
+        }
+
+
     }
 }

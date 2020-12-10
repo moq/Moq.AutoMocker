@@ -12,13 +12,13 @@ namespace Moq.AutoMock
     public static class MockExtensions
     {
         /// <summary>
-        /// Specifies a setup on the mocked type for a call to a non-void (value-returning) method.
+        /// Specifies a setup on the mocked type for a call to a void method. 
         /// All parameters are filled with <see cref ="It.IsAny" /> according to the parameter's type.
         /// </summary>
         /// <remarks>
         /// This may only be used on methods that are not overloaded.
         /// </remarks>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T">Type of the mock</typeparam>
         /// <param name="mock">The mock</param>
         /// <param name="methodName">The name of the expected method invocation.</param>
         /// <returns></returns>
@@ -30,6 +30,11 @@ namespace Moq.AutoMock
                 throw new ArgumentNullException(nameof(mock));
             }
 
+            if (methodName is null)
+            {
+                throw new ArgumentNullException(nameof(methodName));
+            }
+
             LambdaExpression lambdaExpression = GetExpression<T>(methodName);
 
             MethodInfo setupMethod = mock.GetType().GetMethods()
@@ -38,15 +43,15 @@ namespace Moq.AutoMock
         }
 
         /// <summary>
-        /// Specifies a setup on the mocked type for a call to a void method. 
+        /// Specifies a setup on the mocked type for a call to a non-void (value-returning) method. 
         /// All parameters are filled with <see cref ="It.IsAny" /> according to the parameter's type.
         /// </summary>
         /// <remarks>
         /// This may only be used on methods that are not overloaded.
         /// </remarks>
-        /// <typeparam name="T"></typeparam>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="mock"></param>
+        /// <typeparam name="T">Type of the mock</typeparam>
+        /// <typeparam name="TResult">The return type of the method</typeparam>
+        /// <param name="mock">The mock</param>
         /// <param name="methodName">The name of the expected method invocation.</param>
         /// <returns></returns>
         public static ISetup<T, TResult> SetupWithAny<T, TResult>(this Mock<T> mock, string methodName)
@@ -55,6 +60,11 @@ namespace Moq.AutoMock
             if (mock is null)
             {
                 throw new ArgumentNullException(nameof(mock));
+            }
+
+            if (methodName is null)
+            {
+                throw new ArgumentNullException(nameof(methodName));
             }
 
             LambdaExpression lambdaExpression = GetExpression<T>(methodName);

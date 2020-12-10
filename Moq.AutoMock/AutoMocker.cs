@@ -436,6 +436,41 @@ namespace Moq.AutoMock
             return Setup<ISetup<TService, TReturn>, TService>(m => m.Setup(setup));
         }
 
+        /// <summary>
+        /// Specifies a setup on the mocked type for a call to a void method.
+        /// All parameters are filled with <see cref ="It.IsAny" /> according to the parameter's type.
+        /// </summary>
+        /// <remarks>
+        /// This may only be used on methods that are not overloaded.
+        /// This will create the mock when necessary.
+        /// </remarks>
+        /// <typeparam name="TService">The service type</typeparam>
+        /// <param name="methodName">The name of the expected method invocation.</param>
+        /// <returns></returns>
+        public ISetup<TService> SetupWithAny<TService>(string methodName)
+            where TService : class
+        {
+            return Setup<ISetup<TService>, TService>(m => m.SetupWithAny(methodName));
+        }
+
+        /// <summary>
+        /// Specifies a setup on the mocked type for a call to a non-void (value-returning) method.
+        /// All parameters are filled with <see cref ="It.IsAny" /> according to the parameter's type.
+        /// </summary>
+        /// <remarks>
+        /// This may only be used on methods that are not overloaded.
+        /// This will create the mock when necessary.
+        /// </remarks>
+        /// <typeparam name="TService">The service type</typeparam>
+        /// <typeparam name="TReturn">The return type of the method</typeparam>
+        /// <param name="methodName">The name of the expected method invocation.</param>
+        /// <returns></returns>
+        public ISetup<TService, TReturn> SetupWithAny<TService, TReturn>(string methodName)
+            where TService : class
+        {
+            return Setup<ISetup<TService, TReturn>, TService>(m => m.SetupWithAny<TService, TReturn>(methodName));
+        }
+
         private TReturn Setup<TReturn, TService>(Func<Mock<TService>, TReturn> returnValue)
             where TService : class
         {
