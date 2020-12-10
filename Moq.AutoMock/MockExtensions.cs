@@ -12,13 +12,17 @@ namespace Moq.AutoMock
     public static class MockExtensions
     {
         /// <summary>
-        /// TODO
+        /// Specifies a setup on the mocked type for a call to a non-void (value-returning) method.
+        /// All parameters are filled with <see cref ="It.IsAny" /> according to the parameter's type.
         /// </summary>
+        /// <remarks>
+        /// This may only be used on methods that are not overloaded.
+        /// </remarks>
         /// <typeparam name="T"></typeparam>
-        /// <param name="mock"></param>
-        /// <param name="methodName"></param>
+        /// <param name="mock">The mock</param>
+        /// <param name="methodName">The name of the expected method invocation.</param>
         /// <returns></returns>
-        public static ISetup<T> SetupAll<T>(this Mock<T> mock, string methodName)
+        public static ISetup<T> SetupWithAny<T>(this Mock<T> mock, string methodName)
             where T : class
         {
             if (mock is null)
@@ -34,14 +38,18 @@ namespace Moq.AutoMock
         }
 
         /// <summary>
-        /// TODO
+        /// Specifies a setup on the mocked type for a call to a void method. 
+        /// All parameters are filled with <see cref ="It.IsAny" /> according to the parameter's type.
         /// </summary>
+        /// <remarks>
+        /// This may only be used on methods that are not overloaded.
+        /// </remarks>
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="mock"></param>
-        /// <param name="methodName"></param>
+        /// <param name="methodName">The name of the expected method invocation.</param>
         /// <returns></returns>
-        public static ISetup<T, TResult> SetupAll<T, TResult>(this Mock<T> mock, string methodName)
+        public static ISetup<T, TResult> SetupWithAny<T, TResult>(this Mock<T> mock, string methodName)
             where T : class
         {
             if (mock is null)
@@ -62,9 +70,9 @@ namespace Moq.AutoMock
         {
             //Build up the expression to pass to the Setup method
             MethodInfo method = typeof(T).GetMethod(methodName)!;
-            if (method is null) throw new Exception("Boom");
+            if (method is null) throw new MissingMethodException(typeof(T).Name, methodName);
 
-            var itType = typeof(Moq.It);
+            var itType = typeof(It);
             var isAnyMethod = itType.GetMethod(nameof(It.IsAny));
 
             var parameterExpressions = method.GetParameters()

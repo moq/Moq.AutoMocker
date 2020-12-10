@@ -13,7 +13,7 @@ namespace Moq.AutoMock.Tests
             string expected = "SomeValue";
             Mock<IService4> mock = new();
 
-            mock.SetupAll<IService4, string>(nameof(IService4.MainMethodName))
+            mock.SetupWithAny<IService4, string>(nameof(IService4.MainMethodName))
                 .Returns(expected);
 
             string result = mock.Object.MainMethodName("Something");
@@ -26,7 +26,7 @@ namespace Moq.AutoMock.Tests
         {
             Mock<IService6> mock = new();
 
-            mock.SetupAll(nameof(IService6.Void))
+            mock.SetupWithAny(nameof(IService6.Void))
                 .Verifiable();
             
             mock.Object.Void(42, "SomeValue");
