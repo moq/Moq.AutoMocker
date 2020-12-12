@@ -21,6 +21,9 @@ namespace Moq.AutoMock
         /// <typeparam name="T">Type of the mock</typeparam>
         /// <param name="mock">The mock</param>
         /// <param name="methodName">The name of the expected method invocation.</param>
+        /// <exception cref="ArgumentNullException">When mock or methodName is null.</exception>
+        /// <exception cref="MissingMethodException">Thrown when no method with methodName is found.</exception>
+        /// <exception cref="AmbiguousMatchException">Thrown when more that one method matches the passed method name.</exception>
         /// <returns></returns>
         public static ISetup<T> SetupWithAny<T>(this Mock<T> mock, string methodName)
             where T : class
@@ -53,6 +56,9 @@ namespace Moq.AutoMock
         /// <typeparam name="TResult">The return type of the method</typeparam>
         /// <param name="mock">The mock</param>
         /// <param name="methodName">The name of the expected method invocation.</param>
+        /// <exception cref="ArgumentNullException">When mock or methodName is null.</exception>
+        /// <exception cref="MissingMethodException">Thrown when no method with methodName is found.</exception>
+        /// <exception cref="AmbiguousMatchException">Thrown when more that one method matches the passed method name.</exception>
         /// <returns></returns>
         public static ISetup<T, TResult> SetupWithAny<T, TResult>(this Mock<T> mock, string methodName)
             where T : class

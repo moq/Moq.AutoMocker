@@ -446,6 +446,9 @@ namespace Moq.AutoMock
         /// </remarks>
         /// <typeparam name="TService">The service type</typeparam>
         /// <param name="methodName">The name of the expected method invocation.</param>
+        /// <exception cref="ArgumentNullException">When the methodName is null.</exception>
+        /// <exception cref="MissingMethodException">Thrown when no method with methodName is found.</exception>
+        /// <exception cref="AmbiguousMatchException">Thrown when more that one method matches the passed method name.</exception>
         /// <returns></returns>
         public ISetup<TService> SetupWithAny<TService>(string methodName)
             where TService : class
@@ -464,6 +467,9 @@ namespace Moq.AutoMock
         /// <typeparam name="TService">The service type</typeparam>
         /// <typeparam name="TReturn">The return type of the method</typeparam>
         /// <param name="methodName">The name of the expected method invocation.</param>
+        /// <exception cref="ArgumentNullException">When the methodName is null.</exception>
+        /// <exception cref="MissingMethodException">Thrown when no method with methodName is found.</exception>
+        /// <exception cref="AmbiguousMatchException">Thrown when more that one method matches the passed method name.</exception>
         /// <returns></returns>
         public ISetup<TService, TReturn> SetupWithAny<TService, TReturn>(string methodName)
             where TService : class
