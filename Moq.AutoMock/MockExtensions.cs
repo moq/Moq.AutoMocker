@@ -84,10 +84,16 @@ namespace Moq.AutoMock
 
         private static LambdaExpression GetExpression<T>(string methodName)
         {
-            //Build up the expression to pass to the Setup method
-            MethodInfo method = typeof(T).GetMethod(methodName)!;
-            if (method is null) throw new MissingMethodException(typeof(T).Name, methodName);
+            var matchingMethods = typeof(T).GetMethods().Where(x => string.Equals(x.Name, methodName, StringComparison.Ordinal)).ToArray();
+            MethodInfo method = matchingMethods.Length switch
+            {
+                0 => throw new MissingMethodException(typeof(T).Name, methodName),
+                1 => matchingMethods[0],
+                _ => throw new AmbiguousMatchException($"Cannot create a Setup on method '{methodName}'. {nameof(SetupWithAny)} does nto support methods with multiple overloads."),
+            };
 
+
+            //Build up the expression to pass to the Setup method
             var itType = typeof(It);
             var isAnyMethod = itType.GetMethod(nameof(It.IsAny));
 
