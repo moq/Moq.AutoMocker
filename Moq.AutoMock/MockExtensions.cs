@@ -89,7 +89,7 @@ namespace Moq.AutoMock
             {
                 0 => throw new MissingMethodException(typeof(T).Name, methodName),
                 1 => matchingMethods[0],
-                _ => throw new AmbiguousMatchException($"Cannot create a Setup on method '{methodName}'. {nameof(SetupWithAny)} does nto support methods with multiple overloads."),
+                _ => throw new AmbiguousMatchException($"Cannot create a Setup on method '{methodName}'. {nameof(SetupWithAny)} does not support methods with multiple overloads."),
             };
 
 
