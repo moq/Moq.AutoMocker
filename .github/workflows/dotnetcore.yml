@@ -49,11 +49,8 @@ jobs:
         }
         else {
           <# All other pushes get a CI suffix #>
-          $env:VersionSuffix = 'ci'
+          $env:VersionSuffix = 'ci{0:0000}' -f ${{ github.run_number }}
         }
-
-        <# Every build should have the revision set #>
-        $env:Revision = '${{ github.run_number }}'
 
         dotnet pack --configuration Release --verbosity normal --output .
 

@@ -7,7 +7,6 @@
     <NeutralLanguage>en-US</NeutralLanguage>
 
     <VersionPrefix Condition=" '$(VersionPrefix)' == '' ">2.3.0</VersionPrefix>
-    <VersionPrefix Condition=" '$(Revision)' != '' ">$(VersionPrefix).$(Revision)</VersionPrefix>
 
     <Authors>Tim Kellogg, Adam Hewitt, Kevin Bost</Authors>
     <PackageDescription>An auto-mocking container that generates mocks using Moq</PackageDescription>
