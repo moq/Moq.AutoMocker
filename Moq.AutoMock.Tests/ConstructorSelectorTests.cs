@@ -52,5 +52,12 @@ namespace Moq.AutoMock.Tests
             var ctor = typeof(WithPrivateConstructor).SelectCtor(Array.Empty<Type>(), privateBindingFlags);
             Assert.AreEqual(2, ctor.GetParameters().Length);
         }
+
+        [TestMethod]
+        public void It_will_always_allow_empty_private_constructor()
+        {
+            var ctor = typeof(ProtectedConstructor).SelectCtor(Array.Empty<Type>(), DefaultBindingFlags);
+            Assert.AreEqual(0, ctor.GetParameters().Length);
+        }
     }
 }

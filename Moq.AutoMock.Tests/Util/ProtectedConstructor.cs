@@ -4,4 +4,9 @@
     {
         protected ProtectedConstructor() { }
     }
+
+    public abstract class ProtectedConstructor1
+    {
+        protected ProtectedConstructor1(IService1 _) { }
+    }
 }
