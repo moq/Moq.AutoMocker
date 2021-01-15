@@ -1,11 +1,14 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Text;
 using System;
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxKind;
 
@@ -21,6 +24,12 @@ namespace Generators
         public void Execute(GeneratorExecutionContext context)
         {
             var sourceCode = CompilationUnit()
+                .WithUsings(List(new[]
+                {
+                    typeof(GeneratedCodeAttribute),
+                    typeof(CompilerGeneratedAttribute),
+                    typeof(ExcludeFromCodeCoverageAttribute),
+                }.Distinct().Select(x => UsingDirective(IdentifierName(x.Namespace)))))
                 .WithMembers(SingletonList<MemberDeclarationSyntax>(NamespaceDeclaration(QualifiedName(IdentifierName("Moq"), IdentifierName("AutoMock")))
                     .WithMembers(SingletonList<MemberDeclarationSyntax>(ClassDeclaration("AutoMocker")
                         .WithModifiers(TokenList(Token(PartialKeyword)))
@@ -34,7 +43,8 @@ namespace Generators
         private MemberDeclarationSyntax Combine(int count)
         {
             return MethodDeclaration(PredefinedType(Token(VoidKeyword)), "Combine")
-                .WithModifiers(TokenList(Token(TriviaList(Trivia(Documentation)), PublicKeyword, TriviaList())))
+                .WithModifiers(TokenList(Token(PublicKeyword)))
+                .WithAttributeLists(List(attributes()))
                 .WithTypeParameterList(TypeParameterList(SeparatedList(Enumerable.Range(0, count + 1).Select(type))))
                 .WithExpressionBody(ArrowExpressionClause(
                     InvocationExpression(IdentifierName("Combine"))
@@ -45,6 +55,23 @@ namespace Generators
             static string identifier(int index) => index is 0 ? "TService" : $"TAsWellAs{index}";
             static TypeParameterSyntax type(int index) => TypeParameter(identifier(index));
             static ArgumentSyntax argument(int index) => Argument(TypeOfExpression(IdentifierName(identifier(index))));
+            IEnumerable<AttributeListSyntax> attributes()
+            {
+                var array = new[]
+                {
+                    Attribute(IdentifierName(nameof(GeneratedCodeAttribute)), AttributeArgumentList(SeparatedList(new []
+                    {
+                        AttributeArgument(LiteralExpression(StringLiteralExpression, Literal(nameof(CombineGenerator)))),
+                        AttributeArgument(LiteralExpression(StringLiteralExpression, Literal(Assembly.GetExecutingAssembly().GetName().Version.ToString()))),
+                    }))),
+                    Attribute(IdentifierName(nameof(CompilerGeneratedAttribute))),
+                    Attribute(IdentifierName(nameof(ExcludeFromCodeCoverageAttribute))),
+                }.Select(a => AttributeList(SeparatedList(new[]{a})))
+                .ToList();
+                
+                array[0] = array[0].WithLeadingTrivia(Trivia(Documentation));
+                return array;
+            }
         }
 
         private DocumentationCommentTriviaSyntax Documentation { get; } = DocumentationComment(

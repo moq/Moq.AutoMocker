@@ -18,36 +18,42 @@ namespace System.Diagnostics.CodeAnalysis
     internal sealed class DoesNotReturnAttribute : Attribute
     {
     }
+
+    [ExcludeFromCodeCoverage]
     [AttributeUsage(AttributeTargets.Parameter)]
     internal sealed class DoesNotReturnIfAttribute : Attribute
     {
         public DoesNotReturnIfAttribute(bool parameterValue) { }
         public bool ParameterValue { get { throw null!; } }
     }
-    [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Constructor | AttributeTargets.Event | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
-    internal sealed class ExcludeFromCodeCoverageAttribute : Attribute
-    {
-    }
+
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, Inherited = false)]
     internal sealed class MaybeNullAttribute : Attribute
     {
     }
+
+    [ExcludeFromCodeCoverage]
     [AttributeUsage(AttributeTargets.Parameter)]
     internal sealed class MaybeNullWhenAttribute : Attribute
     {
         public MaybeNullWhenAttribute(bool returnValue) { }
         public bool ReturnValue { get { throw null!; } }
     }
+
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, Inherited = false)]
     internal sealed class NotNullAttribute : Attribute
     {
     }
+
+    [ExcludeFromCodeCoverage]
     [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, AllowMultiple = true, Inherited = false)]
     internal sealed class NotNullIfNotNullAttribute : Attribute
     {
         public NotNullIfNotNullAttribute(string parameterName) { }
         public string ParameterName { get { throw null!; } }
     }
+
+    [ExcludeFromCodeCoverage]
     [AttributeUsage(AttributeTargets.Parameter)]
     internal sealed class NotNullWhenAttribute : Attribute
     {

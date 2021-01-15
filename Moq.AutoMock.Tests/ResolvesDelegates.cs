@@ -12,9 +12,6 @@ namespace Moq.AutoMock.Tests
         [DataTestMethod, DynamicData(nameof(DelegateTypes))]
         public void ResolvesFuncReturningDefinedParameter(Type delegateType, object expected)
         {
-            if (delegateType is null) throw new ArgumentNullException(nameof(delegateType));
-            if (expected is null) throw new ArgumentNullException(nameof(expected));
-
             var mocker = new AutoMocker { Resolvers = { new FuncResolver() } };
             mocker.Use(expected.GetType(), expected);
 
@@ -25,8 +22,7 @@ namespace Moq.AutoMock.Tests
             Assert.AreEqual(expected, func.DynamicInvoke(@params));
         }
 
-
-        static IEnumerable<object[]> DelegateTypes
+        private static IEnumerable<object[]> DelegateTypes
         {
             get
             {

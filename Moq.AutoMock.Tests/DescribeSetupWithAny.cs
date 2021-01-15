@@ -53,21 +53,17 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(AmbiguousMatchException))]
         public void When_void_method_is_overloaded_it_throws()
         {
             Mock<IService7> mock = new();
-
-            mock.SetupWithAny(nameof(IService7.Void));
+            Assert.ThrowsException<AmbiguousMatchException>(() => mock.SetupWithAny(nameof(IService7.Void)));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(AmbiguousMatchException))]
         public void When_method_is_overloaded_it_throws()
         {
             Mock<IService7> mock = new();
-
-            mock.SetupWithAny(nameof(IService7.ReturnValue));
+            Assert.ThrowsException<AmbiguousMatchException>(() => mock.SetupWithAny(nameof(IService7.ReturnValue)));
         }
 
         [TestMethod]
