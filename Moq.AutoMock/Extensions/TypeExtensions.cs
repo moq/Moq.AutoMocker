@@ -9,7 +9,7 @@ namespace Moq.AutoMock.Extensions
 {
     internal static class TypeExtensions
     {
-        internal static bool TryCompileGetter(this AutoMocker autoMocker, Type funcType, [NotNullWhen(true)] out Delegate? @delegate)
+        public static bool TryCompileGetter(this AutoMocker autoMocker, Type funcType, [NotNullWhen(true)] out Delegate? @delegate)
         {
             @delegate = null;
             var stInfo = funcType.GetTypeInfo();
@@ -33,6 +33,13 @@ namespace Moq.AutoMock.Extensions
 
             @delegate = Expression.Lambda(funcType, call, @params).Compile();
             return @delegate != null;
+        }
+
+        public static bool IsDelegateType(this Type type) => type.BaseType == typeof(MulticastDelegate);
+
+        public static bool IsMockable(this Type type)
+        {
+            return (!type.IsSealed && !type.IsArray) || type.IsDelegateType();
         }
     }
 }

@@ -44,32 +44,32 @@ namespace Moq.AutoMock.Tests
         public void It_fails_mocking_abstract_with_protected_ctor()
         {
             var mocker = new AutoMocker();
-            Assert.ThrowsException<ArgumentException>(() => mocker.GetMock<ProtectedConstructor>());
+            Assert.ThrowsException<ArgumentException>(() => mocker.GetMock<ProtectedConstructor1>());
         }
 
         [TestMethod]
         public void It_allows_protected_abstract_mock_when_overriden()
         {
             var mocker = new AutoMocker();
-            var mock = mocker.GetMock<ProtectedConstructor>(enablePrivate: true);
+            var mock = mocker.GetMock<ProtectedConstructor1>(enablePrivate: true);
             Assert.IsNotNull(mock);
-            Assert.IsInstanceOfType(mock.Object, typeof(ProtectedConstructor));
+            Assert.IsInstanceOfType(mock.Object, typeof(ProtectedConstructor1));
         }
 
         [TestMethod]
         public void It_fails_getting_mocked_object_with_protected_ctor()
         {
             var mocker = new AutoMocker();
-            Assert.ThrowsException<ArgumentException>(() => mocker.Get<ProtectedConstructor>());
+            Assert.ThrowsException<ArgumentException>(() => mocker.Get<ProtectedConstructor1>());
         }
 
         [TestMethod]
         public void It_allows_getting_mocked_object_when_overriden()
         {
             var mocker = new AutoMocker();
-            var @protected = mocker.Get<ProtectedConstructor>(enablePrivate: true);
+            var @protected = mocker.Get<ProtectedConstructor1>(enablePrivate: true);
             Assert.IsNotNull(@protected);
-            Assert.IsInstanceOfType(@protected, typeof(ProtectedConstructor));
+            Assert.IsInstanceOfType(@protected, typeof(ProtectedConstructor1));
         }
     }
 }
