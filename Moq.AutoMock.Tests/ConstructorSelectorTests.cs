@@ -32,6 +32,13 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
+        public void It_wont_select_if_an_argument_is_sealed_and_only_one_constructor()
+        {
+            Assert.ThrowsException<ArgumentException>(
+                () => typeof(WithSealedParameter2).SelectCtor(Array.Empty<Type>(), DefaultBindingFlags));
+        }
+
+        [TestMethod]
         public void It_wont_select_if_an_argument_is_sealed_and_not_array()
         {
             var ctor = typeof(WithSealedParameter).SelectCtor(Array.Empty<Type>(), DefaultBindingFlags);

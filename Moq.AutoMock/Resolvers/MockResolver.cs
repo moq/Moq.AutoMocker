@@ -36,13 +36,14 @@ namespace Moq.AutoMock.Resolvers
 
             if (!(context.Value is null)) return;
 
-            var mockType = typeof(Mock<>).MakeGenericType(context.RequestType);
+            Type requestType = context.RequestType;
+            var mockType = typeof(Mock<>).MakeGenericType(requestType);
 
-            bool mayHaveDependencies = context.RequestType.IsClass
-                                       && !typeof(Delegate).IsAssignableFrom(context.RequestType);
+            bool mayHaveDependencies = requestType.IsClass
+                                       && !typeof(Delegate).IsAssignableFrom(requestType);
 
             object?[] constructorArgs = mayHaveDependencies
-                ? context.AutoMocker.CreateArguments(context.RequestType, context.ObjectGraphContext)
+                ? context.AutoMocker.CreateArguments(requestType, context.ObjectGraphContext)
                 : Array.Empty<object>();
 
             if (Activator.CreateInstance(mockType, _mockBehavior, constructorArgs) is Mock mock)

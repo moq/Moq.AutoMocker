@@ -1,3 +1,4 @@
+using Moq.AutoMock.Extensions;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -10,25 +11,29 @@ namespace Moq.AutoMock
         {
             ConstructorInfo? best = type
                 .GetConstructors(bindingFlags)
+                .Where(constructor =>
+                {
+                    var parameters = constructor.GetParameters();
+
+                    return parameters.Length is 0 || parameters
+                        .Select(parameter => parameter.ParameterType)
+                        .All(type => existingTypes.Contains(type)
+                            || type.IsMockable()
+                            || type.IsArray);
+                })
                 .Aggregate<ConstructorInfo, ConstructorInfo?>(null, (value, constructor) =>
                 {
                     if (value is null) return constructor;
-                    if (value.GetParameters().Length >= constructor.GetParameters().Length)
-                        return value;
-
-                    if (constructor.GetParameters()
-                        .Where(x => !existingTypes.Contains(x.ParameterType))
-                        .Any(x => x.ParameterType.GetTypeInfo().IsSealed && !x.ParameterType.IsArray))
-                        return value;
-
-                    return constructor;
+                    return value.GetParameters().Length >= constructor.GetParameters().Length ? value : constructor;
                 });
 
-            return best ?? Empty(type) ?? throw new ArgumentException($"Did not find a best constructor for `{type}`", nameof(type));
+            return best 
+                ?? Empty(type) 
+                ?? throw new ArgumentException($"Did not find a best constructor for `{type}`", nameof(type));
 
             static ConstructorInfo Empty(Type type) => type
                 .GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)
-                .FirstOrDefault(x => !x.GetParameters().Any());
+                .FirstOrDefault(x => x.GetParameters().Length is 0);
         }
     }
 }
