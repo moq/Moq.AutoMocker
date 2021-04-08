@@ -91,6 +91,19 @@ namespace Moq.AutoMock
         /// </summary>
         public ICollection<IMockResolver> Resolvers { get; }
 
+        /// <summary>
+        /// A collection of objects stored in this AutoMocker instance.
+        /// The keys are the types used when resolving services.
+        /// </summary>
+        public IReadOnlyDictionary<Type, object?> ResolvedObjects
+            => _typeMap.ToDictionary(kvp => kvp.Key, kvp => {
+                return kvp.Value switch
+                {
+                    MockInstance mockInstance => mockInstance.Mock,
+                    _ => kvp.Value.Value
+                };
+            });
+
         private IInstance Resolve(Type serviceType, ObjectGraphContext resolutionContext)
         {
             if (serviceType.IsArray)
