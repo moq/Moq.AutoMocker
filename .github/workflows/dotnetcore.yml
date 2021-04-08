@@ -68,7 +68,8 @@ jobs:
         git config --global user.name 'GitHub Action'
         git config --global user.email 'github-actions@users.noreply.github.com'
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-        git commit -am "Automated docs update"
+        git add --all docs/*
+        git commit -m "Automated docs update"
         
 
   # Publish to NuGet and GitHub Packages
