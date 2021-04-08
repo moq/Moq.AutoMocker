@@ -58,7 +58,7 @@ jobs:
     - name: Update Docs
       run: |
         dotnet tool install xmldocmd
-        dotnet tool run xmldocmd .\Moq.AutoMock\bin\Release\net45\Moq.AutoMock.dll .\docs
+        dotnet tool run xmldocmd .\Moq.AutoMock\bin\Release\net461\Moq.AutoMock.dll .\docs
 
         $modified = $(git status -u --porcelain)
         if ($modified.Where({$_.Contains(" docs/")}, 'First').Count -lt 1) {
