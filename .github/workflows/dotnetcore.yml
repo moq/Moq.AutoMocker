@@ -56,6 +56,7 @@ jobs:
 
   # Update the docs
     - name: Update Docs
+      if: github.event_name == 'push'
       run: |
         dotnet tool install xmldocmd
         dotnet tool run xmldocmd .\Moq.AutoMock\bin\Release\net461\Moq.AutoMock.dll .\docs
@@ -70,7 +71,7 @@ jobs:
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
         git add --all docs/*
         git commit -m "Automated docs update"
-        
+        git push
 
   # Publish to NuGet and GitHub Packages
     - name: Publish
