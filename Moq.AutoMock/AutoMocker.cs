@@ -109,7 +109,7 @@ namespace Moq.AutoMock
             if (serviceType.IsArray)
             {
                 Type elmType = serviceType.GetElementType() ?? throw new InvalidOperationException($"Could not determine element type for '{serviceType}'");
-                MockArrayInstance instance = new MockArrayInstance(elmType);
+                MockArrayInstance instance = new(elmType);
                 if (_typeMap.TryGetValue(elmType, out var element))
                     instance.Add(element);
                 return instance;
@@ -539,12 +539,9 @@ namespace Moq.AutoMock
         {
             if (type is null) throw new ArgumentNullException(nameof(type));
 
-            if (Resolve(type, new ObjectGraphContext(false)) is not MockInstance mockObject)
-                throw new ArgumentException($"{type} did not resolve to a Mock", nameof(type));
-
-            _ = forwardTo.Aggregate(mockObject.Mock, As);
-            foreach (var serviceType in forwardTo.Concat(new[] { type }))
-                _typeMap[serviceType] = mockObject;
+            Mock mock = forwardTo.Aggregate(GetOrMakeMockFor(type), As);
+            foreach (var serviceType in new[] { type }.Concat(forwardTo))
+                _typeMap[serviceType] = new MockInstance(mock);
 
             static Mock As(Mock mock, Type forInterface)
             {
