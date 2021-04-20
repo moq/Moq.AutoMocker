@@ -65,13 +65,22 @@ jobs:
         if ($modified.Where({$_.Contains(" docs/")}, 'First').Count -lt 1) {
           return 0
         }
-
-        git config --global user.name 'GitHub Action'
-        git config --global user.email 'github-actions@users.noreply.github.com'
-        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-        git add --all docs/*
-        git commit -m "Automated docs update"
-        git push
+        
+  # Create docs pull request
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v3
+      if: github.event_name == 'push'
+      with:
+        commit-message: |
+          [Docs update detected by Github Action].
+          Auto generated pull request.
+        branch: docs/automated-update
+        delete-branch: true
+        base: master
+        title: Update Docs [GitHub Action]
+        body: |
+          [Docs update detected by Github Action].
+          Auto generated pull request.
 
   # Publish to NuGet and GitHub Packages
     - name: Publish
