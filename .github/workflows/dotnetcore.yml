@@ -54,6 +54,25 @@ jobs:
 
         dotnet pack --configuration Release --verbosity normal --output .
 
+  # Update the docs
+    - name: Update Docs
+      if: github.event_name == 'push'
+      run: |
+        dotnet tool install xmldocmd
+        dotnet tool run xmldocmd .\Moq.AutoMock\bin\Release\net461\Moq.AutoMock.dll .\docs
+
+        $modified = $(git status -u --porcelain)
+        if ($modified.Where({$_.Contains(" docs/")}, 'First').Count -lt 1) {
+          return 0
+        }
+
+        git config --global user.name 'GitHub Action'
+        git config --global user.email 'github-actions@users.noreply.github.com'
+        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+        git add --all docs/*
+        git commit -m "Automated docs update"
+        git push
+
   # Publish to NuGet and GitHub Packages
     - name: Publish
       if: github.event_name == 'push'
