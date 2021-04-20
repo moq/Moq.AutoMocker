@@ -29,7 +29,9 @@ namespace Moq.AutoMock
 
             return best 
                 ?? Empty(type) 
-                ?? throw new ArgumentException($"Did not find a best constructor for `{type}`", nameof(type));
+                ?? throw new ArgumentException(
+                    $"Did not find a best constructor for `{type}`. If your type has a non-public constructor, set the 'enablePrivate' parameter to true for this AutoMocker method.",
+                    nameof(type));
 
             static ConstructorInfo Empty(Type type) => type
                 .GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)
