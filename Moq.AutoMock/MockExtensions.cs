@@ -7,7 +7,7 @@ using System.Reflection;
 namespace Moq.AutoMock
 {
     /// <summary>
-    /// TODO
+    /// Extensions for <see cref="Mock" /> objects.
     /// </summary>
     public static class MockExtensions
     {
