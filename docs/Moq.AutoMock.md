@@ -1,7 +1,7 @@
 # Moq.AutoMock assembly
 
 ## Moq.AutoMock namespace
- 
+
 | public type | description |
 | --- | --- |
 | class [AutoMocker](Moq.AutoMock/AutoMocker.md) | An auto-mocking IoC container that generates mock objects using Moq. |
