@@ -15,6 +15,7 @@ public class AutoMocker
 | [CallBase](AutoMocker/CallBase.md) { get; } | Whether the base member virtual implementation will be called for created mocks if no setup is matched. Defaults to `false`. |
 | [DefaultValue](AutoMocker/DefaultValue.md) { get; } | Specifies the behavior to use when returning default values for unexpected invocations on loose mocks created by this instance. |
 | [MockBehavior](AutoMocker/MockBehavior.md) { get; } | Behavior of created mocks, according to the value set in the constructor. |
+| [ResolvedObjects](AutoMocker/ResolvedObjects.md) { get; } | A collection of objects stored in this AutoMocker instance. The keys are the types used when resolving services. |
 | [Resolvers](AutoMocker/Resolvers.md) { get; } | A collection of resolves determining how a given dependency will be resolved. |
 | [Combine](AutoMocker/Combine.md)(…) | Combines all given types so that they are mocked by the same mock. Some IoC containers call this "Forwarding" one type to other interfaces. In the end, this just means that all given types will be implemented by the same instance. |
 | [Combine&lt;TService,TAsWellAs1&gt;](AutoMocker/Combine.md)() | Combines all given types so that they are mocked by the same mock. Some IoC containers call this "Forwarding" one type to other interfaces. In the end, this just means that all given types will be implemnted by the same instance. |
