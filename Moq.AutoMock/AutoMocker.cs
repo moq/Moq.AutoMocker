@@ -311,7 +311,7 @@ namespace Moq.AutoMock
         /// <typeparam name="TImplementation">The service implementation type</typeparam>
         public void With<TImplementation>()
             where TImplementation : class
-            => Use<TImplementation>(CreateInstance<TImplementation>());
+            => Use(CreateInstance<TImplementation>());
 
         /// <summary>
         /// Creates an instance of <paramref name="implementationType"/> and registers it for service type <paramref name="serviceType"/>.
