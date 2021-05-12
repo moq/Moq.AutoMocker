@@ -1,4 +1,5 @@
-﻿using Moq.AutoMock.Resolvers;
+﻿using Microsoft.Win32;
+using Moq.AutoMock.Resolvers;
 using Moq.Language;
 using Moq.Language.Flow;
 using System;
@@ -292,6 +293,39 @@ namespace Moq.AutoMock
 
             Use(Mock.Get(Mock.Of(setup)));
         }
+
+        /// <summary>
+        /// Creates an instance of <typeparamref name="TImplementation"/> and registers it as for service type <typeparamref name="TService"/>.
+        /// This is a convenience method for Use&lt;<typeparamref name="TService"/>&gt;(CreateInstance&lt;<typeparamref name="TImplementation"/>&gt;())
+        /// </summary>
+        /// <typeparam name="TService">The service type</typeparam>
+        /// <typeparam name="TImplementation">The service implementation type</typeparam>
+        public void With<TService, TImplementation>()
+            where TImplementation: class, TService
+            => Use<TService>(CreateInstance<TImplementation>());
+
+        /// <summary>
+        /// Creates an instance of <typeparamref name="TImplementation"/> and registers it as for service type <typeparamref name="TImplementation"/>.
+        /// This is a convenience method for Use&lt;<typeparamref name="TImplementation"/>&gt;(CreateInstance&lt;<typeparamref name="TImplementation"/>&gt;())
+        /// </summary>
+        /// <typeparam name="TImplementation">The service implementation type</typeparam>
+        public void With<TImplementation>()
+            where TImplementation : class
+            => Use(CreateInstance<TImplementation>());
+
+        /// <summary>
+        /// Creates an instance of <paramref name="implementationType"/> and registers it for service type <paramref name="serviceType"/>.
+        /// This is a convenience method for Use(<paramref name="serviceType"/>, CreateInstance(<paramref name="implementationType"/>))
+        /// </summary>
+        public void With(Type serviceType, Type implementationType)
+            => Use(serviceType, CreateInstance(implementationType));
+
+        /// <summary>
+        /// Creates an instance of <paramref name="implementationType"/> and registers it for service type <paramref name="implementationType"/>.
+        /// This is a convenience method for Use(<paramref name="implementationType"/>, CreateInstance(<paramref name="implementationType"/>))
+        /// </summary>
+        public void With(Type implementationType)
+            => Use(implementationType, CreateInstance(implementationType));
 
         #endregion Use
 
