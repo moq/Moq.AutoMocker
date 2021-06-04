@@ -52,6 +52,9 @@ public class AutoMocker
 | [Verify&lt;T&gt;](AutoMocker/Verify.md)(…) | Verifies that a specific invocation matching the given expression was performed on the mock. Use in conjunction with the default Moq.MockBehavior.Loose. (11 methods) |
 | [Verify&lt;T,TResult&gt;](AutoMocker/Verify.md)(…) | Verify a mock in the container. (5 methods) |
 | [VerifyAll](AutoMocker/VerifyAll.md)() | This is a shortcut for calling `mock.VerifyAll()` on every mock that we have. |
+| [With](AutoMocker/With.md)(…) | Creates an instance of *implementationType* and registers it for service type *serviceType*. This is a convenience method for Use(*serviceType*, CreateInstance(*implementationType*)) (2 methods) |
+| [With&lt;TImplementation&gt;](AutoMocker/With.md)() | Creates an instance of *TImplementation* and registers it as for service type *TImplementation*. This is a convenience method for Use&lt;*TImplementation*&gt;(CreateInstance&lt;*TImplementation*&gt;()) |
+| [With&lt;TService,TImplementation&gt;](AutoMocker/With.md)() | Creates an instance of *TImplementation* and registers it as for service type *TService*. This is a convenience method for Use&lt;*TService*&gt;(CreateInstance&lt;*TImplementation*&gt;()) |
 
 ## See Also
 
