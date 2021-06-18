@@ -1,20 +1,93 @@
 name: Continuous
 
 on:
-  push:
-    branches: [ master ]
+  # PRs will be built, and a package posted to GH Packages
   pull_request:
+  
+  push:
+    paths-ignore:
+    - 'README.md'
+    - 'docs/**'
+
+    # We'll build, pack, and push a pre-release to NuGet on master
+    branches: [ master ]
+
+    # Tagging with v* will build that version number and push a release to Nuget
+    #   e.g. v1.2, v3.4.5, etc.
+    tags:
+    - 'v*'
+
+defaults:
+  run:
+    shell: pwsh
 
 jobs:
   build:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
-    
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.102
+        dotnet-version: 5.0.100
 
+  # Run unit tests
     - name: Test
       run: dotnet test --configuration Release --verbosity normal
+
+  # Package Release
+    - name: Pack
+      run: |
+        <# If we're a tag, force VersionPrefix to the tag value #>
+        if ('${{ github.ref }}' -match '^refs/tags/v') {
+          $match = [regex]::Match('${{ github.ref }}', '^refs/tags/v([0-9]+(\.[0-9]+){1,2})')
+          if ($match.Success) {
+            $env:VersionPrefix = $match.Groups[1].Value
+          } else {
+            throw 'Invalid tag version: ${{ github.ref }}'
+          }
+        }
+        else {
+          <# All other pushes get a CI suffix #>
+          $env:VersionSuffix = 'ci{0:0000}' -f ${{ github.run_number }}
+        }
+
+        dotnet pack --configuration Release --verbosity normal --output .
+
+  # Update the docs
+    - name: Update Docs
+      if: github.event_name == 'push'
+      run: |
+        dotnet tool install xmldocmd
+        dotnet tool run xmldocmd .\Moq.AutoMock\bin\Release\net461\Moq.AutoMock.dll .\docs
+
+        $modified = $(git status -u --porcelain)
+        if ($modified.Where({$_.Contains(" docs/")}, 'First').Count -lt 1) {
+          return 0
+        }
+        
+  # Create docs pull request
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v3
+      if: github.event_name == 'push'
+      with:
+        commit-message: |
+          [Docs update detected by Github Action].
+          Auto generated pull request.
+        branch: docs/automated-update
+        delete-branch: true
+        base: master
+        title: Update Docs [GitHub Action]
+        body: |
+          [Docs update detected by Github Action].
+          Auto generated pull request.
+
+  # Publish to NuGet and GitHub Packages
+    - name: Publish
+      if: github.event_name == 'push'
+      run: |
+        dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN }} --skip-duplicate
+        dotnet nuget push *.nupkg `
+          --source 'https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json' `
+          --api-key '${{ github.token }}' `
+          --skip-duplicate

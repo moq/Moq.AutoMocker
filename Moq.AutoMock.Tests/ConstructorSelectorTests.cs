@@ -32,6 +32,13 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
+        public void It_wont_select_if_an_argument_is_sealed_and_only_one_constructor()
+        {
+            Assert.ThrowsException<ArgumentException>(
+                () => typeof(WithSealedParameter2).SelectCtor(Array.Empty<Type>(), DefaultBindingFlags));
+        }
+
+        [TestMethod]
         public void It_wont_select_if_an_argument_is_sealed_and_not_array()
         {
             var ctor = typeof(WithSealedParameter).SelectCtor(Array.Empty<Type>(), DefaultBindingFlags);
@@ -51,6 +58,13 @@ namespace Moq.AutoMock.Tests
             const BindingFlags privateBindingFlags = DefaultBindingFlags | BindingFlags.NonPublic;
             var ctor = typeof(WithPrivateConstructor).SelectCtor(Array.Empty<Type>(), privateBindingFlags);
             Assert.AreEqual(2, ctor.GetParameters().Length);
+        }
+
+        [TestMethod]
+        public void It_will_always_allow_empty_private_constructor()
+        {
+            var ctor = typeof(ProtectedConstructor).SelectCtor(Array.Empty<Type>(), DefaultBindingFlags);
+            Assert.AreEqual(0, ctor.GetParameters().Length);
         }
     }
 }

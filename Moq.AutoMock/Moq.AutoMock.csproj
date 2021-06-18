@@ -1,16 +1,14 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     <OutputType>Library</OutputType>
-    <RootNamespace>Moq.AutoMock</RootNamespace>
-    <AssemblyName>Moq.AutoMock</AssemblyName>
-    <AssemblyTitle>Moq.AutoMocker</AssemblyTitle>
-    <Product>Moq.AutoMocker</Product>
     <Copyright>Copyright © $([System.DateTime]::UtcNow.ToString("yyyy"))</Copyright>
+    <NeutralLanguage>en-US</NeutralLanguage>
 
-    <VersionPrefix>2.0.1</VersionPrefix>
-    <Authors>Tim Kellogg,Adam Hewitt,Kevin Bost</Authors>
+    <VersionPrefix Condition=" '$(VersionPrefix)' == '' ">3.0.0</VersionPrefix>
+
+    <Authors>Tim Kellogg, Adam Hewitt, Kevin Bost</Authors>
     <PackageDescription>An auto-mocking container that generates mocks using Moq</PackageDescription>
     <Copyright>Copyright Tim Kellogg $([System.DateTime]::UtcNow.ToString("yyyy"))</Copyright>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
@@ -25,23 +23,32 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <WarningsAsErrors />
   </PropertyGroup>
 
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" >
-      <PrivateAssets>All</PrivateAssets>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+      <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Moq" Version="4.13.1" />
+    <PackageReference Include="Moq" Version="4.15.1" />
+    <ProjectReference Include="../Generators/Generators.csproj">
+      <OutputItemType>Analyzer</OutputItemType>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
   </ItemGroup>
-  
+
   <ItemGroup>
     <None Include="..\LICENSE" Pack="true" PackagePath="" />
-    <None Include="AutoMocker.Combine.cs.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>AutoMocker.Combine.cs.generated.cs</LastGenOutput>
-    </None>
     <Compile Include="..\System.Diagnostics.CodeAnalysis.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Strings.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <StronglyTypedNamespace>$(AssemblyName).Resources</StronglyTypedNamespace>
+      <StronglyTypedClassName>Strings</StronglyTypedClassName>
+      <StronglyTypedFileName>$(IntermediateOutputPath)\Strings.Designer.cs</StronglyTypedFileName>
+      <StronglyTypedLanguage>CSharp</StronglyTypedLanguage>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

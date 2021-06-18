@@ -27,7 +27,7 @@ namespace Moq.AutoMock.Resolvers
         }
 
         /// <summary>
-        /// Resolves requsted types with Mock instances.
+        /// Resolves requested types with Mock instances.
         /// </summary>
         /// <param name="context">The resolution context.</param>
         public void Resolve(MockResolutionContext context)
@@ -36,8 +36,17 @@ namespace Moq.AutoMock.Resolvers
 
             if (!(context.Value is null)) return;
 
-            var mockType = typeof(Mock<>).MakeGenericType(context.RequestType);
-            if (Activator.CreateInstance(mockType, _mockBehavior) is Mock mock)
+            Type requestType = context.RequestType;
+            var mockType = typeof(Mock<>).MakeGenericType(requestType);
+
+            bool mayHaveDependencies = requestType.IsClass
+                                       && !typeof(Delegate).IsAssignableFrom(requestType);
+
+            object?[] constructorArgs = mayHaveDependencies
+                ? context.AutoMocker.CreateArguments(requestType, context.ObjectGraphContext)
+                : Array.Empty<object>();
+
+            if (Activator.CreateInstance(mockType, _mockBehavior, constructorArgs) is Mock mock)
             {
                 mock.DefaultValue = _defaultValue;
                 mock.CallBase = _callBase;

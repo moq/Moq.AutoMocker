@@ -1,6 +1,5 @@
 
 /.vs
-_ReSharper.*/
 
 bin/
 obj/
@@ -14,3 +13,4 @@ packages/
 *.coverage
 *.nupkg
 *.snupkg
+*.Designer.cs

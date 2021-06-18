@@ -28,7 +28,6 @@ namespace Moq.AutoMock.Tests
 
         static IEnumerable<object[]> DelegateTypes
         {
-            // ReSharper disable once UnusedMember.Local
             get
             {
                 yield return new[] { typeof(Func<object>), new object() };
