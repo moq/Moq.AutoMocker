@@ -13,9 +13,9 @@ namespace Moq.AutoMock.Tests
             TestDisposable test = new();
             AutoMocker mocker = new();
             mocker.Use(test);
+
             using (mocker.AsDisposable())
-            {
-            }
+            { }
 
             Assert.IsTrue(test.IsDisposed);
         }
@@ -32,7 +32,7 @@ namespace Moq.AutoMock.Tests
 
             disposable.Dispose();
 
-            Assert.IsTrue(disposer is CustomDisposer);
+            Assert.IsTrue(disposable is CustomDisposer);
             Assert.IsTrue(test.IsDisposed);
         }
 
