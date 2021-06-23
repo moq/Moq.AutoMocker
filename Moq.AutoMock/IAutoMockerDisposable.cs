@@ -6,7 +6,7 @@ namespace Moq.AutoMock
     /// <summary>
     /// An interface that is used to clean up AutoMocker instances.
     /// </summary>
-    public interface IAutoMockerDisposable : IDisposable
+    internal interface IAutoMockerDisposable : IDisposable
     {
 
     }
