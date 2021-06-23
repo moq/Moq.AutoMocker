@@ -26,14 +26,6 @@ namespace Moq.AutoMock.Tests
             Assert.IsTrue(ReferenceEquals(mocker, hasDependency.Mocker));
         }
 
-        private class HasAutoMockerDependency
-        {
-            public HasAutoMockerDependency(AutoMocker mocker)
-            {
-                Mocker = mocker;
-            }
-
-            public AutoMocker Mocker { get; }
-        }
+        private record HasAutoMockerDependency(AutoMocker Mocker);
     }
 }
