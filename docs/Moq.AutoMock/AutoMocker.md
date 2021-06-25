@@ -17,6 +17,7 @@ public class AutoMocker
 | [MockBehavior](AutoMocker/MockBehavior.md) { get; } | Behavior of created mocks, according to the value set in the constructor. |
 | [ResolvedObjects](AutoMocker/ResolvedObjects.md) { get; } | A collection of objects stored in this AutoMocker instance. The keys are the types used when resolving services. |
 | [Resolvers](AutoMocker/Resolvers.md) { get; } | A collection of resolves determining how a given dependency will be resolved. |
+| [AsDisposable](AutoMocker/AsDisposable.md)() | Retrieve an IDisposable instance that will dispose of all disposable instances contained within this AutoMocker instance. |
 | [Combine](AutoMocker/Combine.md)(…) | Combines all given types so that they are mocked by the same mock. Some IoC containers call this "Forwarding" one type to other interfaces. In the end, this just means that all given types will be implemented by the same instance. |
 | [Combine&lt;TService,TAsWellAs1&gt;](AutoMocker/Combine.md)() | Combines all given types so that they are mocked by the same mock. Some IoC containers call this "Forwarding" one type to other interfaces. In the end, this just means that all given types will be implemnted by the same instance. |
 | [Combine&lt;TService,TAsWellAs1,TAsWellAs2&gt;](AutoMocker/Combine.md)() | Combines all given types so that they are mocked by the same mock. Some IoC containers call this "Forwarding" one type to other interfaces. In the end, this just means that all given types will be implemnted by the same instance. |
