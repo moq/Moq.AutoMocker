@@ -63,10 +63,12 @@ namespace Moq.AutoMock
 
             Resolvers = new List<IMockResolver>
             {
+                new SelfResolver(),
+                new AutoMockerDisposableResolver(),
                 new MockResolver(mockBehavior, defaultValue, callBase),
                 new FuncResolver(),
                 new LazyResolver(),
-                new EnumerableResolver()
+                new EnumerableResolver(),
             };
         }
 
@@ -697,6 +699,17 @@ namespace Moq.AutoMock
         }
 
         #endregion Verify
+
+        #region Cleanup
+
+        /// <summary>
+        /// Retrieve an IDisposable instance that will dispose of all disposable
+        /// instances contained within this AutoMocker instance.
+        /// </summary>
+        /// <returns></returns>
+        public IDisposable AsDisposable() => Get<IAutoMockerDisposable>();
+
+        #endregion Cleanup
 
         #region Utilities
 

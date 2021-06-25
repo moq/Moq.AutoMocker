@@ -1,8 +1,11 @@
-﻿namespace Moq.AutoMock
+﻿using System;
+
+namespace Moq.AutoMock
 {
     internal interface IInstance
     {
         object? Value { get; }
         bool IsMock { get; }
     }
+
 }
