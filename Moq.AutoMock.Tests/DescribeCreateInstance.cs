@@ -67,18 +67,21 @@ namespace Moq.AutoMock.Tests
             WithServiceArray instance = mocker.CreateInstance<WithServiceArray>();
             IService2[] services = instance.Services;
             Assert.IsNotNull(services);
-            Assert.IsFalse(services.Any());
+            Assert.AreEqual(1, services.Length);
+            Assert.IsTrue(services[0] is IService2);
         }
 
         [TestMethod]
         public void It_creates_mock_objects_for_ctor_array_parameters_with_elements()
         {
             var mocker = new AutoMocker();
-            mocker.Use(new Mock<IService2>());
+            var expectedService = new Mock<IService2>();
+            mocker.Use(expectedService);
             WithServiceArray instance = mocker.CreateInstance<WithServiceArray>();
             IService2[] services = instance.Services;
             Assert.IsNotNull(services);
-            Assert.IsTrue(services.Any());
+            Assert.AreEqual(1, services.Length);
+            Assert.AreEqual(expectedService.Object, services[0]);
         }
 
         [TestMethod]

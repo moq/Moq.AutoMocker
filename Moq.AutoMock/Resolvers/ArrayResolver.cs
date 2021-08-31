@@ -14,8 +14,7 @@ namespace Moq.AutoMock.Resolvers
             {
                 Type elmType = context.RequestType.GetElementType() ?? throw new InvalidOperationException($"Could not determine element type for '{context.RequestType}'");
                 MockArrayInstance arrayInstance = new(elmType);
-                if (context.AutoMocker.TryGet(elmType, context.ObjectGraphContext, out IInstance? instance) &&
-                    !instance.IsMock)
+                if (context.AutoMocker.TryGet(elmType, context.ObjectGraphContext, out IInstance? instance))
                 {
                     arrayInstance.Add(instance);
                 }
