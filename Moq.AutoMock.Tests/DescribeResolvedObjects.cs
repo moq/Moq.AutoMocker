@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq.AutoMock.Resolvers;
 using Moq.AutoMock.Tests.Util;
 using System;
 using System.Collections.Generic;
@@ -41,9 +42,10 @@ namespace Moq.AutoMock.Tests
 
             IReadOnlyDictionary<Type, object?> resolved = mocker.ResolvedObjects;
 
-            Assert.AreEqual(1, resolved.Count);
+            Assert.AreEqual(2, resolved.Count);
             var resolvedArray = resolved[typeof(string[])] as string[];
             Assert.AreEqual(0, resolvedArray?.Length);
+            Assert.AreEqual(null, resolved[typeof(string)]);
         }
 
         [TestMethod]
@@ -60,6 +62,56 @@ namespace Moq.AutoMock.Tests
             var resolvedArray = resolved[typeof(IService2[])] as IService2[];
             Assert.AreEqual(1, resolvedArray?.Length);
             Assert.AreEqual(service, resolvedArray![0]);
+        }
+
+        [TestMethod]
+        public void ResolvedObjects_custom_resolver_providing_value_prevents_subsequent_resolver_from_being_invoked()
+        {
+            AutoMocker mocker = new();
+            object singleton = new();
+            mocker.Resolvers.Clear();
+            mocker.Resolvers.Add(new SingletonResolver<object>(singleton));
+            mocker.Resolvers.Add(new ThrowingResolver());
+
+            object resolved = mocker.Get<object>();
+            Assert.AreEqual(singleton, resolved);
+        }
+
+        [TestMethod]
+        public void ResolvedObjects_custom_resolver_can_prempt_cache_resolver()
+        {
+            object singleton = new();
+            object used = new();
+            AutoMocker mocker = new();
+            mocker.Use(used);
+            mocker.Resolvers.Insert(0, new SingletonResolver<object>(singleton));
+            
+            object resolved = mocker.Get<object>();
+            Assert.AreEqual(singleton, resolved);
+        }
+
+        private class ThrowingResolver : IMockResolver
+        {
+            public void Resolve(MockResolutionContext context) 
+                => throw new NotImplementedException();
+        }
+
+        private class SingletonResolver<T> : IMockResolver
+        {
+            public SingletonResolver(T value)
+            {
+                Value = value;
+            }
+
+            public T Value { get; }
+
+            public void Resolve(MockResolutionContext context)
+            {
+                if (context.RequestType == typeof(T))
+                {
+                    context.Value = Value;
+                }
+            }
         }
     }
 }

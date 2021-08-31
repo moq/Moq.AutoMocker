@@ -22,7 +22,7 @@ namespace Moq.AutoMock.Resolvers
                 return;
 
             var elementType = serviceType.GetGenericArguments().Single();
-            var array = System.Array.CreateInstance(elementType, 1);
+            var array = Array.CreateInstance(elementType, 1);
 
             array.SetValue(am.Get(elementType), 0);
             context.Value = array;

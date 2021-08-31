@@ -1,4 +1,4 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
 using Moq.AutoMock.Resolvers;
 using Moq.Language;
 using Moq.Language.Flow;
@@ -20,8 +20,6 @@ namespace Moq.AutoMock
     /// </summary>
     public partial class AutoMocker
     {
-        private readonly Dictionary<Type, IInstance> _typeMap = new Dictionary<Type, IInstance>();
-
         /// <summary>
         /// Initializes an instance of AutoMockers.
         /// </summary>
@@ -63,12 +61,14 @@ namespace Moq.AutoMock
 
             Resolvers = new List<IMockResolver>
             {
+                new CacheResolver(),
                 new SelfResolver(),
+                new ArrayResolver(),
                 new AutoMockerDisposableResolver(),
-                new MockResolver(mockBehavior, defaultValue, callBase),
-                new FuncResolver(),
-                new LazyResolver(),
                 new EnumerableResolver(),
+                new LazyResolver(),
+                new FuncResolver(),
+                new MockResolver(mockBehavior, defaultValue, callBase),
             };
         }
 
@@ -82,7 +82,7 @@ namespace Moq.AutoMock
         /// unexpected invocations on loose mocks created by this instance.
         /// </summary>
         public DefaultValue DefaultValue { get; }
-        
+
         /// <summary>
         /// Whether the base member virtual implementation will be called 
         /// for created mocks if no setup is matched. Defaults to <c>false</c>.
@@ -99,25 +99,22 @@ namespace Moq.AutoMock
         /// The keys are the types used when resolving services.
         /// </summary>
         public IReadOnlyDictionary<Type, object?> ResolvedObjects
-            => _typeMap.ToDictionary(kvp => kvp.Key, kvp => {
+            => TypeMap?.ToDictionary(kvp => kvp.Key, kvp =>
+            {
                 return kvp.Value switch
                 {
                     MockInstance mockInstance => mockInstance.Mock,
                     _ => kvp.Value.Value
                 };
-            });
+            }) ?? Empty;
+
+        private static IReadOnlyDictionary<Type, object?> Empty = new Dictionary<Type, object?>();
+
+        private Dictionary<Type, IInstance>? TypeMap
+            => Resolvers.OfType<CacheResolver>().FirstOrDefault()?.TypeMap;
 
         private IInstance Resolve(Type serviceType, ObjectGraphContext resolutionContext)
         {
-            if (serviceType.IsArray)
-            {
-                Type elmType = serviceType.GetElementType() ?? throw new InvalidOperationException($"Could not determine element type for '{serviceType}'");
-                MockArrayInstance instance = new(elmType);
-                if (_typeMap.TryGetValue(elmType, out var element))
-                    instance.Add(element);
-                return instance;
-            }
-
             object? resolved = Resolve(serviceType, null, resolutionContext);
             return resolved switch
             {
@@ -127,7 +124,7 @@ namespace Moq.AutoMock
             };
         }
 
-        private object? Resolve(Type serviceType, object? initialValue, ObjectGraphContext resolutionContext)
+        private object? Resolve(Type serviceType, object? defaultValue, ObjectGraphContext resolutionContext)
         {
             if (resolutionContext.VisitedTypes.Contains(serviceType))
             {
@@ -139,12 +136,77 @@ namespace Moq.AutoMock
             }
 
             resolutionContext.VisitedTypes.Add(serviceType);
-            var context = new MockResolutionContext(this, serviceType, initialValue, resolutionContext);
+            var context = new MockResolutionContext(this, serviceType, resolutionContext);
 
-            foreach (var r in Resolvers)
-                r.Resolve(context);
+            List<IMockResolver> resolvers = new(Resolvers);
+            List<Exception> resolverExceptions = new();
+            for (int i = 0; i < resolvers.Count && !context.ValueProvided; i++)
+            {
+                try
+                {
+                    resolvers[i].Resolve(context);
+                }
+                catch (Exception ex)
+                {
+                    ex.Data["Resolver"] = resolvers[i];
+                    resolverExceptions.Add(ex);
+                }
+            }
 
-            return context.Value;
+            if (!context.ValueProvided && resolverExceptions.Count > 0)
+            {
+                throw resolverExceptions.Count switch
+                {
+                    1 => resolverExceptions[0],
+                    _ => new AggregateException($"Failed to resolve '{serviceType.FullName}'", resolverExceptions)
+                };
+            }
+            return context.ValueProvided ? context.Value : defaultValue;
+        }
+
+        private bool TryResolve(Type serviceType,
+            object? defaultValue,
+            ObjectGraphContext resolutionContext,
+            [NotNullWhen(true)] out IInstance? instance)
+        {
+            if (resolutionContext.VisitedTypes.Contains(serviceType))
+            {
+                instance = null;
+                return false;
+            }
+
+            resolutionContext.VisitedTypes.Add(serviceType);
+            var context = new MockResolutionContext(this, serviceType, resolutionContext);
+
+            List<IMockResolver> resolvers = new(Resolvers);
+            List<Exception> resolverExceptions = new();
+            for (int i = 0; i < resolvers.Count && !context.ValueProvided; i++)
+            {
+                try
+                {
+                    resolvers[i].Resolve(context);
+                }
+                catch (Exception ex)
+                {
+                    ex.Data["Resolver"] = resolvers[i];
+                    resolverExceptions.Add(ex);
+                }
+            }
+
+            if (!context.ValueProvided && resolverExceptions.Count > 0)
+            {
+                instance = null;
+                return false;
+            }
+            object? resolved = context.ValueProvided ? context.Value : defaultValue;
+
+            instance = resolved switch
+            {
+                Mock mock => new MockInstance(mock),
+                IInstance i => i,
+                _ => new RealInstance(resolved),
+            };
+            return true;
         }
 
         #region Create Instance/SelfMock
@@ -196,11 +258,19 @@ namespace Moq.AutoMock
             if (type is null) throw new ArgumentNullException(nameof(type));
 
             var context = new ObjectGraphContext(enablePrivate);
-            object?[] arguments = CreateArguments(type, context);
+            if (!TryGetConstructorInvocation(type, context, out ConstructorInfo? ctor, out IInstance[]? arguments))
+            {
+                throw new ArgumentException(
+                    $"Did not find a best constructor for `{type}`. If your type has a non-public constructor, set the 'enablePrivate' parameter to true for this {nameof(AutoMocker)} method.",
+                    nameof(type));
+            }
+
+            CacheInstances(arguments.Zip(ctor.GetParameters(), (i, p) => (p.ParameterType, i)));
+
             try
             {
-                var ctor = type.SelectCtor(_typeMap.Keys.ToArray(), context.BindingFlags);
-                return ctor.Invoke(arguments);
+                object?[] parameters = arguments.Select(x => x.Value).ToArray();
+                return ctor.Invoke(parameters);
             }
             catch (TargetInvocationException e)
             {
@@ -232,18 +302,22 @@ namespace Moq.AutoMock
         public T CreateSelfMock<T>(bool enablePrivate) where T : class?
         {
             var context = new ObjectGraphContext(enablePrivate);
-            var arguments = CreateArguments(typeof(T), context);
+            if (!TryGetConstructorInvocation(typeof(T), context, out _, out IInstance[]? arguments))
+            {
+                throw new ArgumentException(
+                    $"Did not find a best constructor for `{typeof(T)}`. If your type has a non-public constructor, set the 'enablePrivate' parameter to true for this {nameof(AutoMocker)} method.");
+            }
 
-            var mock = new Mock<T>(MockBehavior, arguments)
+            var mock = new Mock<T>(MockBehavior, arguments.Select(x => x.Value).ToArray())
             {
                 DefaultValue = DefaultValue,
                 CallBase = CallBase
             };
 
-            var resolved = Resolve(typeof(T), mock, context);
+            var resolved = Resolve(typeof(T), mock, new ObjectGraphContext(enablePrivate));
             if (resolved is Mock<T> m)
                 return m.Object;
-            
+
             return default!;
         }
 
@@ -269,7 +343,14 @@ namespace Moq.AutoMock
             if (type is null) throw new ArgumentNullException(nameof(type));
             if (service != null && !type.IsInstanceOfType(service))
                 throw new ArgumentException($"{nameof(service)} is not of type {type}");
-            _typeMap[type] = new RealInstance(service);
+            if (TypeMap is { } typeMap)
+            {
+                typeMap[type] = new RealInstance(service);
+            }
+            else
+            {
+                throw new InvalidOperationException($"{nameof(AutoMock.Resolvers.CacheResolver)} was not found. Cannot cache service instance without resolver.");
+            }
         }
 
         /// <summary>
@@ -280,7 +361,14 @@ namespace Moq.AutoMock
         public void Use<TService>(Mock<TService> mockedService)
             where TService : class
         {
-            _typeMap[typeof(TService)] = new MockInstance(mockedService ?? throw new ArgumentNullException(nameof(mockedService)));
+            if (TypeMap is { } typeMap)
+            {
+                typeMap[typeof(TService)] = new MockInstance(mockedService ?? throw new ArgumentNullException(nameof(mockedService)));
+            }
+            else
+            {
+                throw new InvalidOperationException($"{nameof(AutoMock.Resolvers.CacheResolver)} was not found. Cannot cache service instance without resolver.");
+            }
         }
 
         /// <summary>
@@ -303,7 +391,7 @@ namespace Moq.AutoMock
         /// <typeparam name="TService">The service type</typeparam>
         /// <typeparam name="TImplementation">The service implementation type</typeparam>
         public void With<TService, TImplementation>()
-            where TImplementation: class, TService
+            where TImplementation : class, TService
             => Use<TService>(CreateInstance<TImplementation>());
 
         /// <summary>
@@ -384,17 +472,34 @@ namespace Moq.AutoMock
         {
             return Get(serviceType, new ObjectGraphContext(enablePrivate));
         }
-        
+
         private object Get(Type serviceType, ObjectGraphContext context)
+        {
+            if (TryGet(serviceType, context, out IInstance? service))
+            {
+                if (TypeMap is { } typeMap && !typeMap.ContainsKey(serviceType))
+                {
+                    typeMap[serviceType] = service;
+                }
+                return service.Value!; //Should generally not be null, unless the caller has forced a null in with Use
+            }
+            throw new ArgumentException($"{serviceType} could not resolve to an object.", nameof(serviceType));
+        }
+
+        internal bool TryGet(
+            Type serviceType, 
+            ObjectGraphContext context, 
+            [NotNullWhen(true)]out IInstance? service)
         {
             if (serviceType is null) throw new ArgumentNullException(nameof(serviceType));
 
-            if (!_typeMap.TryGetValue(serviceType, out var instance) || instance is null)
-                instance = _typeMap[serviceType] = Resolve(serviceType, context);
-
-            if (instance is null)
-                throw new ArgumentException($"{serviceType} could not resolve to an object.", nameof(serviceType));
-            return instance.Value!; //Should generally not be null, unless the caller has forced a null in with Use
+            if (TryResolve(serviceType, null, context, out IInstance? instance))
+            {
+                service = instance;
+                return true;
+            }
+            service = null;
+            return false;
         }
 
         #endregion Get
@@ -447,8 +552,11 @@ namespace Moq.AutoMock
 
         private Mock GetMockImplementation(Type serviceType, bool enablePrivate)
         {
-            if (!_typeMap.TryGetValue(serviceType, out var instance) || instance is null)
-                instance = _typeMap[serviceType] = Resolve(serviceType, new ObjectGraphContext(enablePrivate));
+            IInstance instance = Resolve(serviceType, new ObjectGraphContext(enablePrivate));
+            if (TypeMap is { } typeMap && !typeMap.ContainsKey(serviceType))
+            {
+                typeMap[serviceType] = instance;
+            }
 
             if (instance == null || !instance.IsMock)
                 throw new ArgumentException($"Registered service `{Get(serviceType)?.GetType()}` was not a mock");
@@ -530,7 +638,6 @@ namespace Moq.AutoMock
             where TService : class
         {
             var mock = (Mock<TService>)GetOrMakeMockFor(typeof(TService));
-            Use(mock);
             return returnValue(mock);
         }
 
@@ -574,10 +681,13 @@ namespace Moq.AutoMock
         public void Combine(Type type, params Type[] forwardTo)
         {
             if (type is null) throw new ArgumentNullException(nameof(type));
+            if (!(TypeMap is { } typeMap)) throw new InvalidOperationException($"{nameof(AutoMock.Resolvers.CacheResolver)} was not found. Cannot combine types without resolver.");
 
             Mock mock = forwardTo.Aggregate(GetOrMakeMockFor(type), As);
             foreach (var serviceType in new[] { type }.Concat(forwardTo))
-                _typeMap[serviceType] = new MockInstance(mock);
+            {
+                typeMap[serviceType] = new MockInstance(mock);
+            }
 
             static Mock As(Mock mock, Type forInterface)
             {
@@ -596,7 +706,9 @@ namespace Moq.AutoMock
         /// </summary>
         public void VerifyAll()
         {
-            foreach (var pair in _typeMap)
+            if (!(TypeMap is { } typeMap)) throw new InvalidOperationException($"{nameof(AutoMock.Resolvers.CacheResolver)} was not found. Cannot verify expectations without resolver.");
+
+            foreach (var pair in typeMap)
             {
                 if (pair.Value is MockInstance instance)
                     instance.Mock.VerifyAll();
@@ -608,7 +720,9 @@ namespace Moq.AutoMock
         /// </summary>
         public void Verify()
         {
-            foreach (var pair in _typeMap)
+            if (!(TypeMap is { } typeMap)) throw new InvalidOperationException($"{nameof(AutoMock.Resolvers.CacheResolver)} was not found. Cannot verify expectations without resolver.");
+
+            foreach (var pair in typeMap)
             {
                 if (pair.Value is MockInstance instance)
                     instance.Mock.Verify();
@@ -713,25 +827,77 @@ namespace Moq.AutoMock
 
         #region Utilities
 
-        internal object?[] CreateArguments(Type type, ObjectGraphContext context)
+        internal bool TryGetConstructorInvocation(
+            Type type,
+            ObjectGraphContext context,
+            [NotNullWhen(true)] out ConstructorInfo? constructor,
+            [NotNullWhen(true)] out IInstance[]? arguments)
         {
-            ConstructorInfo ctor = type.SelectCtor(_typeMap.Keys.ToArray(), context.BindingFlags);
-            if (ctor is null)
-                throw new ArgumentException($"`{type}` does not have an acceptable constructor.", nameof(type));
+            IEnumerable<ConstructorInfo> ctors = type
+                .GetConstructors(context.BindingFlags)
+                .OrderByDescending(x => x.GetParameters().Length)
+                .Concat(new[] { Empty(type) })
+                .Where(x => x is not null)!;
 
-            return ctor.GetParameters().Select(x => Get(x.ParameterType, context)).ToArray();
+            foreach (var ctor in ctors)
+            {
+                if (TryCreateArguments(ctor, context, out IInstance[] args))
+                {
+                    constructor = ctor;
+                    arguments = args;
+                    return true;
+                }
+            }
+            constructor = null;
+            arguments = null;
+            return false;
+
+            static ConstructorInfo? Empty(Type type) => type
+                .GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)
+                .FirstOrDefault(x => x.GetParameters().Length is 0);
+
+            bool TryCreateArguments(ConstructorInfo constructor, ObjectGraphContext context, out IInstance[] arguments)
+            {
+                var parameters = constructor.GetParameters();
+                arguments = new IInstance[parameters.Length];
+                for (int i = 0; i < parameters.Length; i++)
+                {
+                    ObjectGraphContext parameterContext = new(context);
+                    if (!TryGet(parameters[i].ParameterType, parameterContext, out IInstance? service))
+                    {
+                        return false;
+                    }
+                    arguments[i] = service;
+                }
+                return true;
+            }
         }
 
         private Mock GetOrMakeMockFor(Type type)
         {
-            if (!_typeMap.TryGetValue(type, out var instance) || !instance.IsMock)
-                instance = Resolve(type, new ObjectGraphContext(false));
-
+            IInstance instance = Resolve(type, new ObjectGraphContext(false));
             if (instance is not MockInstance mockInstance)
                 throw new ArgumentException($"{type} does not resolve to a Mock");
 
-            _typeMap[type] = mockInstance;
+            if (TypeMap is { } typeMap && !typeMap.ContainsKey(type))
+            {
+                typeMap[type] = mockInstance;
+            }
             return mockInstance.Mock;
+        }
+
+        internal void CacheInstances(IEnumerable<(Type, IInstance)> instances)
+        {
+            if (TypeMap is { } typeMap)
+            {
+                foreach(var (type, instance) in instances)
+                {
+                    if (!typeMap.ContainsKey(type))
+                    {
+                        typeMap[type] = instance;
+                    }
+                }
+            }
         }
 
         #endregion

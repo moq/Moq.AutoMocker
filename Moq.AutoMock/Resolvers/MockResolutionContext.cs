@@ -7,21 +7,21 @@ namespace Moq.AutoMock.Resolvers
     /// </summary>
     public class MockResolutionContext
     {
+        private object? _value;
+
         /// <summary>
         /// Initializes an instance of MockResolutionContext.
         /// </summary>
         /// <param name="autoMocker">The <c>AutoMocker</c> instance.</param>
         /// <param name="requestType">The requested type to resolve.</param>
-        /// <param name="initialValue">The initial value to use.</param>
         /// <param name="objectGraphContext">
         /// Context within the object graph being created. This differs from the MockResolutionContext which is
         /// only relevant for a single object creation.
         /// </param>
-        public MockResolutionContext(AutoMocker autoMocker, Type requestType, object? initialValue, ObjectGraphContext objectGraphContext)
+        public MockResolutionContext(AutoMocker autoMocker, Type requestType, ObjectGraphContext objectGraphContext)
         {
             AutoMocker = autoMocker ?? throw new ArgumentNullException(nameof(autoMocker));
             RequestType = requestType ?? throw new ArgumentNullException(nameof(requestType));
-            Value = initialValue;
             ObjectGraphContext = objectGraphContext ?? throw new ArgumentNullException(nameof(objectGraphContext));
         }
 
@@ -38,13 +38,26 @@ namespace Moq.AutoMock.Resolvers
         /// <summary>
         /// The value to use from the resolution.
         /// </summary>
-        public object? Value { get; set; }
+        public object? Value 
+        {
+            get => _value;
+            set
+            {
+                _value = value;
+                ValueProvided = true;
+            }
+        }
         
         /// <summary>
         /// Context within the object graph being created. This differs from the MockResolutionContext which is
         /// only relevant for a single object creation.
         /// </summary>
         public ObjectGraphContext ObjectGraphContext { get; }
+
+        /// <summary>
+        /// Indicates if a value was set on the Value property.
+        /// </summary>
+        internal bool ValueProvided { get; private set; }
 
         /// <summary>
         /// Deconstruct this instance into its individual properties.

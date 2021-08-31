@@ -11,7 +11,7 @@
         /// <param name="context">The mock resolution context</param>
         public void Resolve(MockResolutionContext context)
         {
-            if (context.RequestType == typeof(AutoMocker) && context.Value is null)
+            if (context.RequestType == typeof(AutoMocker))
             {
                 context.Value = context.AutoMocker;
             }

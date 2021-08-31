@@ -1,4 +1,5 @@
 ﻿using System;
+using Castle.DynamicProxy;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq.AutoMock.Tests.Util;
 
@@ -39,14 +40,6 @@ namespace Moq.AutoMock.Tests
             Assert.IsNotNull(mock);
         }
 
-
-        [TestMethod]
-        public void It_fails_mocking_abstract_with_protected_ctor()
-        {
-            var mocker = new AutoMocker();
-            Assert.ThrowsException<ArgumentException>(() => mocker.GetMock<ProtectedConstructor1>());
-        }
-
         [TestMethod]
         public void It_allows_protected_abstract_mock_when_overriden()
         {
@@ -57,10 +50,11 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
-        public void It_fails_getting_mocked_object_with_protected_ctor()
+        public void It_gets_mocked_object_with_protected_ctor()
         {
             var mocker = new AutoMocker();
-            Assert.ThrowsException<ArgumentException>(() => mocker.Get<ProtectedConstructor1>());
+            var mock = mocker.GetMock<ProtectedConstructor1>();
+            Assert.ThrowsException<InvalidProxyConstructorArgumentsException>(() => mock.Object);
         }
 
         [TestMethod]

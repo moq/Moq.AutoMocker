@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
 
 namespace Moq.AutoMock.Resolvers
 {
@@ -34,7 +36,7 @@ namespace Moq.AutoMock.Resolvers
         {
             if (context is null) throw new ArgumentNullException(nameof(context));
 
-            if (!(context.Value is null)) return;
+            if (context.RequestType == typeof(string)) return;
 
             Type requestType = context.RequestType;
             var mockType = typeof(Mock<>).MakeGenericType(requestType);
@@ -42,9 +44,13 @@ namespace Moq.AutoMock.Resolvers
             bool mayHaveDependencies = requestType.IsClass
                                        && !typeof(Delegate).IsAssignableFrom(requestType);
 
-            object?[] constructorArgs = mayHaveDependencies
-                ? context.AutoMocker.CreateArguments(requestType, context.ObjectGraphContext)
-                : Array.Empty<object>();
+            object?[] constructorArgs = Array.Empty<object>();
+            if (mayHaveDependencies && 
+                context.AutoMocker.TryGetConstructorInvocation(requestType, context.ObjectGraphContext, out ConstructorInfo? ctor, out IInstance[]? arguments))
+            {
+                constructorArgs = arguments.Select(x => x.Value).ToArray();
+                context.AutoMocker.CacheInstances(arguments.Zip(ctor.GetParameters(), (i, p) => (p.ParameterType, i)));
+            }
 
             if (Activator.CreateInstance(mockType, _mockBehavior, constructorArgs) is Mock mock)
             {

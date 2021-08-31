@@ -20,6 +20,21 @@ namespace Moq.AutoMock
         }
 
         /// <summary>
+        /// Creates a new instance, copying the values for the Binding flags and the Visited types.
+        /// </summary>
+        /// <param name="context"></param>
+        public ObjectGraphContext(ObjectGraphContext context)
+        {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            BindingFlags = context.BindingFlags;
+            VisitedTypes = new List<Type>(context.VisitedTypes);
+        }
+
+        /// <summary>
         /// Flags passed to Mock constructor.
         /// </summary>
         public BindingFlags BindingFlags { get; }
@@ -30,6 +45,8 @@ namespace Moq.AutoMock
         /// </summary>
         public List<Type> VisitedTypes { get; }
         
+        
+
         private static BindingFlags GetBindingFlags(bool enablePrivate)
         {
             var bindingFlags = BindingFlags.Instance | BindingFlags.Public;

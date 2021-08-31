@@ -6,7 +6,7 @@
     public interface IMockResolver
     {
         /// <summary>
-        /// Resolve a mock dependency.
+        /// Resolve a dependency.
         /// </summary>
         /// <param name="context">The context to be used while resolving the dependency.</param>
         void Resolve(MockResolutionContext context);
