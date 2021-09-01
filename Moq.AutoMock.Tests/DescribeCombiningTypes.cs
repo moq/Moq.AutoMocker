@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq.AutoMock.Tests.Util;
+using System;
 
 namespace Moq.AutoMock.Tests
 {
@@ -37,6 +38,14 @@ namespace Moq.AutoMock.Tests
 
             Assert.AreEqual("42", mocker.Get<IBaseInterface>().Foo());
             Assert.AreEqual("42", mocker.Get<IDerivedInterface>().Foo());
+        }
+
+        [TestMethod]
+        public void Combine_throws_on_null_type()
+        {
+            AutoMocker mocker = new();
+            var e = Assert.ThrowsException<ArgumentNullException>(() => mocker.Combine(null!));
+            Assert.AreEqual("type", e.ParamName);
         }
     }
 

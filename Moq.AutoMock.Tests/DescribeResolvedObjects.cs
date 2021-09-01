@@ -3,6 +3,7 @@ using Moq.AutoMock.Resolvers;
 using Moq.AutoMock.Tests.Util;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Moq.AutoMock.Tests
 {
@@ -44,7 +45,7 @@ namespace Moq.AutoMock.Tests
 
             Assert.AreEqual(1, resolved.Count);
             var resolvedArray = resolved[typeof(string[])] as string[];
-            Assert.AreEqual(0, resolvedArray?.Length);
+            Assert.AreEqual(0, resolvedArray!.Length);
         }
 
         [TestMethod]
@@ -59,7 +60,7 @@ namespace Moq.AutoMock.Tests
 
             Assert.AreEqual(2, resolved.Count);
             var resolvedArray = resolved[typeof(IService2[])] as IService2[];
-            Assert.AreEqual(1, resolvedArray?.Length);
+            Assert.AreEqual(1, resolvedArray!.Length);
             Assert.AreEqual(service, resolvedArray![0]);
         }
 
@@ -89,6 +90,7 @@ namespace Moq.AutoMock.Tests
             Assert.AreEqual(singleton, resolved);
         }
 
+        [ExcludeFromCodeCoverage]
         private class ThrowingResolver : IMockResolver
         {
             public void Resolve(MockResolutionContext context) 

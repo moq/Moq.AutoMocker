@@ -34,8 +34,6 @@ namespace Moq.AutoMock.Resolvers
         /// <param name="context">The resolution context.</param>
         public void Resolve(MockResolutionContext context)
         {
-            if (context is null) throw new ArgumentNullException(nameof(context));
-
             if (context.RequestType == typeof(string)) return;
 
             Type requestType = context.RequestType;

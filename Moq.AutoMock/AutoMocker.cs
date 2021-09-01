@@ -111,46 +111,6 @@ namespace Moq.AutoMock
         private Dictionary<Type, IInstance>? TypeMap
             => Resolvers.OfType<CacheResolver>().FirstOrDefault()?.TypeMap;
 
-        private object? Resolve(Type serviceType, object? defaultValue, ObjectGraphContext resolutionContext)
-        {
-            if (resolutionContext.VisitedTypes.Contains(serviceType))
-            {
-                var message = string.Join(Environment.NewLine,
-                     $"Class could not be constructed because it appears to be used recursively: '{serviceType}'",
-                     string.Join($"{Environment.NewLine} --> ", resolutionContext.VisitedTypes)
-                );
-                throw new InvalidOperationException(message);
-            }
-
-            resolutionContext.VisitedTypes.Add(serviceType);
-            var context = new MockResolutionContext(this, serviceType, resolutionContext);
-
-            List<IMockResolver> resolvers = new(Resolvers);
-            List<Exception> resolverExceptions = new();
-            for (int i = 0; i < resolvers.Count && !context.ValueProvided; i++)
-            {
-                try
-                {
-                    resolvers[i].Resolve(context);
-                }
-                catch (Exception ex)
-                {
-                    ex.Data["Resolver"] = resolvers[i];
-                    resolverExceptions.Add(ex);
-                }
-            }
-
-            if (!context.ValueProvided && resolverExceptions.Count > 0)
-            {
-                throw resolverExceptions.Count switch
-                {
-                    1 => resolverExceptions[0],
-                    _ => new AggregateException($"Failed to resolve '{serviceType.FullName}'", resolverExceptions)
-                };
-            }
-            return context.ValueProvided ? context.Value : defaultValue;
-        }
-
         private bool TryResolve(Type serviceType,
             ObjectGraphContext resolutionContext,
             [NotNullWhen(true)] out IInstance? instance)
