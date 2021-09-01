@@ -92,7 +92,7 @@ namespace Moq.AutoMock
         /// <summary>
         /// A collection of resolves determining how a given dependency will be resolved.
         /// </summary>
-        public ICollection<IMockResolver> Resolvers { get; }
+        public IList<IMockResolver> Resolvers { get; }
 
         /// <summary>
         /// A collection of objects stored in this AutoMocker instance.
