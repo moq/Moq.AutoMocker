@@ -165,12 +165,12 @@ namespace Moq.AutoMock
         }
 
         private bool TryResolve(Type serviceType,
-            object? defaultValue,
             ObjectGraphContext resolutionContext,
             [NotNullWhen(true)] out IInstance? instance)
         {
             if (resolutionContext.VisitedTypes.Contains(serviceType))
             {
+                //Rejected due to circular dependency
                 instance = null;
                 return false;
             }
@@ -193,18 +193,17 @@ namespace Moq.AutoMock
                 }
             }
 
-            if (!context.ValueProvided && resolverExceptions.Count > 0)
+            if (!context.ValueProvided)
             {
                 instance = null;
                 return false;
             }
-            object? resolved = context.ValueProvided ? context.Value : defaultValue;
 
-            instance = resolved switch
+            instance = context.Value switch
             {
                 Mock mock => new MockInstance(mock),
                 IInstance i => i,
-                _ => new RealInstance(resolved),
+                _ => new RealInstance(context.Value),
             };
             return true;
         }
@@ -261,7 +260,7 @@ namespace Moq.AutoMock
             if (!TryGetConstructorInvocation(type, context, out ConstructorInfo? ctor, out IInstance[]? arguments))
             {
                 throw new ArgumentException(
-                    $"Did not find a best constructor for `{type}`. If your type has a non-public constructor, set the 'enablePrivate' parameter to true for this {nameof(AutoMocker)} method.",
+                    $"Did not find a best constructor for `{type}`. If any type in the hierarchy has a non-public constructor, set the 'enablePrivate' parameter to true for this {nameof(AutoMocker)} method.",
                     nameof(type));
             }
 
@@ -493,7 +492,7 @@ namespace Moq.AutoMock
         {
             if (serviceType is null) throw new ArgumentNullException(nameof(serviceType));
 
-            if (TryResolve(serviceType, null, context, out IInstance? instance))
+            if (TryResolve(serviceType, context, out IInstance? instance))
             {
                 service = instance;
                 return true;
@@ -838,7 +837,8 @@ namespace Moq.AutoMock
                 .OrderByDescending(x => x.GetParameters().Length)
                 .Concat(new[] { Empty(type) })
                 .Where(x => x is not null)!;
-
+            
+            context.VisitedTypes.Add(type);
             foreach (var ctor in ctors)
             {
                 if (TryCreateArguments(ctor, context, out IInstance[] args))

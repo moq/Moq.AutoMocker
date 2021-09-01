@@ -116,13 +116,13 @@ namespace Moq.AutoMock.Tests
         {
             var mocker = new AutoMocker();
             var instance = mocker.CreateInstance<With2ClassDependencies>();
-            
+
             var dependency1 = instance.WithService;
             Assert.IsNotNull(dependency1);
             Assert.IsInstanceOfType(dependency1, typeof(WithService));
             Assert.IsInstanceOfType(Mock.Get(dependency1), typeof(Mock<WithService>));
             Assert.AreSame(dependency1, mocker.Get<WithService>());
-            
+
             var dependency2 = instance.With3Parameters;
             Assert.IsNotNull(dependency2);
             Assert.IsInstanceOfType(dependency2, typeof(With3Parameters));
@@ -149,7 +149,8 @@ namespace Moq.AutoMock.Tests
             // I could see this changing to something else in the future, like null. Right now, it seems
             // best to cause early failure to clarify what went wrong. Also, returning null "allows" the
             // behavior, so it's easier to move that direction later without breaking backward compatibility.
-            Assert.ThrowsException<InvalidOperationException>(mocker.CreateInstance<WithRecursiveDependency>);
+            ArgumentException e = Assert.ThrowsException<ArgumentException>(mocker.CreateInstance<WithRecursiveDependency>);
+            Assert.IsTrue(e.Message.StartsWith($"Did not find a best constructor for `{typeof(WithRecursiveDependency)}`"));
         }
     }
 }

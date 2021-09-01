@@ -42,10 +42,9 @@ namespace Moq.AutoMock.Tests
 
             IReadOnlyDictionary<Type, object?> resolved = mocker.ResolvedObjects;
 
-            Assert.AreEqual(2, resolved.Count);
+            Assert.AreEqual(1, resolved.Count);
             var resolvedArray = resolved[typeof(string[])] as string[];
             Assert.AreEqual(0, resolvedArray?.Length);
-            Assert.AreEqual(null, resolved[typeof(string)]);
         }
 
         [TestMethod]

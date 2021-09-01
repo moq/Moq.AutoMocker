@@ -16,7 +16,7 @@ namespace Moq.AutoMock
         public ObjectGraphContext(bool enablePrivate)
         {
             BindingFlags = GetBindingFlags(enablePrivate);
-            VisitedTypes = new List<Type>();
+            VisitedTypes = new HashSet<Type>();
         }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace Moq.AutoMock
             }
 
             BindingFlags = context.BindingFlags;
-            VisitedTypes = new List<Type>(context.VisitedTypes);
+            VisitedTypes = new HashSet<Type>(context.VisitedTypes);
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace Moq.AutoMock
         /// Used internally to track which types have been created inside a call graph,
         /// to detect cycles in the object graph.
         /// </summary>
-        public List<Type> VisitedTypes { get; }
+        public HashSet<Type> VisitedTypes { get; }
         
         
 
