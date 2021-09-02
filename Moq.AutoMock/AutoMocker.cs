@@ -283,14 +283,14 @@ namespace Moq.AutoMock
         {
             if (type is null) throw new ArgumentNullException(nameof(type));
             if (service != null && !type.IsInstanceOfType(service))
-                throw new ArgumentException($"{nameof(service)} is not of type {type}");
+                throw new ArgumentException($"{nameof(service)} is not of type {type}", nameof(service));
             if (TypeMap is { } typeMap)
             {
                 typeMap[type] = new RealInstance(service);
             }
             else
             {
-                throw new InvalidOperationException($"{nameof(AutoMock.Resolvers.CacheResolver)} was not found. Cannot cache service instance without resolver.");
+                throw new InvalidOperationException($"{nameof(CacheResolver)} was not found. Cannot cache service instance without resolver.");
             }
         }
 
@@ -308,7 +308,7 @@ namespace Moq.AutoMock
             }
             else
             {
-                throw new InvalidOperationException($"{nameof(AutoMock.Resolvers.CacheResolver)} was not found. Cannot cache service instance without resolver.");
+                throw new InvalidOperationException($"{nameof(CacheResolver)} was not found. Cannot cache service instance without resolver.");
             }
         }
 
@@ -622,7 +622,7 @@ namespace Moq.AutoMock
         public void Combine(Type type, params Type[] forwardTo)
         {
             if (type is null) throw new ArgumentNullException(nameof(type));
-            if (!(TypeMap is { } typeMap)) throw new InvalidOperationException($"{nameof(AutoMock.Resolvers.CacheResolver)} was not found. Cannot combine types without resolver.");
+            if (!(TypeMap is { } typeMap)) throw new InvalidOperationException($"{nameof(CacheResolver)} was not found. Cannot combine types without resolver.");
 
             Mock mock = forwardTo.Aggregate(GetOrMakeMockFor(type), As);
             foreach (var serviceType in new[] { type }.Concat(forwardTo))
@@ -647,7 +647,7 @@ namespace Moq.AutoMock
         /// </summary>
         public void VerifyAll()
         {
-            if (!(TypeMap is { } typeMap)) throw new InvalidOperationException($"{nameof(AutoMock.Resolvers.CacheResolver)} was not found. Cannot verify expectations without resolver.");
+            if (!(TypeMap is { } typeMap)) throw new InvalidOperationException($"{nameof(CacheResolver)} was not found. Cannot verify expectations without resolver.");
 
             foreach (var pair in typeMap)
             {
@@ -661,7 +661,7 @@ namespace Moq.AutoMock
         /// </summary>
         public void Verify()
         {
-            if (!(TypeMap is { } typeMap)) throw new InvalidOperationException($"{nameof(AutoMock.Resolvers.CacheResolver)} was not found. Cannot verify expectations without resolver.");
+            if (!(TypeMap is { } typeMap)) throw new InvalidOperationException($"{nameof(CacheResolver)} was not found. Cannot verify expectations without resolver.");
 
             foreach (var pair in typeMap)
             {

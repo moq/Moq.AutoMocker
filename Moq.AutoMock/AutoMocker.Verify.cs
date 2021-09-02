@@ -58,6 +58,11 @@ namespace Moq.AutoMock
                 throw new ArgumentNullException(nameof(expression));
             }
 
+            if (times is null)
+            {
+                throw new ArgumentNullException(nameof(times));
+            }
+
             var mock = GetMock<T>();
             mock.Verify(expression, times);
         }

@@ -3,6 +3,7 @@ using Moq.AutoMock.Resolvers;
 using Moq.AutoMock.Tests.Util;
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Moq.AutoMock.Tests
 {
@@ -19,7 +20,7 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
-        public void It_throws_if_expression_is_null()
+        public void It_throws_if_func_expression_is_null()
         {
             AutoMocker mocker = new();
 
@@ -27,7 +28,7 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
-        public void It_verifies_mock_with_expression()
+        public void It_verifies_mock_with_func_expression()
         {
             AutoMocker mocker = new();
             var mock = mocker.GetMock<IService7>();
@@ -37,7 +38,7 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
-        public void It_throws_if_expression_with_times_is_null()
+        public void It_throws_if_func_expression_with_times_is_null()
         {
             AutoMocker mocker = new();
 
@@ -45,7 +46,7 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
-        public void It_verifies_mock_with_expression_and_times()
+        public void It_verifies_mock_with_func_expression_and_times()
         {
             AutoMocker mocker = new();
             var mock = mocker.GetMock<IService7>();
@@ -55,7 +56,7 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
-        public void It_throws_if_expression_with_times_func_has_null_expression()
+        public void It_throws_if_func_expression_with_times_func_has_null_func_expression()
         {
             AutoMocker mocker = new();
 
@@ -63,7 +64,7 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
-        public void It_throws_if_expression_with_times_func_has_null_times_func()
+        public void It_throws_if_func_expression_with_times_func_has_null_times_func()
         {
             AutoMocker mocker = new();
 
@@ -71,7 +72,7 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
-        public void It_verifies_mock_with_expression_and_times_func()
+        public void It_verifies_mock_with_func_expression_and_times_func()
         {
             AutoMocker mocker = new();
             var mock = mocker.GetMock<IService7>();
@@ -81,7 +82,7 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
-        public void It_throws_if_expression_with_fail_message_has_null_expression()
+        public void It_throws_if_func_expression_with_fail_message_has_null_func_expression()
         {
             AutoMocker mocker = new();
 
@@ -89,7 +90,7 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
-        public void It_verifies_mock_with_expression_and_fail_message()
+        public void It_verifies_mock_with_func_expression_and_fail_message()
         {
             AutoMocker mocker = new();
             var mock = mocker.GetMock<IService7>();
@@ -99,7 +100,7 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
-        public void It_throws_if_expression_with_times_and_fail_message_has_null_expression()
+        public void It_throws_if_func_expression_with_times_and_fail_message_has_null_func_expression()
         {
             AutoMocker mocker = new();
 
@@ -107,7 +108,7 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
-        public void It_throws_if_expression_with_times_and_fail_message_has_null_fail_message()
+        public void It_throws_if_func_expression_with_times_and_fail_message_has_null_fail_message()
         {
             AutoMocker mocker = new();
 
@@ -115,13 +116,93 @@ namespace Moq.AutoMock.Tests
         }
 
         [TestMethod]
-        public void It_verifies_mock_with_expression_and_times_and_fail_message()
+        public void It_verifies_mock_with_func_expression_and_times_and_fail_message()
         {
             AutoMocker mocker = new();
             var mock = mocker.GetMock<IService7>();
             mock.Object.ReturnValue("foo");
 
             mocker.Verify<IService7, object>(x => x.ReturnValue("foo"), Times.Once(), "fail");
+        }
+
+        [TestMethod]
+        public void It_throws_with_null_action_expression()
+        {
+            AutoMocker mocker = new();
+
+            Assert.ThrowsException<ArgumentNullException>(() => mocker.Verify<IService7>((Expression<Action<IService7>>)null!));
+        }
+
+        [TestMethod]
+        public void It_verifies_with_action_expression()
+        {
+            AutoMocker mocker = new();
+            var mock = mocker.GetMock<IService7>();
+            mock.Object.Void("foo");
+
+            mocker.Verify<IService7>(x => x.Void("foo"));
+        }
+
+        [TestMethod]
+        public void It_throws_with_action_expression_and_times_with_null_expression()
+        {
+            AutoMocker mocker = new();
+
+            Assert.ThrowsException<ArgumentNullException>(() => mocker.Verify<IService7>((Expression<Action<IService7>>)null!, Times.Never()));
+        }
+
+        [TestMethod]
+        public void It_verifies_with_action_expression_and_times()
+        {
+            AutoMocker mocker = new();
+            var mock = mocker.GetMock<IService7>();
+            mock.Object.Void("foo");
+
+            mocker.Verify<IService7>(x => x.Void("foo"), Times.Once());
+        }
+
+        [TestMethod]
+        public void It_throws_with_action_expression_and_times_func_with_null_expression()
+        {
+            AutoMocker mocker = new();
+
+            Assert.ThrowsException<ArgumentNullException>(() => mocker.Verify<IService7>((Expression<Action<IService7>>)null!, Times.Never));
+        }
+
+        [TestMethod]
+        public void It_throws_with_action_expression_and_times_func_with_null_times_func()
+        {
+            AutoMocker mocker = new();
+
+            Assert.ThrowsException<ArgumentNullException>(() => mocker.Verify<IService7>(x => x.Void("foo"), (Func<Times>)null!));
+        }
+
+        [TestMethod]
+        public void It_verifies_with_action_expression_and_times_func()
+        {
+            AutoMocker mocker = new();
+            var mock = mocker.GetMock<IService7>();
+            mock.Object.Void("foo");
+
+            mocker.Verify<IService7>(x => x.Void("foo"), Times.Once);
+        }
+
+        [TestMethod]
+        public void It_throws_with_action_expression_and_failure_message_with_null_expression()
+        {
+            AutoMocker mocker = new();
+
+            Assert.ThrowsException<ArgumentNullException>(() => mocker.Verify<IService7>((Expression<Action<IService7>>)null!, "fail"));
+        }
+
+        [TestMethod]
+        public void It_verifies_with_action_expression_and_failure_message()
+        {
+            AutoMocker mocker = new();
+            var mock = mocker.GetMock<IService7>();
+            mock.Object.Void("foo");
+
+            mocker.Verify<IService7>(x => x.Void("foo"), "fail");
         }
     }
 }
