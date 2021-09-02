@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -56,6 +57,35 @@ namespace Moq.AutoMock.Tests
                             return mock.Object;
                         })
                         .ToArray();
+
+                    for (int i = 0; i < parameters.Length; i++)
+                    {
+                        object?[] values = parameterValues.ToArray();
+                        values[i] = null;
+
+                        if (parameters[i].HasDefaultValue && parameters[i].DefaultValue is null)
+                        {
+                            //NB: no exception thrown
+                            constructor.Invoke(values);
+                        }
+                        else
+                        {
+                            string parameterDisplay = $"'{parameters[i].Name}' ({parameters[i].ParameterType.Name})";
+                            TargetInvocationException ex = Assert.ThrowsException<TargetInvocationException>(new Action(() =>
+                            {
+                                object? rv = constructor.Invoke(values);
+                                throw new Exception($"Expected {nameof(ArgumentNullException)} for null parameter {parameterDisplay} but no exception was thrown");
+                            }));
+                            if (ex.InnerException is ArgumentNullException argumentNullException)
+                            {
+                                Assert.AreEqual(parameters[i].Name, argumentNullException.ParamName);
+                            }
+                            else
+                            {
+                                throw new Exception($"Thrown argument for {parameterDisplay} was '{ex.InnerException?.GetType().Name}' not {nameof(ArgumentNullException)}.", ex.InnerException);
+                            }
+                        }
+                    }
                 }
             }
         }

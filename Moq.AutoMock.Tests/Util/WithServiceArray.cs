@@ -2,6 +2,7 @@
 
 namespace Moq.AutoMock.Tests.Util
 {
+    [ExcludeFromCodeCoverage]
     public class WithServiceArray
     {
         [SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "The point is to test the array.")]
