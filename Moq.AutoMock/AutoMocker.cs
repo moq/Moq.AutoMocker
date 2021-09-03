@@ -126,17 +126,15 @@ namespace Moq.AutoMock
             var context = new MockResolutionContext(this, serviceType, resolutionContext);
 
             List<IMockResolver> resolvers = new(Resolvers);
-            List<Exception> resolverExceptions = new();
             for (int i = 0; i < resolvers.Count && !context.ValueProvided; i++)
             {
                 try
                 {
                     resolvers[i].Resolve(context);
                 }
-                catch (Exception ex)
+                catch
                 {
-                    ex.Data["Resolver"] = resolvers[i];
-                    resolverExceptions.Add(ex);
+                    //TODO: Should we do anything with exceptions?
                 }
             }
 
