@@ -32,7 +32,6 @@ namespace Generators
         {
             return MethodDeclaration(PredefinedType(Token(VoidKeyword)), "Combine")
                 .WithModifiers(TokenList(Token(TriviaList(Trivia(Documentation)), PublicKeyword, TriviaList())))
-                //.WithAttributeLists(SingletonList(AttributeList(SingletonSeparatedList(Attribute(IdentifierName("System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage"))))))
                 .WithTypeParameterList(TypeParameterList(SeparatedList(Enumerable.Range(0, count + 1).Select(type))))
                 .WithExpressionBody(ArrowExpressionClause(
                     InvocationExpression(IdentifierName("Combine"))
