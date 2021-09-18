@@ -16,7 +16,7 @@ namespace Moq.AutoMock.Resolvers
         /// <param name="context">The resolution context.</param>
         public void Resolve(MockResolutionContext context)
         {
-            var (am, serviceType, _) = context ?? throw new ArgumentNullException(nameof(context));
+            var (am, serviceType, _) = context;
 
             if (!serviceType.GetTypeInfo().IsGenericType || serviceType.GetGenericTypeDefinition() != typeof(Lazy<>))
                 return;

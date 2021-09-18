@@ -14,6 +14,11 @@ namespace Moq.AutoMock
         public void Verify<T>(Expression<Action<T>> expression)
             where T : class
         {
+            if (expression is null)
+            {
+                throw new ArgumentNullException(nameof(expression));
+            }
+
             var mock = GetMock<T>();
             mock.Verify(expression);
         }
@@ -29,6 +34,11 @@ namespace Moq.AutoMock
         public void Verify<T>(Expression<Action<T>> expression, Times times)
             where T : class
         {
+            if (expression is null)
+            {
+                throw new ArgumentNullException(nameof(expression));
+            }
+
             var mock = GetMock<T>();
             mock.Verify(expression, times);
         }
@@ -43,6 +53,16 @@ namespace Moq.AutoMock
         public void Verify<T>(Expression<Action<T>> expression, Func<Times> times)
             where T : class
         {
+            if (expression is null)
+            {
+                throw new ArgumentNullException(nameof(expression));
+            }
+
+            if (times is null)
+            {
+                throw new ArgumentNullException(nameof(times));
+            }
+
             var mock = GetMock<T>();
             mock.Verify(expression, times);
         }
@@ -57,6 +77,11 @@ namespace Moq.AutoMock
         public void Verify<T>(Expression<Action<T>> expression, string failMessage)
             where T : class
         {
+            if (expression is null)
+            {
+                throw new ArgumentNullException(nameof(expression));
+            }
+
             var mock = GetMock<T>();
             mock.Verify(expression, failMessage);
         }
@@ -72,6 +97,11 @@ namespace Moq.AutoMock
         public void Verify<T>(Expression<Action<T>> expression, Times times, string failMessage)
             where T : class
         {
+            if (expression is null)
+            {
+                throw new ArgumentNullException(nameof(expression));
+            }
+
             var mock = GetMock<T>();
             mock.Verify(expression, times, failMessage);
         }
@@ -87,6 +117,16 @@ namespace Moq.AutoMock
         public void Verify<T>(Expression<Action<T>> expression, Func<Times> times, string failMessage)
             where T : class
         {
+            if (expression is null)
+            {
+                throw new ArgumentNullException(nameof(expression));
+            }
+
+            if (times is null)
+            {
+                throw new ArgumentNullException(nameof(times));
+            }
+
             var mock = GetMock<T>();
             mock.Verify(expression, times, failMessage);
         }
@@ -100,6 +140,11 @@ namespace Moq.AutoMock
         public void Verify<T>(Expression<Func<T, object>> expression)
             where T : class
         {
+            if (expression is null)
+            {
+                throw new ArgumentNullException(nameof(expression));
+            }
+
             var mock = GetMock<T>();
 
             if (CastChecker.DoesReturnPrimitive(expression))
@@ -118,6 +163,11 @@ namespace Moq.AutoMock
         public void Verify<T>(Expression<Func<T, object>> expression, Times times)
             where T : class
         {
+            if (expression is null)
+            {
+                throw new ArgumentNullException(nameof(expression));
+            }
+
             var mock = GetMock<T>();
 
             if (CastChecker.DoesReturnPrimitive(expression))
@@ -136,6 +186,16 @@ namespace Moq.AutoMock
         public void Verify<T>(Expression<Func<T, object>> expression, Func<Times> times)
             where T : class
         {
+            if (expression is null)
+            {
+                throw new ArgumentNullException(nameof(expression));
+            }
+
+            if (times is null)
+            {
+                throw new ArgumentNullException(nameof(times));
+            }
+
             var mock = GetMock<T>();
 
             if (CastChecker.DoesReturnPrimitive(expression))
@@ -154,6 +214,11 @@ namespace Moq.AutoMock
         public void Verify<T>(Expression<Func<T, object>> expression, string failMessage)
             where T : class
         {
+            if (expression is null)
+            {
+                throw new ArgumentNullException(nameof(expression));
+            }
+
             var mock = GetMock<T>();
 
             if (CastChecker.DoesReturnPrimitive(expression))
@@ -173,6 +238,11 @@ namespace Moq.AutoMock
         public void Verify<T>(Expression<Func<T, object>> expression, Times times, string failMessage)
             where T : class
         {
+            if (expression is null)
+            {
+                throw new ArgumentNullException(nameof(expression));
+            }
+
             var mock = GetMock<T>();
 
             if (CastChecker.DoesReturnPrimitive(expression))

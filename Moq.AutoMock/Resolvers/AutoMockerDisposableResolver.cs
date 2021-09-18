@@ -11,8 +11,7 @@
         /// <param name="context"></param>
         public void Resolve(MockResolutionContext context)
         {
-            if (context.RequestType.IsAssignableFrom(typeof(IAutoMockerDisposable)) &&
-                context.Value is null)
+            if (context.RequestType.IsAssignableFrom(typeof(IAutoMockerDisposable)))
             {
                 context.Value = new AutoMockerDisposable(context.AutoMocker);
             }

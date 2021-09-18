@@ -1,5 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq.AutoMock.Resolvers;
 using Moq.AutoMock.Tests.Util;
+using System;
+using System.Linq;
 
 namespace Moq.AutoMock.Tests
 {
@@ -37,6 +40,23 @@ namespace Moq.AutoMock.Tests
 
             Assert.AreEqual("42", mocker.Get<IBaseInterface>().Foo());
             Assert.AreEqual("42", mocker.Get<IDerivedInterface>().Foo());
+        }
+
+        [TestMethod]
+        public void Combine_throws_on_null_type()
+        {
+            AutoMocker mocker = new();
+            var e = Assert.ThrowsException<ArgumentNullException>(() => mocker.Combine(null!));
+            Assert.AreEqual("type", e.ParamName);
+        }
+
+        [TestMethod]
+        public void It_throws_if_cache_is_not_registered()
+        {
+            AutoMocker mocker = new();
+            mocker.Resolvers.Remove(mocker.Resolvers.OfType<CacheResolver>().Single());
+
+            Assert.ThrowsException<InvalidOperationException>(() => mocker.Combine(typeof(object), typeof(object)));
         }
     }
 

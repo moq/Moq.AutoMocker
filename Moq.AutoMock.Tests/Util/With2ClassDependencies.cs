@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Moq.AutoMock.Tests.Util
 {
+    [ExcludeFromCodeCoverage]
     public class With2ClassDependencies
     {
         public WithService WithService { get; }

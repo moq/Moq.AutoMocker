@@ -1,5 +1,8 @@
-﻿namespace Moq.AutoMock.Tests.Util
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Moq.AutoMock.Tests.Util
 {
+    [ExcludeFromCodeCoverage]
     public class Service2 : IService2
     {
         public IService1 Other

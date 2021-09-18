@@ -14,7 +14,7 @@ namespace Moq.AutoMock.Resolvers
         /// <param name="context">The resolution context.</param>
         public void Resolve(MockResolutionContext context)
         {
-            var (am, serviceType, _) = context ?? throw new ArgumentNullException(nameof(context));
+            var (am, serviceType, _) = context;
 
             if (am.TryCompileGetter(serviceType, out var @delegate))
                 context.Value = @delegate;
