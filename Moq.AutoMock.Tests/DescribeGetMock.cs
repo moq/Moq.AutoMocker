@@ -65,5 +65,22 @@ namespace Moq.AutoMock.Tests
             Assert.IsNotNull(@protected);
             Assert.IsInstanceOfType(@protected, typeof(ProtectedConstructor1));
         }
+
+        [TestMethod]
+        public void It_gets_mocked_object_via_iserviceprovider()
+        {
+            IServiceProvider mocker = new AutoMocker();
+            var service = mocker.GetService(typeof(Empty));
+            Assert.IsNotNull(service);
+            Assert.IsInstanceOfType(service, typeof(Empty));
+        }
+
+        [TestMethod]
+        public void It_returns_null_for_unmockable_object_via_iserviceprovider()
+        {
+            IServiceProvider mocker = new AutoMocker();
+            var service = mocker.GetService(typeof(string));
+            Assert.IsNull(service);
+        }
     }
 }
