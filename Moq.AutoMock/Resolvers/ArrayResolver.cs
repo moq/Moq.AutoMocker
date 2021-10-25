@@ -7,7 +7,7 @@ namespace Moq.AutoMock.Resolvers
     /// </summary>
     public class ArrayResolver : IMockResolver
     {
-        /// <inheritdocs />
+        /// <inheritdoc />
         public void Resolve(MockResolutionContext context)
         {
             if (context.RequestType.IsArray && context.RequestType != typeof(string))
