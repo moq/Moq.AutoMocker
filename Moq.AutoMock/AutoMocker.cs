@@ -18,7 +18,7 @@ namespace Moq.AutoMock
     /// <summary>
     /// An auto-mocking IoC container that generates mock objects using Moq.
     /// </summary>
-    public partial class AutoMocker
+    public partial class AutoMocker : IServiceProvider
     {
         /// <summary>
         /// Initializes an instance of AutoMockers.
@@ -439,6 +439,14 @@ namespace Moq.AutoMock
             }
             service = null;
             return false;
+        }
+
+        /// <inheritdoc />
+        object? IServiceProvider.GetService(Type serviceType)
+        {
+            return TryGet(serviceType, new ObjectGraphContext(false), out IInstance? service)
+                ? service.Value
+                : null;
         }
 
         #endregion Get
