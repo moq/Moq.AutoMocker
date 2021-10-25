@@ -10,7 +10,7 @@ namespace Moq.AutoMock.Resolvers
     {
         internal Dictionary<Type, IInstance> TypeMap { get; } = new();
 
-        /// <inheritdocs />
+        /// <inheritdoc />
         public void Resolve(MockResolutionContext context)
         {
             if (TypeMap.TryGetValue(context.RequestType, out IInstance instance))
