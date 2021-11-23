@@ -23,5 +23,22 @@ namespace Moq.AutoMock.Tests
             Assert.IsNotNull(selfMock.Service);
             Assert.IsNotNull(Mock.Get(selfMock.Service));
         }
+
+        [TestMethod]
+        [Description("Issue 130")]
+        public void It_reuses_dependencies_when_creating_self_mock()
+        {
+            var mocker = new AutoMocker();
+            var service = mocker.CreateSelfMock<AbstractService>();
+            Assert.IsTrue(ReferenceEquals(service.Dependency, mocker.GetMock<IDependency>().Object));
+        }
+
+        public abstract class AbstractService
+        {
+            public IDependency Dependency { get; }
+            public AbstractService(IDependency dependency) => Dependency = dependency;
+        }
+
+        public interface IDependency { }
     }
 }

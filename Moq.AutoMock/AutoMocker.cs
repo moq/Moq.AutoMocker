@@ -246,11 +246,13 @@ namespace Moq.AutoMock
         public T CreateSelfMock<T>(bool enablePrivate) where T : class?
         {
             var context = new ObjectGraphContext(enablePrivate);
-            if (!TryGetConstructorInvocation(typeof(T), context, out _, out IInstance[]? arguments))
+            if (!TryGetConstructorInvocation(typeof(T), context, out ConstructorInfo? ctor, out IInstance[]? arguments))
             {
                 throw new ArgumentException(
                     $"Did not find a best constructor for `{typeof(T)}`. If your type has a non-public constructor, set the 'enablePrivate' parameter to true for this {nameof(AutoMocker)} method.");
             }
+
+            CacheInstances(arguments.Zip(ctor.GetParameters(), (i, p) => (p.ParameterType, i)));
 
             var mock = new Mock<T>(MockBehavior, arguments.Select(x => x.Value).ToArray())
             {
