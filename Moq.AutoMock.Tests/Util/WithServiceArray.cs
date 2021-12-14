@@ -1,16 +1,15 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Moq.AutoMock.Tests.Util
-{
-    [ExcludeFromCodeCoverage]
-    public class WithServiceArray
-    {
-        [SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "The point is to test the array.")]
-        public IService2[] Services { get; set; }
+namespace Moq.AutoMock.Tests.Util;
 
-        public WithServiceArray(IService2[] services)
-        {
-            Services = services;
-        }
+[ExcludeFromCodeCoverage]
+public class WithServiceArray
+{
+    [SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "The point is to test the array.")]
+    public IService2[] Services { get; set; }
+
+    public WithServiceArray(IService2[] services)
+    {
+        Services = services;
     }
 }

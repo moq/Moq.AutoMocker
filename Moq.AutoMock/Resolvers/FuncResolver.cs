@@ -1,23 +1,22 @@
-﻿using Moq.AutoMock.Extensions;
-using System;
+﻿using System;
+using Moq.AutoMock.Extensions;
 
-namespace Moq.AutoMock.Resolvers
+namespace Moq.AutoMock.Resolvers;
+
+/// <summary>
+/// A resolver that resolves Func&lt;&gt; dependency types
+/// </summary>
+public class FuncResolver : IMockResolver
 {
     /// <summary>
-    /// A resolver that resolves Func&lt;&gt; dependency types
+    /// Resolves requested Func&lt;&gt; types.
     /// </summary>
-    public class FuncResolver : IMockResolver
+    /// <param name="context">The resolution context.</param>
+    public void Resolve(MockResolutionContext context)
     {
-        /// <summary>
-        /// Resolves requested Func&lt;&gt; types.
-        /// </summary>
-        /// <param name="context">The resolution context.</param>
-        public void Resolve(MockResolutionContext context)
-        {
-            var (am, serviceType, _) = context;
+        var (am, serviceType, _) = context;
 
-            if (am.TryCompileGetter(serviceType, out var @delegate))
-                context.Value = @delegate;
-        }
+        if (am.TryCompileGetter(serviceType, out var @delegate))
+            context.Value = @delegate;
     }
 }

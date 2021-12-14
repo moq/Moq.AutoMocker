@@ -1,124 +1,123 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq.AutoMock.Tests.Util;
-using System;
+﻿using System;
 using System.Reflection;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq.AutoMock.Tests.Util;
 
-namespace Moq.AutoMock.Tests
+namespace Moq.AutoMock.Tests;
+
+[TestClass]
+public class DescribeSetupWithAny
 {
-    [TestClass]
-    public class DescribeSetupWithAny
+    [TestMethod]
+    public void You_can_setup_with_any_on_a_method_with_a_return_value()
     {
-        [TestMethod]
-        public void You_can_setup_with_any_on_a_method_with_a_return_value()
-        {
-            string expected = "SomeValue";
-            Mock<IService4> mock = new();
+        string expected = "SomeValue";
+        Mock<IService4> mock = new();
 
-            mock.SetupWithAny<IService4, string>(nameof(IService4.MainMethodName))
-                .Returns(expected);
+        mock.SetupWithAny<IService4, string>(nameof(IService4.MainMethodName))
+            .Returns(expected);
 
-            string result = mock.Object.MainMethodName("Something");
+        string result = mock.Object.MainMethodName("Something");
 
-            Assert.AreEqual(expected, result);
-        }
+        Assert.AreEqual(expected, result);
+    }
 
-        [TestMethod]
-        public void You_can_setup_with_any_on_a_void_method()
-        {
-            Mock<IService6> mock = new();
+    [TestMethod]
+    public void You_can_setup_with_any_on_a_void_method()
+    {
+        Mock<IService6> mock = new();
 
-            mock.SetupWithAny(nameof(IService6.Void))
-                .Verifiable();
-            
-            mock.Object.Void(42, "SomeValue");
+        mock.SetupWithAny(nameof(IService6.Void))
+            .Verifiable();
 
-            mock.VerifyAll();
-        }
+        mock.Object.Void(42, "SomeValue");
 
-        [TestMethod]
-        public void When_method_is_not_found_it_throws()
-        {
-            Mock<IService1> mock = new();
+        mock.VerifyAll();
+    }
 
-            string expectedMessage = 
-                new MissingMethodException(typeof(IService1).Name, "Unknown Method").Message;
+    [TestMethod]
+    public void When_method_is_not_found_it_throws()
+    {
+        Mock<IService1> mock = new();
 
-            var ex = Assert.ThrowsException<MissingMethodException>(() => mock.SetupWithAny("Unknown Method"));
-            Assert.AreEqual(expectedMessage, ex.Message);
-        }
+        string expectedMessage =
+            new MissingMethodException(typeof(IService1).Name, "Unknown Method").Message;
 
-        [TestMethod]
-        public void When_void_method_is_overloaded_it_throws()
-        {
-            Mock<IService7> mock = new();
+        var ex = Assert.ThrowsException<MissingMethodException>(() => mock.SetupWithAny("Unknown Method"));
+        Assert.AreEqual(expectedMessage, ex.Message);
+    }
 
-            Assert.ThrowsException<AmbiguousMatchException>(() => mock.SetupWithAny(nameof(IService7.Void)));
-        }
+    [TestMethod]
+    public void When_void_method_is_overloaded_it_throws()
+    {
+        Mock<IService7> mock = new();
 
-        [TestMethod]
-        public void When_method_is_overloaded_it_throws()
-        {
-            Mock<IService7> mock = new();
+        Assert.ThrowsException<AmbiguousMatchException>(() => mock.SetupWithAny(nameof(IService7.Void)));
+    }
 
-            Assert.ThrowsException<AmbiguousMatchException>(() => mock.SetupWithAny(nameof(IService7.ReturnValue)));
-        }
+    [TestMethod]
+    public void When_method_is_overloaded_it_throws()
+    {
+        Mock<IService7> mock = new();
 
-        [TestMethod]
-        public void You_can_setup_with_any_on_a_method_with_a_return_value_using_AutoMocker()
-        {
-            string expected = "SomeValue";
-            AutoMocker mocker = new();
+        Assert.ThrowsException<AmbiguousMatchException>(() => mock.SetupWithAny(nameof(IService7.ReturnValue)));
+    }
 
-            mocker.SetupWithAny<IService4, string>(nameof(IService4.MainMethodName))
-                .Returns(expected);
+    [TestMethod]
+    public void You_can_setup_with_any_on_a_method_with_a_return_value_using_AutoMocker()
+    {
+        string expected = "SomeValue";
+        AutoMocker mocker = new();
 
-            string result = mocker.Get<IService4>().MainMethodName("Something");
+        mocker.SetupWithAny<IService4, string>(nameof(IService4.MainMethodName))
+            .Returns(expected);
 
-            Assert.AreEqual(expected, result);
-        }
+        string result = mocker.Get<IService4>().MainMethodName("Something");
 
-        [TestMethod]
-        public void You_can_setup_with_any_on_a_method_with_a_return_value_using_AutoMocker_with_cached_mock()
-        {
-            string expected = "SomeValue";
-            AutoMocker mocker = new();
-            Mock<IService4> mock = new();
-            mocker.Use(mock);
+        Assert.AreEqual(expected, result);
+    }
 
-            mocker.SetupWithAny<IService4, string>(nameof(IService4.MainMethodName))
-                .Returns(expected);
+    [TestMethod]
+    public void You_can_setup_with_any_on_a_method_with_a_return_value_using_AutoMocker_with_cached_mock()
+    {
+        string expected = "SomeValue";
+        AutoMocker mocker = new();
+        Mock<IService4> mock = new();
+        mocker.Use(mock);
 
-            string result = mock.Object.MainMethodName("Something");
+        mocker.SetupWithAny<IService4, string>(nameof(IService4.MainMethodName))
+            .Returns(expected);
 
-            Assert.AreEqual(expected, result);
-        }
+        string result = mock.Object.MainMethodName("Something");
 
-        [TestMethod]
-        public void You_can_setup_with_any_on_a_void_method_using_AutoMocker()
-        {
-            AutoMocker mocker = new();
+        Assert.AreEqual(expected, result);
+    }
 
-            mocker.SetupWithAny<IService6>(nameof(IService6.Void))
-                .Verifiable();
+    [TestMethod]
+    public void You_can_setup_with_any_on_a_void_method_using_AutoMocker()
+    {
+        AutoMocker mocker = new();
 
-            mocker.Get<IService6>().Void(42, "SomeValue");
+        mocker.SetupWithAny<IService6>(nameof(IService6.Void))
+            .Verifiable();
 
-            mocker.VerifyAll();
-        }
+        mocker.Get<IService6>().Void(42, "SomeValue");
 
-        [TestMethod]
-        public void You_can_setup_with_any_on_a_void_method_using_AutoMocker_with_cached_mock()
-        {
-            AutoMocker mocker = new();
-            Mock<IService6> mock = new();
-            mocker.Use(mock);
+        mocker.VerifyAll();
+    }
 
-            mocker.SetupWithAny<IService6>(nameof(IService6.Void))
-                .Verifiable();
+    [TestMethod]
+    public void You_can_setup_with_any_on_a_void_method_using_AutoMocker_with_cached_mock()
+    {
+        AutoMocker mocker = new();
+        Mock<IService6> mock = new();
+        mocker.Use(mock);
 
-            mock.Object.Void(42, "SomeValue");
+        mocker.SetupWithAny<IService6>(nameof(IService6.Void))
+            .Verifiable();
 
-            mock.VerifyAll();
-        }
+        mock.Object.Void(42, "SomeValue");
+
+        mock.VerifyAll();
     }
 }

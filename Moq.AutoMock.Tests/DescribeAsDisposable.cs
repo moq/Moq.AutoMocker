@@ -1,42 +1,41 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Moq.AutoMock.Tests
+namespace Moq.AutoMock.Tests;
+
+[TestClass]
+public class DescribeAsDisposable
 {
-    [TestClass]
-    public class DescribeAsDisposable
+    [TestMethod]
+    public void It_disposes_all_registered_disposable_instances()
     {
-        [TestMethod]
-        public void It_disposes_all_registered_disposable_instances()
+        TestDisposable test = new();
+        AutoMocker mocker = new();
+        mocker.Use(test);
+
+        using (mocker.AsDisposable())
+        { }
+
+        Assert.IsTrue(test.IsDisposed);
+    }
+
+    private sealed class TestDisposable : IDisposable
+    {
+        public bool IsDisposed { get; set; }
+
+        private void Dispose(bool disposing)
         {
-            TestDisposable test = new();
-            AutoMocker mocker = new();
-            mocker.Use(test);
-
-            using (mocker.AsDisposable())
-            { }
-
-            Assert.IsTrue(test.IsDisposed);
+            if (!IsDisposed)
+            {
+                IsDisposed = true;
+            }
         }
 
-        private sealed class TestDisposable : IDisposable
+        public void Dispose()
         {
-            public bool IsDisposed { get; set; }
-
-            private void Dispose(bool disposing)
-            {
-                if (!IsDisposed)
-                {
-                    IsDisposed = true;
-                }
-            }
-
-            public void Dispose()
-            {
-                // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-                Dispose(disposing: true);
-                GC.SuppressFinalize(this);
-            }
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

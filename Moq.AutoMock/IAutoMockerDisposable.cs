@@ -1,51 +1,50 @@
 ﻿using System;
 using System.Linq;
 
-namespace Moq.AutoMock
-{
-    /// <summary>
-    /// An interface that is used to clean up AutoMocker instances.
-    /// </summary>
-    internal interface IAutoMockerDisposable : IDisposable
-    {
+namespace Moq.AutoMock;
 
+/// <summary>
+/// An interface that is used to clean up AutoMocker instances.
+/// </summary>
+internal interface IAutoMockerDisposable : IDisposable
+{
+
+}
+
+
+internal sealed class AutoMockerDisposable : IAutoMockerDisposable
+{
+    private bool _isDisposed;
+
+    private AutoMocker Mocker { get; }
+
+    public AutoMockerDisposable(AutoMocker mocker)
+    {
+        Mocker = mocker ?? throw new ArgumentNullException(nameof(mocker));
     }
 
-
-    internal sealed class AutoMockerDisposable : IAutoMockerDisposable
+    private void Dispose(bool disposing)
     {
-        private bool _isDisposed;
-
-        private AutoMocker Mocker { get; }
-
-        public AutoMockerDisposable(AutoMocker mocker)
+        if (!_isDisposed)
         {
-            Mocker = mocker ?? throw new ArgumentNullException(nameof(mocker));
-        }
-
-        private void Dispose(bool disposing)
-        {
-            if (!_isDisposed)
+            _isDisposed = true;
+            if (disposing)
             {
-                _isDisposed = true;
-                if (disposing)
+                foreach (var disposable in Mocker.ResolvedObjects.Values.OfType<IDisposable>())
                 {
-                    foreach(var disposable in Mocker.ResolvedObjects.Values.OfType<IDisposable>())
+                    if (!ReferenceEquals(disposable, this))
                     {
-                        if (!ReferenceEquals(disposable, this))
-                        {
-                            disposable.Dispose();
-                        }
+                        disposable.Dispose();
                     }
                 }
-
             }
-        }
 
-        public void Dispose()
-        {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
         }
+    }
+
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 }

@@ -1,15 +1,14 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Moq.AutoMock.Tests.Util
-{
-    [ExcludeFromCodeCoverage]
-    public class OneConstructor
-    {
-        public Empty Empty { get; }
+namespace Moq.AutoMock.Tests.Util;
 
-        public OneConstructor(Empty empty)
-        {
-            Empty = empty;
-        }
+[ExcludeFromCodeCoverage]
+public class OneConstructor
+{
+    public Empty Empty { get; }
+
+    public OneConstructor(Empty empty)
+    {
+        Empty = empty;
     }
 }

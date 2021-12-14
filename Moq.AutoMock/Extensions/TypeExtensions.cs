@@ -5,41 +5,40 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace Moq.AutoMock.Extensions
+namespace Moq.AutoMock.Extensions;
+
+internal static class TypeExtensions
 {
-    internal static class TypeExtensions
+    public static bool TryCompileGetter(this AutoMocker autoMocker, Type funcType, [NotNullWhen(true)] out Delegate? @delegate)
     {
-        public static bool TryCompileGetter(this AutoMocker autoMocker, Type funcType, [NotNullWhen(true)] out Delegate? @delegate)
-        {
-            @delegate = null;
-            var stInfo = funcType.GetTypeInfo();
-            if (!typeof(Delegate).IsAssignableFrom(funcType)
-                || !stInfo.IsGenericType || funcType.GetGenericTypeDefinition() is not Type td
-                || td.Namespace != nameof(System) || !Regex.IsMatch(td.Name, $"^{nameof(Func<object>)}\\b"))
-                return false;
+        @delegate = null;
+        var stInfo = funcType.GetTypeInfo();
+        if (!typeof(Delegate).IsAssignableFrom(funcType)
+            || !stInfo.IsGenericType || funcType.GetGenericTypeDefinition() is not Type td
+            || td.Namespace != nameof(System) || !Regex.IsMatch(td.Name, $"^{nameof(Func<object>)}\\b"))
+            return false;
 
-            var genericArgs = funcType.GetGenericArguments();
-            var @params = genericArgs.Take(genericArgs.Length - 1)
-                .Select(Expression.Parameter);
-            var returnType = genericArgs.Last();
+        var genericArgs = funcType.GetGenericArguments();
+        var @params = genericArgs.Take(genericArgs.Length - 1)
+            .Select(Expression.Parameter);
+        var returnType = genericArgs.Last();
 
-            Expression call = Expression.Call(Expression.Constant(autoMocker), nameof(AutoMocker.Get), null, Expression.Constant(returnType, typeof(Type)));
+        Expression call = Expression.Call(Expression.Constant(autoMocker), nameof(AutoMocker.Get), null, Expression.Constant(returnType, typeof(Type)));
 
-            var rti = returnType.GetTypeInfo();
-            if (rti.IsValueType || rti.IsPrimitive)
-                call = Expression.Unbox(call, returnType);
-            else
-                call = Expression.TypeAs(call, returnType);
+        var rti = returnType.GetTypeInfo();
+        if (rti.IsValueType || rti.IsPrimitive)
+            call = Expression.Unbox(call, returnType);
+        else
+            call = Expression.TypeAs(call, returnType);
 
-            @delegate = Expression.Lambda(funcType, call, @params).Compile();
-            return @delegate != null;
-        }
+        @delegate = Expression.Lambda(funcType, call, @params).Compile();
+        return @delegate != null;
+    }
 
-        public static bool IsDelegateType(this Type type) => type.BaseType == typeof(MulticastDelegate);
+    public static bool IsDelegateType(this Type type) => type.BaseType == typeof(MulticastDelegate);
 
-        public static bool IsMockable(this Type type)
-        {
-            return (!type.IsSealed && !type.IsArray) || type.IsDelegateType();
-        }
+    public static bool IsMockable(this Type type)
+    {
+        return (!type.IsSealed && !type.IsArray) || type.IsDelegateType();
     }
 }
