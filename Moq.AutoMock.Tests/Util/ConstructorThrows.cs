@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Moq.AutoMock.Tests.Util
+namespace Moq.AutoMock.Tests.Util;
+
+[ExcludeFromCodeCoverage]
+public class ConstructorThrows
 {
-    [ExcludeFromCodeCoverage]
-    public class ConstructorThrows
+    public ConstructorThrows()
     {
-        public ConstructorThrows()
-        {
-            throw new ArgumentException(string.Empty);
-        }
+        throw new ArgumentException(string.Empty);
     }
 }

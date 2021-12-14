@@ -1,7 +1,6 @@
-﻿namespace Moq.AutoMock.Tests.Util
+﻿namespace Moq.AutoMock.Tests.Util;
+
+public interface IService5
 {
-    public interface IService5
-    {
-        string Name { get; set; }
-    }
+    string Name { get; set; }
 }

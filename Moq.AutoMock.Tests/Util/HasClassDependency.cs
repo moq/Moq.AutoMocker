@@ -1,15 +1,14 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace Moq.AutoMock.Tests.Util
+namespace Moq.AutoMock.Tests.Util;
+
+[ExcludeFromCodeCoverage]
+public class HasClassDependency
 {
-    [ExcludeFromCodeCoverage]
-    public class HasClassDependency
+    public WithService WithService { get; }
+
+    public HasClassDependency(WithService withService)
     {
-        public WithService WithService { get; }
-        
-        public HasClassDependency(WithService withService)
-        {
-            WithService = withService;
-        }
+        WithService = withService;
     }
 }

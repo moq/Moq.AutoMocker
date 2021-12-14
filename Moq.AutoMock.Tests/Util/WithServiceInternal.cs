@@ -1,20 +1,19 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Moq.AutoMock.Tests.Util
+namespace Moq.AutoMock.Tests.Util;
+
+[ExcludeFromCodeCoverage]
+public class WithServiceInternal
 {
-    [ExcludeFromCodeCoverage]
-    public class WithServiceInternal
+    public IService1? Service { get; set; }
+
+    internal WithServiceInternal(IService1? service)
     {
-        public IService1? Service { get; set; }
+        Service = service;
+    }
 
-        internal WithServiceInternal(IService1? service)
-        {
-            Service = service;
-        }
-
-        public WithServiceInternal() 
-            : this(null)
-        {
-        }
+    public WithServiceInternal()
+        : this(null)
+    {
     }
 }

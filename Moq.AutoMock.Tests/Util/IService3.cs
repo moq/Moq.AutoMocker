@@ -1,7 +1,6 @@
-﻿namespace Moq.AutoMock.Tests.Util
+﻿namespace Moq.AutoMock.Tests.Util;
+
+public interface IService3
 {
-    public interface IService3
-    {
-        string MainMethodName { get; }
-    }
+    string MainMethodName { get; }
 }

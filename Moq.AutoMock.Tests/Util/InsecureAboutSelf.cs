@@ -1,22 +1,21 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Moq.AutoMock.Tests.Util
+namespace Moq.AutoMock.Tests.Util;
+
+[ExcludeFromCodeCoverage]
+public class InsecureAboutSelf
 {
-    [ExcludeFromCodeCoverage]
-    public class InsecureAboutSelf
-    {
-        public bool SelfDepricated { get; set; }
+    public bool SelfDepricated { get; set; }
 
 #pragma warning disable CA1822      //Member does not access instance data and can be marked as static
-        public void TellJoke()
-        {
+    public void TellJoke()
+    {
 
-        }
+    }
 #pragma warning restore CA1822
 
-        protected virtual void SelfDepricate()
-        {
-            SelfDepricated = true;
-        }
+    protected virtual void SelfDepricate()
+    {
+        SelfDepricated = true;
     }
 }
