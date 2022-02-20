@@ -38,6 +38,10 @@
     </ProjectReference>
   </ItemGroup>
 
+  <ItemGroup Condition="$(TargetFramework) == 'net461'">
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+  </ItemGroup>
+
   <ItemGroup>
     <None Include="..\LICENSE" Pack="true" PackagePath="" />
     <Compile Include="..\System.Diagnostics.CodeAnalysis.cs" />
