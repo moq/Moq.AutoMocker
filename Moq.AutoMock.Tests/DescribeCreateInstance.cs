@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq.AutoMock.Resolvers;
 using Moq.AutoMock.Tests.Util;
 
 namespace Moq.AutoMock.Tests;
@@ -150,5 +151,56 @@ public class DescribeCreateInstance
         // behavior, so it's easier to move that direction later without breaking backward compatibility.
         ArgumentException e = Assert.ThrowsException<ArgumentException>(mocker.CreateInstance<WithRecursiveDependency>);
         Assert.IsTrue(e.Message.StartsWith($"Did not find a best constructor for `{typeof(WithRecursiveDependency)}`"));
+    }
+
+
+    [TestMethod]
+    [Description("Issue 123")]
+    public void It_can_use_fixed_value_to_supply_string_parameter()
+    {
+        AutoMocker mocker = new();
+        mocker.Use("Test string");
+        HasStringParameter sut = mocker.CreateInstance<HasStringParameter>();
+
+        Assert.AreEqual("Test string", sut.String);
+    }
+
+    [TestMethod]
+    [Description("Issue 123")]
+    public void It_can_use_custom_resolver_to_supply_string_parameter()
+    {
+        AutoMocker mocker = new();
+        mocker.Resolvers.Add(new CustomStringResolver("Test string"));
+        HasStringParameter sut = mocker.CreateInstance<HasStringParameter>();
+
+        Assert.AreEqual("Test string", sut.String);
+    }
+
+    private class CustomStringResolver : IMockResolver
+    {
+        public CustomStringResolver(string stringValue)
+        {
+            StringValue = stringValue;
+        }
+
+        public string StringValue { get; }
+
+        public void Resolve(MockResolutionContext context)
+        {
+            if (context.RequestType == typeof(string))
+            {
+                context.Value = StringValue;
+            }
+        }
+    }
+
+    public class HasStringParameter
+    {
+        public HasStringParameter(string @string)
+        {
+            String = @string;
+        }
+
+        public string String { get; }
     }
 }
