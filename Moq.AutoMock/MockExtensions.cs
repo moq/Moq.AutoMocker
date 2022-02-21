@@ -109,4 +109,16 @@ public static class MockExtensions
         var methodCallExpression = Expression.Call(xExpression, method, parameterExpressions);
         return Expression.Lambda(methodCallExpression, false, new[] { xExpression });
     }
+
+    private static Lazy<MethodInfo?> AsMethod { get; } = new(() => typeof(Mock).GetMethod(nameof(Mock.As)));
+
+    internal static Mock As(this Mock mock, Type interfaceType)
+    {
+        if (AsMethod.Value is { } method)
+        {
+            return (Mock)method.MakeGenericMethod(interfaceType)
+                .Invoke(mock, Array.Empty<object>());
+        }
+        throw new InvalidOperationException($"Could not find {typeof(Mock).FullName}.{nameof(Mock.As)} method");
+    }
 }

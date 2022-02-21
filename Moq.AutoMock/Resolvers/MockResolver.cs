@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
-
-namespace Moq.AutoMock.Resolvers;
+﻿namespace Moq.AutoMock.Resolvers;
 
 /// <summary>
 /// A resolver that resolves requested types with Mock&lt;T&gt; instances.
@@ -36,24 +32,13 @@ public class MockResolver : IMockResolver
     {
         if (context.RequestType == typeof(string)) return;
 
-        Type requestType = context.RequestType;
-        var mockType = typeof(Mock<>).MakeGenericType(requestType);
-
-        bool mayHaveDependencies = requestType.IsClass
-                                   && !typeof(Delegate).IsAssignableFrom(requestType);
-
-        object?[] constructorArgs = Array.Empty<object>();
-        if (mayHaveDependencies &&
-            context.AutoMocker.TryGetConstructorInvocation(requestType, context.ObjectGraphContext, out ConstructorInfo? ctor, out IInstance[]? arguments))
+        if (context.AutoMocker.CreateMock(
+            context.RequestType,
+            _mockBehavior,
+            _defaultValue,
+            _callBase, 
+            context.ObjectGraphContext) is { } mock)
         {
-            constructorArgs = arguments.Select(x => x.Value).ToArray();
-            context.AutoMocker.CacheInstances(arguments.Zip(ctor.GetParameters(), (i, p) => (p.ParameterType, i)));
-        }
-
-        if (Activator.CreateInstance(mockType, _mockBehavior, constructorArgs) is Mock mock)
-        {
-            mock.DefaultValue = _defaultValue;
-            mock.CallBase = _callBase;
             context.Value = mock;
         }
     }
