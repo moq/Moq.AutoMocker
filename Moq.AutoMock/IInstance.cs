@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Moq.AutoMock;
+﻿namespace Moq.AutoMock;
 
 internal interface IInstance
 {
