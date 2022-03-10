@@ -1,10 +1,11 @@
 <Project>
 
- <PropertyGroup>
+  <PropertyGroup>
     <LangVersion>10.0</LangVersion>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
     <EnforceCodeStyleInBuild Condition=" '$(BuildingForLiveUnitTesting)' == '' ">true</EnforceCodeStyleInBuild>
     <TreatWarningsAsErrors Condition=" '$(BuildingForLiveUnitTesting)' == '' ">true</TreatWarningsAsErrors>
- </PropertyGroup>
+  </PropertyGroup>
 
 </Project>

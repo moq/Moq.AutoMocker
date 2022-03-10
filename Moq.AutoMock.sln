@@ -11,12 +11,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
 		.github\workflows\dotnetcore.yml = .github\workflows\dotnetcore.yml
 		LICENSE.md = LICENSE.md
 		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Generators", "Generators\Generators.csproj", "{98CADDA9-5D66-405A-8A59-90636A242869}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GeneratorTests", "GeneratorTests", "{1D10BDDE-2E03-42E4-AA7A-B12AF01E7FE8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.AutoMock.Generator.Example", "GeneratorTests\Moq.AutoMocker.Generator.Example\Moq.AutoMock.Generator.Example.csproj", "{F142399A-FAB8-4097-BC7B-0266200FA14D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.AutoMock.Generator.Example.MSTest", "GeneratorTests\Moq.AutoMock.Generator.Example.MSTest\Moq.AutoMock.Generator.Example.MSTest.csproj", "{BAFB5236-9C52-48D2-8CD5-E214652F38D3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.AutoMock.Generator.Example.NUnit", "GeneratorTests\Moq.AutoMock.Generator.Example.NUnit\Moq.AutoMock.Generator.Example.NUnit.csproj", "{0E545A4D-809E-47CA-AC16-5CB80CD231F6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.AutoMock.Generator.Example.xUnit", "GeneratorTests\Moq.AutoMock.Generator.Example.xUnit\Moq.AutoMock.Generator.Example.xUnit.csproj", "{586D1D6A-3EE2-4AB8-988A-CEB810EF7787}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,9 +47,31 @@ Global
 		{98CADDA9-5D66-405A-8A59-90636A242869}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98CADDA9-5D66-405A-8A59-90636A242869}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{98CADDA9-5D66-405A-8A59-90636A242869}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F142399A-FAB8-4097-BC7B-0266200FA14D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F142399A-FAB8-4097-BC7B-0266200FA14D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F142399A-FAB8-4097-BC7B-0266200FA14D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F142399A-FAB8-4097-BC7B-0266200FA14D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BAFB5236-9C52-48D2-8CD5-E214652F38D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAFB5236-9C52-48D2-8CD5-E214652F38D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BAFB5236-9C52-48D2-8CD5-E214652F38D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BAFB5236-9C52-48D2-8CD5-E214652F38D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E545A4D-809E-47CA-AC16-5CB80CD231F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E545A4D-809E-47CA-AC16-5CB80CD231F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E545A4D-809E-47CA-AC16-5CB80CD231F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E545A4D-809E-47CA-AC16-5CB80CD231F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{586D1D6A-3EE2-4AB8-988A-CEB810EF7787}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{586D1D6A-3EE2-4AB8-988A-CEB810EF7787}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{586D1D6A-3EE2-4AB8-988A-CEB810EF7787}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{586D1D6A-3EE2-4AB8-988A-CEB810EF7787}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F142399A-FAB8-4097-BC7B-0266200FA14D} = {1D10BDDE-2E03-42E4-AA7A-B12AF01E7FE8}
+		{BAFB5236-9C52-48D2-8CD5-E214652F38D3} = {1D10BDDE-2E03-42E4-AA7A-B12AF01E7FE8}
+		{0E545A4D-809E-47CA-AC16-5CB80CD231F6} = {1D10BDDE-2E03-42E4-AA7A-B12AF01E7FE8}
+		{586D1D6A-3EE2-4AB8-988A-CEB810EF7787} = {1D10BDDE-2E03-42E4-AA7A-B12AF01E7FE8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1A499C6A-1AB1-4A04-A133-BBCF4759DACA}
