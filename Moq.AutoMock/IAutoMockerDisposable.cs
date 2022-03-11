@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace Moq.AutoMock;
+﻿namespace Moq.AutoMock;
 
 /// <summary>
 /// An interface that is used to clean up AutoMocker instances.

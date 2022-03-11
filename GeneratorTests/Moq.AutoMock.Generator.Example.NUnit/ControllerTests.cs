@@ -14,13 +14,7 @@ public partial class ControllerTests
     public void ControllerConstructor_WithNullIService_ThrowsArgumentNullException()
     {
         AutoMocker mocker = new();
-        mocker.Resolvers.Insert(0, new GenericResolver(ctx =>
-        {
-            if (ctx.RequestType == typeof(IService))
-            {
-                ctx.Value = null;
-            }
-        }));
+        mocker.Use(typeof(IService), null!);
         ArgumentNullException? ex = Assert.Throws<ArgumentNullException>(() => mocker.CreateInstance<Controller>());
         Assert.AreEqual("service", ex!.ParamName);
     }

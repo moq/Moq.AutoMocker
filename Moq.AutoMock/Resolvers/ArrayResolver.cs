@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Moq.AutoMock.Resolvers;
+﻿namespace Moq.AutoMock.Resolvers;
 
 /// <summary>
 /// Provides a means to create arrays.

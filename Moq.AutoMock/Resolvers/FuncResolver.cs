@@ -1,5 +1,4 @@
-﻿using System;
-using Moq.AutoMock.Extensions;
+﻿using Moq.AutoMock.Extensions;
 
 namespace Moq.AutoMock.Resolvers;
 
