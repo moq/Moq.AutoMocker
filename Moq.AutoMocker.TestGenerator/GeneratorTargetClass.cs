@@ -1,4 +1,6 @@
-﻿namespace Moq.AutoMocker.TestGenerator;
+﻿using Microsoft.CodeAnalysis;
+
+namespace Moq.AutoMocker.TestGenerator;
 
 public class GeneratorTargetClass
 {
@@ -19,7 +21,20 @@ public class SutClass
 
 public class NullConstructorParameterTest
 {
+    public List<Parameter>? Parameters { get; set; }
+    public int NullParameterIndex { get; set; }
     public string? NullTypeName { get; set; }
-    public string? NullTypeFullName { get; set; }
-    public string? ParameterName { get; set; }
+    public string? NullParameterName => Parameters?[NullParameterIndex].Name;
+}
+
+public class Parameter
+{
+    public Parameter(IParameterSymbol symbol)
+    {
+        Symbol = symbol;
+    }
+    private  IParameterSymbol Symbol { get; }
+
+    public string Name => Symbol.Name;
+    public string ParameterType => Symbol.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 }

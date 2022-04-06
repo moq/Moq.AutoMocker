@@ -8,6 +8,8 @@ public class UnitTestSourceGenerator : ISourceGenerator
 {
     public void Execute(GeneratorExecutionContext context)
     {
+        if (context.Compilation.Language is not LanguageNames.CSharp) return;
+
         var testingFramework = GetTestingFramework(context.Compilation.ReferencedAssemblyNames);
         SyntaxReceiver rx = (SyntaxReceiver)context.SyntaxContextReceiver!;
 
@@ -21,6 +23,7 @@ public class UnitTestSourceGenerator : ISourceGenerator
             builder.AppendLine($"    partial class {testClass.TestClassName}");
             builder.AppendLine("    {");
 
+            HashSet<string> testNames = new();
 
             foreach (var test in testClass.Sut?.NullConstructorParameterTests ?? Enumerable.Empty<NullConstructorParameterTest>())
             {
@@ -37,24 +40,37 @@ public class UnitTestSourceGenerator : ISourceGenerator
                         break;
                 }
 
-                builder.AppendLine($"        public void {testClass.Sut!.Name}Constructor_WithNull{test.NullTypeName}_ThrowsArgumentNullException()");
+                string testName;
+                int testNameIndex = 0;
+                for(testName = $"{testClass.Sut!.Name}Constructor_WithNull{test.NullTypeName}_ThrowsArgumentNullException";
+                    !testNames.Add(testName); 
+                    testName = $"{testClass.Sut!.Name}Constructor_WithNull{test.NullTypeName}{++testNameIndex}_ThrowsArgumentNullException")
+                { }
+
+                builder.AppendLine($"        public void {testName}()");
                 builder.AppendLine("        {");
                 builder.AppendLine("            Moq.AutoMock.AutoMocker mocker = new Moq.AutoMock.AutoMocker();");
-                builder.AppendLine($"            mocker.Use(typeof({test.NullTypeFullName}), null);");
+
+                foreach(var parameter in test.Parameters ?? Enumerable.Empty<Parameter>())
+                {
+                    builder.AppendLine($"            var {parameter.Name} = mocker.Get<{parameter.ParameterType}>();");
+                }
+
+                string constructorInvocation = $"_ = new {testClass.Sut.FullName}({string.Join(",", GetParameterNames(test))})";
 
                 switch (testingFramework)
                 {
                     case TargetTestingFramework.MSTest:
-                        builder.AppendLine($"            System.ArgumentNullException ex = global::Microsoft.VisualStudio.TestTools.UnitTesting.Assert.ThrowsException<System.ArgumentNullException>(() => mocker.CreateInstance<{testClass.Sut.FullName}>());");
-                        builder.AppendLine($"            global::Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(\"{test.ParameterName}\", ex.ParamName);");
+                        builder.AppendLine($"            System.ArgumentNullException ex = global::Microsoft.VisualStudio.TestTools.UnitTesting.Assert.ThrowsException<System.ArgumentNullException>(() => {constructorInvocation});");
+                        builder.AppendLine($"            global::Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(\"{test.NullParameterName}\", ex.ParamName);");
                         break;
                     case TargetTestingFramework.Xunit:
-                        builder.AppendLine($"            System.ArgumentNullException ex = global::Xunit.Assert.Throws<System.ArgumentNullException>(() => mocker.CreateInstance<{testClass.Sut.FullName}>());");
-                        builder.AppendLine($"            global::Xunit.Assert.Equal(\"{test.ParameterName}\", ex.ParamName);");
+                        builder.AppendLine($"            System.ArgumentNullException ex = global::Xunit.Assert.Throws<System.ArgumentNullException>(() => {constructorInvocation});");
+                        builder.AppendLine($"            global::Xunit.Assert.Equal(\"{test.NullParameterName}\", ex.ParamName);");
                         break;
                     case TargetTestingFramework.NUnit:
-                        builder.AppendLine($"            System.ArgumentNullException ex = global::NUnit.Framework.Assert.Throws<System.ArgumentNullException>(() => mocker.CreateInstance<{testClass.Sut.FullName}>());");
-                        builder.AppendLine($"            global::NUnit.Framework.Assert.AreEqual(\"{test.ParameterName}\", ex.ParamName);");
+                        builder.AppendLine($"            System.ArgumentNullException ex = global::NUnit.Framework.Assert.Throws<System.ArgumentNullException>(() => {constructorInvocation});");
+                        builder.AppendLine($"            global::NUnit.Framework.Assert.AreEqual(\"{test.NullParameterName}\", ex.ParamName);");
                         break;
                 }
 
@@ -66,6 +82,21 @@ public class UnitTestSourceGenerator : ISourceGenerator
 
             context.AddSource($"{testClass.TestClassName}.g.cs", builder.ToString());
 
+        }
+
+        static IEnumerable<string> GetParameterNames(NullConstructorParameterTest test)
+        {
+            for(int i =0; i < test.Parameters?.Count; i++)
+            {
+                if (i == test.NullParameterIndex)
+                {
+                    yield return "default";
+                }
+                else
+                {
+                    yield return test.Parameters[i].Name;
+                }
+            }
         }
     }
 

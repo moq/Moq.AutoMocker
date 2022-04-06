@@ -51,14 +51,17 @@ public class SyntaxReceiver : ISyntaxContextReceiver
 
             foreach (IMethodSymbol ctor in sutType.Constructors)
             {
+                var parameters = ctor.Parameters.Select(x => new Parameter(x)).ToList();
+                int nullIndex = 0;
                 foreach (IParameterSymbol parameter in ctor.Parameters)
                 {
                     sut.NullConstructorParameterTests.Add(new NullConstructorParameterTest()
                     {
-                        NullTypeName = parameter.Type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat),
-                        NullTypeFullName = parameter.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-                        ParameterName = parameter.Name
+                        Parameters = parameters,
+                        NullParameterIndex = nullIndex,
+                        NullTypeName = parameter.Type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)
                     });
+                    nullIndex++;
                 }
             }
 
@@ -68,11 +71,6 @@ public class SyntaxReceiver : ISyntaxContextReceiver
                 TestClassName = testClassName,
                 Sut = sut
             };
-
-            foreach (IMethodSymbol ctor in symbol.Constructors)
-            {
-
-            }
 
             TestClasses.Add(targetClass);
 

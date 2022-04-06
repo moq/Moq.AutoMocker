@@ -2,10 +2,14 @@
 
 public class Controller
 {
-    public IService Service { get; }
-
     public Controller(IService service)
     {
-        Service = service ?? throw new ArgumentNullException(nameof(service));
+        _ = service ?? throw new ArgumentNullException(nameof(service));
+    }
+
+    public Controller(IService service1, IService service2)
+    {
+        _ = service1 ?? throw new ArgumentNullException(nameof(service1));
+        _ = service2 ?? throw new ArgumentNullException(nameof(service2));
     }
 }
