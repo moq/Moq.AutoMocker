@@ -53,7 +53,12 @@ jobs:
         }
 
         dotnet pack --configuration Release --verbosity normal --output .
-
+    
+    - uses: actions/upload-artifact@v3
+      with:
+        name: NuGet
+        path: '**/*.nupkg'
+      
   # Update the docs
     - name: Update Docs
       if: github.event_name == 'push'
