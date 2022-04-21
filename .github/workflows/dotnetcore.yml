@@ -58,9 +58,10 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: NuGet
+        if-no-files-found: error
         path: |
-          '**/*.nupkg'
-          '**/*.snupkg'
+          **/*.nupkg
+          **/*.snupkg
       
   # Update the docs
     - name: Update Docs
