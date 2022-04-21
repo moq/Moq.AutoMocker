@@ -6,30 +6,31 @@ namespace Moq.AutoMocker.TestGenerator;
 
 public class SyntaxReceiver : ISyntaxContextReceiver
 {
+    private const string ConstructorTestsAttribute = "ConstructorTestsAttribute";
+
     public List<GeneratorTargetClass> TestClasses { get; } = new();
+
+    public List<Diagnostic> DiagnosticMessages { get; } = new();
 
     private TypeSyntax? GetTargetType(AttributeSyntax attributeSyntax)
     {
-        if (attributeSyntax.ArgumentList?.Arguments.Count > 0 &&
+        return attributeSyntax.ArgumentList?.Arguments.Count > 0 &&
             attributeSyntax.ArgumentList.Arguments
                 .Select(x => x.Expression)
                 .OfType<TypeOfExpressionSyntax>()
-                .FirstOrDefault() is { } typeExpression)
-        {
-            return typeExpression.Type;
-        }
-        return null;
+                .FirstOrDefault() is { } typeExpression
+            ? typeExpression.Type
+            : null;
     }
 
     public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
     {
         if (context.Node is ClassDeclarationSyntax classDeclaration &&
-            classDeclaration.Modifiers.Any(x => x.IsKind(SyntaxKind.PartialKeyword)) &&
             context.SemanticModel.GetDeclaredSymbol(classDeclaration) is INamedTypeSymbol symbol &&
             classDeclaration.AttributeLists.SelectMany(x => x.Attributes)
                 .Select(a =>
                 {
-                    if (context.SemanticModel.GetTypeInfo(a).Type?.Name == "ConstructorTestsAttribute" &&
+                    if (context.SemanticModel.GetTypeInfo(a).Type?.Name == ConstructorTestsAttribute &&
                         GetTargetType(a) is { } targetType &&
                         context.SemanticModel.GetTypeInfo(targetType).Type is INamedTypeSymbol sutType)
                     {
@@ -40,6 +41,14 @@ public class SyntaxReceiver : ISyntaxContextReceiver
                 .FirstOrDefault(a => a is not null) is { } sutType
             )
         {
+            if (!classDeclaration.Modifiers.Any(x => x.IsKind(SyntaxKind.PartialKeyword)))
+            {
+                Diagnostic diagnostic = Diagnostics.TestClassesMustBePartial.Create(classDeclaration.GetLocation(),
+                    symbol.OriginalDefinition.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat),
+                    ConstructorTestsAttribute);
+                DiagnosticMessages.Add(diagnostic);
+                return;
+            }
             string testClassName = symbol.OriginalDefinition.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
             string namespaceDeclaration = symbol.ContainingNamespace.ToDisplayString();
 

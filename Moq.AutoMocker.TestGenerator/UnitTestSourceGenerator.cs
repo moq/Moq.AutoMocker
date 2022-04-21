@@ -10,8 +10,14 @@ public class UnitTestSourceGenerator : ISourceGenerator
     {
         if (context.Compilation.Language is not LanguageNames.CSharp) return;
 
-        var testingFramework = GetTestingFramework(context.Compilation.ReferencedAssemblyNames);
         SyntaxReceiver rx = (SyntaxReceiver)context.SyntaxContextReceiver!;
+
+        foreach(Diagnostic diagnostic in rx.DiagnosticMessages)
+        {
+            context.ReportDiagnostic(diagnostic);
+        }
+
+        var testingFramework = GetTestingFramework(context.Compilation.ReferencedAssemblyNames);
 
         foreach (GeneratorTargetClass testClass in rx.TestClasses)
         {
