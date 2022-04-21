@@ -46,7 +46,7 @@
   <ItemGroup>
     <None Include="..\LICENSE" Pack="true" PackagePath="" />
     <Compile Include="..\System.Diagnostics.CodeAnalysis.cs" />
-    <None Include="..\Moq.AutoMocker.TestGenerator\bin\$(Configuration)\netstandard2.0\*.dll" Pack="True" PackagePath="analyzers\dotnet\cs\" />
+    <None Include="../Moq.AutoMocker.TestGenerator/bin/$(Configuration)/netstandard2.0/*.dll" Pack="True" PackagePath="analyzers\dotnet\cs\" />
   </ItemGroup>
 
   <ItemGroup>
