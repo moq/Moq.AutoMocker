@@ -6,8 +6,6 @@ namespace Moq.AutoMocker.TestGenerator;
 
 public class SyntaxReceiver : ISyntaxContextReceiver
 {
-    private const string ConstructorTestsAttribute = "ConstructorTestsAttribute";
-
     public List<GeneratorTargetClass> TestClasses { get; } = new();
 
     public List<Diagnostic> DiagnosticMessages { get; } = new();
@@ -30,7 +28,8 @@ public class SyntaxReceiver : ISyntaxContextReceiver
             classDeclaration.AttributeLists.SelectMany(x => x.Attributes)
                 .Select(a =>
                 {
-                    if (context.SemanticModel.GetTypeInfo(a).Type?.Name == ConstructorTestsAttribute &&
+                    var t = context.SemanticModel.GetTypeInfo(a).Type;
+                    if (context.SemanticModel.GetTypeInfo(a).Type?.Name == AutoMock.ConstructorTestsAttribute &&
                         GetTargetType(a) is { } targetType &&
                         context.SemanticModel.GetTypeInfo(targetType).Type is INamedTypeSymbol sutType)
                     {
@@ -45,7 +44,7 @@ public class SyntaxReceiver : ISyntaxContextReceiver
             {
                 Diagnostic diagnostic = Diagnostics.TestClassesMustBePartial.Create(classDeclaration.GetLocation(),
                     symbol.OriginalDefinition.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat),
-                    ConstructorTestsAttribute);
+                    AutoMock.ConstructorTestsAttribute);
                 DiagnosticMessages.Add(diagnostic);
                 return;
             }

@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Testing;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
 
 namespace Moq.AutoMocker.TestGenerator.Tests;
@@ -13,7 +14,25 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
     {
         public Test()
         {
+            //string fullPath = Path.GetFullPath("Moq.AutoMock.dll");
+            //bool exists = File.Exists(fullPath);
             
+            //ReferenceAssemblies = ReferenceAssemblies.AddAssemblies(ImmutableArray.Create("Moq.AutoMock"));
+        }
+
+        protected override Project ApplyCompilationOptions(Project project)
+        {
+            string fullPath = Path.GetFullPath("Moq.AutoMock.dll");
+            project = project.AddMetadataReference(MetadataReference.CreateFromFile(fullPath));
+            return base.ApplyCompilationOptions(project);
+        }
+
+        protected override CompilationWithAnalyzers CreateCompilationWithAnalyzers(Compilation compilation, ImmutableArray<DiagnosticAnalyzer> analyzers, AnalyzerOptions options, CancellationToken cancellationToken)
+        {
+            //string fullPath = Path.GetFullPath("Moq.AutoMock.dll");
+            //compilation = compilation.AddReferences(MetadataReference.CreateFromFile(fullPath));
+
+            return base.CreateCompilationWithAnalyzers(compilation, analyzers, options, cancellationToken);
         }
 
         protected override CompilationOptions CreateCompilationOptions()

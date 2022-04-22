@@ -10,6 +10,11 @@ public class UnitTestSourceGenerator : ISourceGenerator
     {
         if (context.Compilation.Language is not LanguageNames.CSharp) return;
 
+        if (!context.Compilation.ReferencedAssemblyNames.Any(ai => ai.Name.Equals("Moq.AutoMock", StringComparison.OrdinalIgnoreCase)))
+        {
+            //context.ReportDiagnostic(/*error or warning*/);
+        }
+
         SyntaxReceiver rx = (SyntaxReceiver)context.SyntaxContextReceiver!;
 
         foreach(Diagnostic diagnostic in rx.DiagnosticMessages)

@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
 
+    <IsPackable>false</IsPackable>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
@@ -17,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Moq.AutoMocker.TestGenerator\Moq.AutoMocker.TestGenerator.csproj" />
+    <ProjectReference Include="..\Moq.AutoMock\Moq.AutoMock.csproj" />
   </ItemGroup>
 
 </Project>

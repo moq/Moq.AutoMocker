@@ -1,48 +1,45 @@
-﻿using Microsoft.CodeAnalysis.Text;
+﻿using Microsoft.CodeAnalysis.Testing;
+using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text;
 using System.Threading.Tasks;
-//using VerifyCS = Moq.AutoMocker.TestGenerator.Tests.CSharpCodeFixVerifier<
-//    Analyzer1.Analyzer1Analyzer,
-//    Analyzer1.Analyzer1CodeFixProvider>;
 
 using VerifyCS = Moq.AutoMocker.TestGenerator.Tests.CSharpSourceGeneratorVerifier<Moq.AutoMocker.TestGenerator.UnitTestSourceGenerator>;
 
-
 namespace Moq.AutoMocker.TestGenerator.Tests;
 
-
-
 [TestClass]
-public class UnitTest
+public class TestGeneratorTests
 {
-    //No diagnostics expected to show up
     [TestMethod]
-    public async Task TestMethod1()
+    public async Task Generation_WithDecoratedNonPartialClass_ProducesDiagnosticError()
     {
         var code = @"
+using Moq.AutoMock;
+
 namespace TestNamespace;
 
 [ConstructorTests(TargetType = typeof(Controller))]
-public partial class ControllerTests
+public class ControllerTests
 {
-
+    
 }
+
+public class Controller { }
 ";
-        //var generated = "expected generated code";
+        var expectedResult =
+            DiagnosticResult.CompilerError(Diagnostics.TestClassesMustBePartial.DiagnosticId)
+                        .WithSpan(6, 1, 10, 2)
+                        .WithArguments("TestNamespace.ControllerTests", AutoMock.ConstructorTestsAttribute);
         await new VerifyCS.Test
         {
-            ReferenceAssemblies =
-            {
-                ReferenceAssemblyPath = ""
-            },
             TestState =
             {
                 Sources = { code },
             },
             ExpectedDiagnostics =
             {
-
+                expectedResult
             }
         }.RunAsync();
 
