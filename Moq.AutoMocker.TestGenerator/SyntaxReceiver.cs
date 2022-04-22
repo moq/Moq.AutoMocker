@@ -84,37 +84,6 @@ public class SyntaxReceiver : ISyntaxContextReceiver
             };
 
             TestClasses.Add(targetClass);
-
-            //TestClasses.Add(new GeneratorTargetClass
-            //{
-            //    Namespace = namespaceDeclaration,
-            //    TestClassName = testClassName,
-            //    Sut = new SutClass
-            //    {
-            //        Name = "Controller",
-            //        FullName = "Moq.AutoMock.Generator.Example.Controller",
-            //        NullConstructorParameterTests =
-            //        {
-            //            new NullConstructorParameterTest()
-            //            {
-            //                NullTypeName = "IService",
-            //                NullTypeFullName = "Moq.AutoMock.Generator.Example.IService",
-            //                ParameterName = "service"
-            //            }
-            //        }
-            //    }
-            //});
-        }
-    }
-
-    private static IEnumerable<string> GetNamespaces(ClassDeclarationSyntax classDeclaration)
-    {
-        foreach (var @namespace in classDeclaration
-            .Ancestors()
-            .OfType<BaseNamespaceDeclarationSyntax>()
-            .Reverse())
-        {
-            yield return @namespace.Name.ToFullString();
         }
     }
 }
