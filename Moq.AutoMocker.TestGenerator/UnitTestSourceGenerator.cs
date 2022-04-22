@@ -18,7 +18,7 @@ public class UnitTestSourceGenerator : ISourceGenerator
 
         SyntaxReceiver rx = (SyntaxReceiver)context.SyntaxContextReceiver!;
 
-        foreach(Diagnostic diagnostic in rx.DiagnosticMessages)
+        foreach (Diagnostic diagnostic in rx.DiagnosticMessages)
         {
             context.ReportDiagnostic(diagnostic);
         }
@@ -34,11 +34,23 @@ public class UnitTestSourceGenerator : ISourceGenerator
 
             builder.AppendLine($"    partial class {testClass.TestClassName}");
             builder.AppendLine("    {");
+            builder.AppendLine($"        partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);");
+            builder.AppendLine();
 
             HashSet<string> testNames = new();
 
             foreach (var test in testClass.Sut?.NullConstructorParameterTests ?? Enumerable.Empty<NullConstructorParameterTest>())
             {
+                string testName;
+                int testNameIndex = 0;
+                for (testName = $"{testClass.Sut!.Name}Constructor_WithNull{test.NullTypeName}_ThrowsArgumentNullException";
+                    !testNames.Add(testName);
+                    testName = $"{testClass.Sut!.Name}Constructor_WithNull{test.NullTypeName}{++testNameIndex}_ThrowsArgumentNullException")
+                { }
+
+                builder.AppendLine($"        partial void {testName}Setup(Moq.AutoMock.AutoMocker mocker);");
+                builder.AppendLine();
+
                 switch (testingFramework)
                 {
                     case TargetTestingFramework.MSTest:
@@ -52,19 +64,17 @@ public class UnitTestSourceGenerator : ISourceGenerator
                         break;
                 }
 
-                string testName;
-                int testNameIndex = 0;
-                for(testName = $"{testClass.Sut!.Name}Constructor_WithNull{test.NullTypeName}_ThrowsArgumentNullException";
-                    !testNames.Add(testName); 
-                    testName = $"{testClass.Sut!.Name}Constructor_WithNull{test.NullTypeName}{++testNameIndex}_ThrowsArgumentNullException")
-                { }
 
                 builder.AppendLine($"        public void {testName}()");
                 builder.AppendLine("        {");
                 builder.AppendLine("            Moq.AutoMock.AutoMocker mocker = new Moq.AutoMock.AutoMocker();");
+                builder.AppendLine($"            AutoMockerTestSetup(mocker, \"{testName}\");");
+                builder.AppendLine($"            {testName}Setup(mocker);");
 
-                foreach(var parameter in test.Parameters ?? Enumerable.Empty<Parameter>())
+                for (int i = 0; i < test.Parameters?.Count; i++)
                 {
+                    if (i == test.NullParameterIndex) continue;
+                    Parameter parameter = test.Parameters[i];
                     builder.AppendLine($"            var {parameter.Name} = mocker.Get<{parameter.ParameterType}>();");
                 }
 
@@ -87,6 +97,7 @@ public class UnitTestSourceGenerator : ISourceGenerator
                 }
 
                 builder.AppendLine("        }");
+                builder.AppendLine();
             }
 
             builder.AppendLine("    }");
@@ -98,11 +109,11 @@ public class UnitTestSourceGenerator : ISourceGenerator
 
         static IEnumerable<string> GetParameterNames(NullConstructorParameterTest test)
         {
-            for(int i =0; i < test.Parameters?.Count; i++)
+            for (int i = 0; i < test.Parameters?.Count; i++)
             {
                 if (i == test.NullParameterIndex)
                 {
-                    yield return "default";
+                    yield return $"default({test.Parameters[i].ParameterType})";
                 }
                 else
                 {
