@@ -28,12 +28,16 @@ public class SyntaxReceiver : ISyntaxContextReceiver
             classDeclaration.AttributeLists.SelectMany(x => x.Attributes)
                 .Select(a =>
                 {
-                    var t = context.SemanticModel.GetTypeInfo(a).Type;
-                    if (context.SemanticModel.GetTypeInfo(a).Type?.Name == AutoMock.ConstructorTestsAttribute &&
-                        GetTargetType(a) is { } targetType &&
-                        context.SemanticModel.GetTypeInfo(targetType).Type is INamedTypeSymbol sutType)
+                    if (context.SemanticModel.GetTypeInfo(a).Type?.Name == AutoMock.ConstructorTestsAttribute)
                     {
-                        return sutType;
+                        if (GetTargetType(a) is { } targetType &&
+                            context.SemanticModel.GetTypeInfo(targetType).Type is INamedTypeSymbol sutType)
+                        {
+                            return sutType;
+                        }
+                        Diagnostic diagnostic = Diagnostics.MustSpecifyTargetType.Create(a.GetLocation(),
+                            symbol.OriginalDefinition.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
+                        DiagnosticMessages.Add(diagnostic);
                     }
                     return null;
                 })
@@ -43,8 +47,7 @@ public class SyntaxReceiver : ISyntaxContextReceiver
             if (!classDeclaration.Modifiers.Any(x => x.IsKind(SyntaxKind.PartialKeyword)))
             {
                 Diagnostic diagnostic = Diagnostics.TestClassesMustBePartial.Create(classDeclaration.GetLocation(),
-                    symbol.OriginalDefinition.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat),
-                    AutoMock.ConstructorTestsAttribute);
+                    symbol.OriginalDefinition.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
                 DiagnosticMessages.Add(diagnostic);
                 return;
             }

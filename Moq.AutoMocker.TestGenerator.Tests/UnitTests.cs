@@ -12,6 +12,21 @@ namespace Moq.AutoMocker.TestGenerator.Tests;
 public class TestGeneratorTests
 {
     [TestMethod]
+    public async Task Generation_WithProjectThatDoesNotReferenceAutoMocker_ProducesDiagnosticWarning()
+    {
+        var expectedResult =
+            DiagnosticResult.CompilerWarning(Diagnostics.MustReferenceAutoMock.DiagnosticId);
+        await new VerifyCS.Test
+        {
+            ReferenceAutoMocker = false,
+            ExpectedDiagnostics =
+            {
+                expectedResult
+            }
+        }.RunAsync();
+    }
+
+    [TestMethod]
     public async Task Generation_WithDecoratedNonPartialClass_ProducesDiagnosticError()
     {
         var code = @"
@@ -30,7 +45,7 @@ public class Controller { }
         var expectedResult =
             DiagnosticResult.CompilerError(Diagnostics.TestClassesMustBePartial.DiagnosticId)
                         .WithSpan(6, 1, 10, 2)
-                        .WithArguments("TestNamespace.ControllerTests", AutoMock.ConstructorTestsAttribute);
+                        .WithArguments("TestNamespace.ControllerTests");
         await new VerifyCS.Test
         {
             TestState =
@@ -45,13 +60,31 @@ public class Controller { }
     }
 
     [TestMethod]
-    public async Task Generation_WithProjectThatDoesNotReferenceAutoMocker_ProducesDiagnosticError()
+    public async Task Generation_WithNoTargetTypeSpecified_ProducesDiagnosticError()
     {
+        var code = @"
+using Moq.AutoMock;
+
+namespace TestNamespace;
+
+[ConstructorTests]
+public class ControllerTests
+{
+    
+}
+
+public class Controller { }
+";
         var expectedResult =
-            DiagnosticResult.CompilerWarning(Diagnostics.MustReferenceAutoMock.DiagnosticId);
+            DiagnosticResult.CompilerError(Diagnostics.MustSpecifyTargetType.DiagnosticId)
+                        .WithSpan(6, 2, 6, 18)
+                        .WithArguments("TestNamespace.ControllerTests");
         await new VerifyCS.Test
         {
-            ReferenceAutoMocker = false,
+            TestState =
+            {
+                Sources = { code },
+            },
             ExpectedDiagnostics =
             {
                 expectedResult
