@@ -29,7 +29,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.AutoMock.Generator.Exam
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.AutoMock.Generator.Example.xUnit", "GeneratorTests\Moq.AutoMock.Generator.Example.xUnit\Moq.AutoMock.Generator.Example.xUnit.csproj", "{586D1D6A-3EE2-4AB8-988A-CEB810EF7787}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moq.AutoMocker.TestGenerator", "Moq.AutoMocker.TestGenerator\Moq.AutoMocker.TestGenerator.csproj", "{710AF8FE-BB9E-4FE9-ABF7-0CE8BD212BB4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.AutoMocker.TestGenerator", "Moq.AutoMocker.TestGenerator\Moq.AutoMocker.TestGenerator.csproj", "{710AF8FE-BB9E-4FE9-ABF7-0CE8BD212BB4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.AutoMocker.TestGenerator.Tests", "Moq.AutoMocker.TestGenerator.Tests\Moq.AutoMocker.TestGenerator.Tests.csproj", "{F3663663-0123-4DA3-9BDD-95C91AFA4596}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +71,10 @@ Global
 		{710AF8FE-BB9E-4FE9-ABF7-0CE8BD212BB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{710AF8FE-BB9E-4FE9-ABF7-0CE8BD212BB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{710AF8FE-BB9E-4FE9-ABF7-0CE8BD212BB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3663663-0123-4DA3-9BDD-95C91AFA4596}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3663663-0123-4DA3-9BDD-95C91AFA4596}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3663663-0123-4DA3-9BDD-95C91AFA4596}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3663663-0123-4DA3-9BDD-95C91AFA4596}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
