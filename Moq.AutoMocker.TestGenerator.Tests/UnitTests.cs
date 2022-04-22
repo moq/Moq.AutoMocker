@@ -42,7 +42,20 @@ public class Controller { }
                 expectedResult
             }
         }.RunAsync();
+    }
 
-        //await VerifyCS.VerifyAnalyzerAsync(test);
+    [TestMethod]
+    public async Task Generation_WithProjectThatDoesNotReferenceAutoMocker_ProducesDiagnosticError()
+    {
+        var expectedResult =
+            DiagnosticResult.CompilerWarning(Diagnostics.MustReferenceAutoMock.DiagnosticId);
+        await new VerifyCS.Test
+        {
+            ReferenceAutoMocker = false,
+            ExpectedDiagnostics =
+            {
+                expectedResult
+            }
+        }.RunAsync();
     }
 }

@@ -12,27 +12,16 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
 {
     public class Test : CSharpSourceGeneratorTest<TSourceGenerator, MSTestVerifier>
     {
-        public Test()
-        {
-            //string fullPath = Path.GetFullPath("Moq.AutoMock.dll");
-            //bool exists = File.Exists(fullPath);
-            
-            //ReferenceAssemblies = ReferenceAssemblies.AddAssemblies(ImmutableArray.Create("Moq.AutoMock"));
-        }
+        public bool ReferenceAutoMocker { get; set; } = true;
 
         protected override Project ApplyCompilationOptions(Project project)
         {
-            string fullPath = Path.GetFullPath("Moq.AutoMock.dll");
-            project = project.AddMetadataReference(MetadataReference.CreateFromFile(fullPath));
+            if (ReferenceAutoMocker)
+            {
+                string fullPath = Path.GetFullPath($"{AutoMock.AssemblyName}.dll");
+                project = project.AddMetadataReference(MetadataReference.CreateFromFile(fullPath));
+            }
             return base.ApplyCompilationOptions(project);
-        }
-
-        protected override CompilationWithAnalyzers CreateCompilationWithAnalyzers(Compilation compilation, ImmutableArray<DiagnosticAnalyzer> analyzers, AnalyzerOptions options, CancellationToken cancellationToken)
-        {
-            //string fullPath = Path.GetFullPath("Moq.AutoMock.dll");
-            //compilation = compilation.AddReferences(MetadataReference.CreateFromFile(fullPath));
-
-            return base.CreateCompilationWithAnalyzers(compilation, analyzers, options, cancellationToken);
         }
 
         protected override CompilationOptions CreateCompilationOptions()
