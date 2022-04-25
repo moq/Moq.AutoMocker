@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Moq.AutoMock.Resolvers;
+﻿namespace Moq.AutoMock.Resolvers;
 
 /// <summary>
 /// The context used to resolve types from an <c>AutoMocker</c> instance.

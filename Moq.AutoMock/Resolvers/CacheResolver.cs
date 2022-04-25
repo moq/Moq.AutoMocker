@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Moq.AutoMock.Resolvers;
+﻿namespace Moq.AutoMock.Resolvers;
 
 /// <summary>
 /// Provides the cache used by AutoMocker.

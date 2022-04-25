@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Moq.AutoMock;
+﻿namespace Moq.AutoMock;
 
 internal sealed class MockArrayInstance : IInstance
 {

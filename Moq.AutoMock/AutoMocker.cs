@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
@@ -262,10 +259,10 @@ public partial class AutoMocker : IServiceProvider
     /// <param name="callBase">Sets the CallBase property on the created Mock.</param>
     /// <returns>An instance with virtual and abstract members mocked</returns>
     public T CreateSelfMock<T>(
-        bool enablePrivate = false, 
-        MockBehavior? mockBehavior = null, 
-        DefaultValue? defaultValue = null, 
-        bool? callBase = null) 
+        bool enablePrivate = false,
+        MockBehavior? mockBehavior = null,
+        DefaultValue? defaultValue = null,
+        bool? callBase = null)
         where T : class?
     {
         return BuildSelfMock<T>(enablePrivate, mockBehavior ?? MockBehavior, defaultValue ?? DefaultValue, callBase ?? CallBase).Object;
@@ -284,13 +281,13 @@ public partial class AutoMocker : IServiceProvider
     /// <returns>An instance with virtual and abstract members mocked</returns> 
     public TImplementation WithSelfMock<TService, TImplementation>(
         bool enablePrivate = false,
-        MockBehavior? mockBehavior = null, 
+        MockBehavior? mockBehavior = null,
         DefaultValue? defaultValue = null,
         bool? callBase = null)
         where TImplementation : class, TService
         where TService : class
     {
-        Mock<TImplementation> selfMock = BuildSelfMock<TImplementation>(enablePrivate, 
+        Mock<TImplementation> selfMock = BuildSelfMock<TImplementation>(enablePrivate,
             mockBehavior ?? MockBehavior,
             defaultValue ?? DefaultValue,
             callBase ?? CallBase);
@@ -391,7 +388,7 @@ public partial class AutoMocker : IServiceProvider
     }
 
 
-    private Mock<T> BuildSelfMock<T>(bool enablePrivate, MockBehavior mockBehavior, DefaultValue defaultValue, bool callBase) 
+    private Mock<T> BuildSelfMock<T>(bool enablePrivate, MockBehavior mockBehavior, DefaultValue defaultValue, bool callBase)
         where T : class?
     {
         var context = new ObjectGraphContext(enablePrivate);
