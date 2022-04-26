@@ -19,5 +19,10 @@ public class Controller
         Name = name ?? throw new ArgumentNullException(nameof(name));
     }
 
+    public Controller(ILogger<Controller> logger)
+    {
+        _ = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
     public string Name { get; } = "";
 }

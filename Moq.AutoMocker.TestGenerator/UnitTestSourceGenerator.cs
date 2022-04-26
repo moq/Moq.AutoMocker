@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 
 namespace Moq.AutoMocker.TestGenerator;
@@ -41,12 +42,15 @@ public class UnitTestSourceGenerator : ISourceGenerator
 
             foreach (var test in testClass.Sut?.NullConstructorParameterTests ?? Enumerable.Empty<NullConstructorParameterTest>())
             {
-                string testName;
-                int testNameIndex = 0;
-                for (testName = $"{testClass.Sut!.Name}Constructor_WithNull{test.NullTypeName}_ThrowsArgumentNullException";
-                    !testNames.Add(testName);
-                    testName = $"{testClass.Sut!.Name}Constructor_WithNull{test.NullTypeName}{++testNameIndex}_ThrowsArgumentNullException")
-                { }
+                string testName = "";
+                foreach(var name in TestNameBuilder.CreateTestName(testClass, test))
+                {
+                    if (testNames.Add(name))
+                    {
+                        testName = name;
+                        break;
+                    }
+                }
 
                 builder.AppendLine($"        partial void {testName}Setup(Moq.AutoMock.AutoMocker mocker);");
                 builder.AppendLine();
@@ -78,7 +82,7 @@ public class UnitTestSourceGenerator : ISourceGenerator
                     builder.AppendLine($"            var {parameter.Name} = mocker.Get<{parameter.ParameterType}>();");
                 }
 
-                string constructorInvocation = $"_ = new {testClass.Sut.FullName}({string.Join(",", GetParameterNames(test))})";
+                string constructorInvocation = $"_ = new {testClass.Sut!.FullName}({string.Join(",", GetParameterNames(test))})";
 
                 switch (testingFramework)
                 {
@@ -111,14 +115,9 @@ public class UnitTestSourceGenerator : ISourceGenerator
         {
             for (int i = 0; i < test.Parameters?.Count; i++)
             {
-                if (i == test.NullParameterIndex)
-                {
-                    yield return $"default({test.Parameters[i].ParameterType})";
-                }
-                else
-                {
-                    yield return test.Parameters[i].Name;
-                }
+                yield return i == test.NullParameterIndex 
+                    ? $"default({test.Parameters[i].ParameterType})"
+                    : test.Parameters[i].Name;
             }
         }
     }
@@ -153,12 +152,4 @@ public class UnitTestSourceGenerator : ISourceGenerator
         }
         return TargetTestingFramework.Unknown;
     }
-}
-
-public enum TargetTestingFramework
-{
-    Unknown,
-    MSTest,
-    Xunit,
-    NUnit
 }
