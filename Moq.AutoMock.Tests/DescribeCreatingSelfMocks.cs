@@ -1,7 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq.AutoMock.Tests.Util;
-
-namespace Moq.AutoMock.Tests;
+﻿namespace Moq.AutoMock.Tests;
 
 [TestClass]
 public class DescribeCreatingSelfMocks
@@ -82,6 +79,30 @@ public class DescribeCreatingSelfMocks
         mocker.Setup<FooService, int>(s => s.Foo()).Returns(24);
     }
 
+    [TestMethod]
+    [Description("Issue 144")]
+    public void It_can_register_a_custom_default_value_provider_for_a_self_mock()
+    {
+        AutoMocker mocker = new();
+        CustomDefaultValueProvider provider = new();
+
+        var mock = mocker.CreateSelfMock<InsecureAboutSelf>(defaultValue: DefaultValue.Custom, defaultValueProvider: provider);
+
+        Assert.AreEqual(provider, Mock.Get(mock).DefaultValueProvider);
+    }
+
+    [TestMethod]
+    [Description("Issue 144")]
+    public void It_uses_default_value_provider_for_a_self_mock()
+    {
+        CustomDefaultValueProvider provider = new();
+        AutoMocker mocker = new(MockBehavior.Default, DefaultValue.Custom, provider, false);
+
+        var mock = mocker.CreateSelfMock<InsecureAboutSelf>();
+
+        Assert.AreEqual(provider, Mock.Get(mock).DefaultValueProvider);
+    }
+
     public abstract class AbstractService
     {
         public IDependency Dependency { get; }
@@ -90,8 +111,8 @@ public class DescribeCreatingSelfMocks
 
     public interface IDependency { }
 
-    public interface IFooService 
-    { 
+    public interface IFooService
+    {
         int Foo();
     }
     public class FooService : IFooService

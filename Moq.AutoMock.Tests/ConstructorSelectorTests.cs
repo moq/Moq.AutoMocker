@@ -1,7 +1,4 @@
-﻿using System;
-using System.Reflection;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq.AutoMock.Tests.Util;
+﻿using System.Reflection;
 
 namespace Moq.AutoMock.Tests;
 

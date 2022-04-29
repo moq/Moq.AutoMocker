@@ -46,3 +46,4 @@ public class DescribeWith
         Assert.IsInstanceOfType(mocker.Get<Service2>(), typeof(Service2));
     }
 }
+

@@ -50,22 +50,34 @@ public partial class AutoMocker : IServiceProvider
     /// <param name="defaultValue">The default value to use for created mocks.</param>
     /// <param name="callBase">Whether to call the base virtual implementation for created mocks.</param>
     public AutoMocker(MockBehavior mockBehavior, DefaultValue defaultValue, bool callBase)
+        : this(mockBehavior, defaultValue, null, callBase)
+    { }
+
+    /// <summary>
+    /// Initializes an instance of AutoMockers.
+    /// </summary>
+    /// <param name="mockBehavior">The behavior to use for created mocks.</param>
+    /// <param name="defaultValue">The default value to use for created mocks.</param>
+    /// <param name="defaultValueProvider">The instance that will be used to produce default return values for unexpected invocations.</param>
+    /// <param name="callBase">Whether to call the base virtual implementation for created mocks.</param>
+    public AutoMocker(MockBehavior mockBehavior, DefaultValue defaultValue, DefaultValueProvider? defaultValueProvider, bool callBase)
     {
         MockBehavior = mockBehavior;
         DefaultValue = defaultValue;
+        DefaultValueProvider = defaultValueProvider;
         CallBase = callBase;
 
         Resolvers = new List<IMockResolver>
-            {
-                new CacheResolver(),
-                new SelfResolver(),
-                new ArrayResolver(),
-                new AutoMockerDisposableResolver(),
-                new EnumerableResolver(),
-                new LazyResolver(),
-                new FuncResolver(),
-                new MockResolver(mockBehavior, defaultValue, callBase),
-            };
+        {
+            new CacheResolver(),
+            new SelfResolver(),
+            new ArrayResolver(),
+            new AutoMockerDisposableResolver(),
+            new EnumerableResolver(),
+            new LazyResolver(),
+            new FuncResolver(),
+            new MockResolver(mockBehavior, defaultValue, defaultValueProvider, callBase),
+        };
     }
 
     /// <summary>
@@ -78,6 +90,12 @@ public partial class AutoMocker : IServiceProvider
     /// unexpected invocations on loose mocks created by this instance.
     /// </summary>
     public DefaultValue DefaultValue { get; }
+
+    /// <summary>
+    /// Gets the <see cref="Moq.DefaultValueProvider"/> instance that will be used
+    /// to produce default return values for unexpected invocations.
+    /// </summary>
+    public DefaultValueProvider? DefaultValueProvider { get; }
 
     /// <summary>
     /// Whether the base member virtual implementation will be called 
@@ -244,7 +262,7 @@ public partial class AutoMocker : IServiceProvider
     /// <param name="enablePrivate">When true, non-public constructors will also be used to create mocks.</param> 
     /// <returns>An instance with virtual and abstract members mocked</returns> 
     public T CreateSelfMock<T>(bool enablePrivate) where T : class?
-        => CreateSelfMock<T>(enablePrivate, MockBehavior, DefaultValue, CallBase);
+        => CreateSelfMock<T>(enablePrivate, MockBehavior, DefaultValue, null, CallBase);
 
     /// <summary>
     /// Constructs a self-mock from the services available in the container. A self-mock is 
@@ -256,20 +274,22 @@ public partial class AutoMocker : IServiceProvider
     /// <param name="enablePrivate">When true, non-public constructors will also be used to create mocks.</param>
     /// <param name="mockBehavior">Sets the Behavior property on the created Mock.</param>
     /// <param name="defaultValue">Sets the DefaultValue propert on the created Mock.</param>
+    /// <param name="defaultValueProvider">The instance that will be used to produce default return values for unexpected invocations.</param>
     /// <param name="callBase">Sets the CallBase property on the created Mock.</param>
     /// <returns>An instance with virtual and abstract members mocked</returns>
     public T CreateSelfMock<T>(
         bool enablePrivate = false,
         MockBehavior? mockBehavior = null,
         DefaultValue? defaultValue = null,
+        DefaultValueProvider? defaultValueProvider = null,
         bool? callBase = null)
         where T : class?
     {
-        return BuildSelfMock<T>(enablePrivate, mockBehavior ?? MockBehavior, defaultValue ?? DefaultValue, callBase ?? CallBase).Object;
+        return BuildSelfMock<T>(enablePrivate, mockBehavior ?? MockBehavior, defaultValue ?? DefaultValue, defaultValueProvider ?? DefaultValueProvider, callBase ?? CallBase).Object;
     }
 
     /// <summary>
-    /// This constructs a self mock similar to <see cref="CreateSelfMock{T}(bool, MockBehavior?, DefaultValue?, bool?)" />.
+    /// This constructs a self mock similar to <see cref="CreateSelfMock{T}(bool, MockBehavior?, DefaultValue?, DefaultValueProvider?, bool?)" />.
     /// The created mock instance is automatically registered using both its implementation and service type.
     /// </summary>
     /// <typeparam name="TService">The service type</typeparam>
@@ -277,19 +297,23 @@ public partial class AutoMocker : IServiceProvider
     /// <param name="enablePrivate">When true, non-public constructors will also be used to create mocks.</param>
     /// <param name="mockBehavior">Sets the Behavior property on the created Mock.</param>
     /// <param name="defaultValue">Sets the DefaultValue propert on the created Mock.</param>
+    /// <param name="defaultValueProvider">The instance that will be used to produce default return values for unexpected invocations.</param>
     /// <param name="callBase">Sets the CallBase property on the created Mock.</param>
     /// <returns>An instance with virtual and abstract members mocked</returns> 
     public TImplementation WithSelfMock<TService, TImplementation>(
         bool enablePrivate = false,
         MockBehavior? mockBehavior = null,
         DefaultValue? defaultValue = null,
+        DefaultValueProvider? defaultValueProvider = null,
         bool? callBase = null)
         where TImplementation : class, TService
         where TService : class
     {
-        Mock<TImplementation> selfMock = BuildSelfMock<TImplementation>(enablePrivate,
+        Mock<TImplementation> selfMock = BuildSelfMock<TImplementation>(
+            enablePrivate,
             mockBehavior ?? MockBehavior,
             defaultValue ?? DefaultValue,
+            defaultValueProvider ?? DefaultValueProvider,
             callBase ?? CallBase);
         WithTypeMap(typeMap =>
         {
@@ -300,23 +324,25 @@ public partial class AutoMocker : IServiceProvider
     }
 
     /// <summary>
-    /// This constructs a self mock similar to <see cref="CreateSelfMock{T}(bool, MockBehavior?, DefaultValue?, bool?)" />.
+    /// This constructs a self mock similar to <see cref="CreateSelfMock{T}(bool, MockBehavior?, DefaultValue?, DefaultValueProvider?, bool?)" />.
     /// The created mock instance is automatically registered using both its implementation and service type.
     /// </summary>
     /// <typeparam name="T">The service type</typeparam>
     /// <param name="enablePrivate">When true, non-public constructors will also be used to create mocks.</param>
     /// <param name="mockBehavior">Sets the Behavior property on the created Mock.</param>
     /// <param name="defaultValue">Sets the DefaultValue propert on the created Mock.</param>
+    /// <param name="defaultValueProvider">The instance that will be used to produce default return values for unexpected invocations.</param>
     /// <param name="callBase">Sets the CallBase property on the created Mock.</param>
     /// <returns>An instance with virtual and abstract members mocked</returns> 
     public T WithSelfMock<T>(
         bool enablePrivate = false,
         MockBehavior? mockBehavior = null,
         DefaultValue? defaultValue = null,
+        DefaultValueProvider? defaultValueProvider = null,
         bool? callBase = null)
         where T : class
     {
-        Mock<T> selfMock = BuildSelfMock<T>(enablePrivate, mockBehavior ?? MockBehavior, defaultValue ?? DefaultValue, callBase ?? CallBase);
+        Mock<T> selfMock = BuildSelfMock<T>(enablePrivate, mockBehavior ?? MockBehavior, defaultValue ?? DefaultValue, defaultValueProvider ?? DefaultValueProvider, callBase ?? CallBase);
         WithTypeMap(typeMap =>
         {
             typeMap[typeof(T)] = new MockInstance(selfMock);
@@ -325,7 +351,7 @@ public partial class AutoMocker : IServiceProvider
     }
 
     /// <summary>
-    /// This constructs a self mock similar to <see cref="CreateSelfMock{T}(bool, MockBehavior?, DefaultValue?, bool?)" />.
+    /// This constructs a self mock similar to <see cref="CreateSelfMock{T}(bool, MockBehavior?, DefaultValue?, DefaultValueProvider?, bool?)" />.
     /// The created mock instance is automatically registered using both its implementation and service type.
     /// </summary>
     /// <param name="serviceType">The service type.</param>
@@ -333,6 +359,7 @@ public partial class AutoMocker : IServiceProvider
     /// <param name="enablePrivate">When true, non-public constructors will also be used to create mocks.</param>
     /// <param name="mockBehavior">Sets the Behavior property on the created Mock.</param>
     /// <param name="defaultValue">Sets the DefaultValue propert on the created Mock.</param>
+    /// <param name="defaultValueProvider">The instance that will be used to produce default return values for unexpected invocations.</param>
     /// <param name="callBase">Sets the CallBase property on the created Mock.</param>
     /// <returns>An instance with virtual and abstract members mocked</returns> 
     public object WithSelfMock(
@@ -341,6 +368,7 @@ public partial class AutoMocker : IServiceProvider
         bool enablePrivate = false,
         MockBehavior? mockBehavior = null,
         DefaultValue? defaultValue = null,
+        DefaultValueProvider? defaultValueProvider = null,
         bool? callBase = null)
     {
         Mock selfMock = BuildSelfMock(
@@ -348,6 +376,7 @@ public partial class AutoMocker : IServiceProvider
             enablePrivate,
             mockBehavior ?? MockBehavior,
             defaultValue ?? DefaultValue,
+            defaultValueProvider ?? DefaultValueProvider,
             callBase ?? CallBase);
         WithTypeMap(typeMap =>
         {
@@ -358,13 +387,14 @@ public partial class AutoMocker : IServiceProvider
     }
 
     /// <summary>
-    /// This constructs a self mock similar to <see cref="CreateSelfMock{T}(bool, MockBehavior?, DefaultValue?, bool?)" />.
+    /// This constructs a self mock similar to <see cref="CreateSelfMock{T}(bool, MockBehavior?, DefaultValue?, DefaultValueProvider?, bool?)" />.
     /// The created mock instance is automatically registered using both its implementation and service type.
     /// </summary>
     /// <param name="implementationType">The implementation type of the service.</param>
     /// <param name="enablePrivate">When true, non-public constructors will also be used to create mocks.</param>
     /// <param name="mockBehavior">Sets the Behavior property on the created Mock.</param>
     /// <param name="defaultValue">Sets the DefaultValue propert on the created Mock.</param>
+    /// <param name="defaultValueProvider">The instance that will be used to produce default return values for unexpected invocations.</param>
     /// <param name="callBase">Sets the CallBase property on the created Mock.</param>
     /// <returns>An instance with virtual and abstract members mocked</returns> 
     public object WithSelfMock(
@@ -372,6 +402,7 @@ public partial class AutoMocker : IServiceProvider
         bool enablePrivate = false,
         MockBehavior? mockBehavior = null,
         DefaultValue? defaultValue = null,
+        DefaultValueProvider? defaultValueProvider = null,
         bool? callBase = null)
     {
         Mock selfMock = BuildSelfMock(
@@ -379,6 +410,7 @@ public partial class AutoMocker : IServiceProvider
             enablePrivate,
             mockBehavior ?? MockBehavior,
             defaultValue ?? DefaultValue,
+            defaultValueProvider ?? DefaultValueProvider,
             callBase ?? CallBase);
         WithTypeMap(typeMap =>
         {
@@ -387,20 +419,19 @@ public partial class AutoMocker : IServiceProvider
         return selfMock.Object;
     }
 
-
-    private Mock<T> BuildSelfMock<T>(bool enablePrivate, MockBehavior mockBehavior, DefaultValue defaultValue, bool callBase)
+    private Mock<T> BuildSelfMock<T>(bool enablePrivate, MockBehavior mockBehavior, DefaultValue defaultValue, DefaultValueProvider? defaultValueProvider, bool callBase)
         where T : class?
     {
         var context = new ObjectGraphContext(enablePrivate);
-        return CreateMock(typeof(T), mockBehavior, defaultValue, callBase, context) is Mock<T> mock
+        return CreateMock(typeof(T), mockBehavior, defaultValue, defaultValueProvider, callBase, context) is Mock<T> mock
             ? mock
             : throw new InvalidOperationException($"Failed to create self mock of type {typeof(T).FullName}");
     }
 
-    private Mock BuildSelfMock(Type serviceType, bool enablePrivate, MockBehavior mockBehavior, DefaultValue defaultValue, bool callBase)
+    private Mock BuildSelfMock(Type serviceType, bool enablePrivate, MockBehavior mockBehavior, DefaultValue defaultValue, DefaultValueProvider? defaultValueProvider, bool callBase)
     {
         var context = new ObjectGraphContext(enablePrivate);
-        return CreateMock(serviceType, mockBehavior, defaultValue, callBase, context) is Mock mock
+        return CreateMock(serviceType, mockBehavior, defaultValue, defaultValueProvider, callBase, context) is Mock mock
             ? mock
             : throw new InvalidOperationException($"Failed to create self mock of type {serviceType.FullName}");
     }
@@ -913,7 +944,7 @@ public partial class AutoMocker : IServiceProvider
 
     #region Utilities
 
-    internal Mock? CreateMock(Type serviceType, MockBehavior mockBehavior, DefaultValue defaultValue, bool callBase, ObjectGraphContext objectGraphContext)
+    internal Mock? CreateMock(Type serviceType, MockBehavior mockBehavior, DefaultValue defaultValue, DefaultValueProvider? defaultValueProvider, bool callBase, ObjectGraphContext objectGraphContext)
     {
         var mockType = typeof(Mock<>).MakeGenericType(serviceType);
 
@@ -930,7 +961,14 @@ public partial class AutoMocker : IServiceProvider
 
         if (Activator.CreateInstance(mockType, mockBehavior, constructorArgs) is Mock mock)
         {
-            mock.DefaultValue = defaultValue;
+            if (defaultValueProvider is not null && defaultValue == DefaultValue.Custom)
+            {
+                mock.DefaultValueProvider = defaultValueProvider;
+            }
+            else
+            {
+                mock.DefaultValue = defaultValue;
+            }
             mock.CallBase = callBase;
             return mock;
         }
