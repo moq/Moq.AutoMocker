@@ -1,8 +1,7 @@
-﻿using Microsoft.CodeAnalysis.Testing;
+﻿using System.Text;
+using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Text;
-using System.Threading.Tasks;
 
 using VerifyCS = Moq.AutoMocker.TestGenerator.Tests.CSharpSourceGeneratorVerifier<Moq.AutoMocker.TestGenerator.UnitTestSourceGenerator>;
 
@@ -48,10 +47,7 @@ public class Controller { }
                         .WithArguments("TestNamespace.ControllerTests");
         await new VerifyCS.Test
         {
-            TestState =
-            {
-                Sources = { code },
-            },
+            TestCode = code,
             ExpectedDiagnostics =
             {
                 expectedResult
@@ -81,14 +77,71 @@ public class Controller { }
                         .WithArguments("TestNamespace.ControllerTests");
         await new VerifyCS.Test
         {
-            TestState =
-            {
-                Sources = { code },
-            },
+            TestCode = code,
             ExpectedDiagnostics =
             {
                 expectedResult
             }
         }.RunAsync();
+    }
+
+    [TestMethod]
+    [Description("Issue 142")]
+    public async Task Generation_WithGenericParameter_RemovesInvalidCharactersFromTestsName()
+    {
+        var code = @"
+using Moq.AutoMock;
+
+namespace TestNamespace;
+
+[ConstructorTests(typeof(Controller))]
+public partial class ControllerTests
+{
+    
+}
+
+public class Controller
+{
+    public Controller(ILogger<Controller> logger) { }
+}
+
+public interface ILogger<Controller> { }
+";
+        string expected = @"namespace TestNamespace
+{
+    partial class ControllerTests
+    {
+        partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+
+        partial void ControllerConstructor_WithNullILoggerController_ThrowsArgumentNullExceptionSetup(Moq.AutoMock.AutoMocker mocker);
+
+        public void ControllerConstructor_WithNullILoggerController_ThrowsArgumentNullException()
+        {
+            Moq.AutoMock.AutoMocker mocker = new Moq.AutoMock.AutoMocker();
+            AutoMockerTestSetup(mocker, ""ControllerConstructor_WithNullILoggerController_ThrowsArgumentNullException"");
+            ControllerConstructor_WithNullILoggerController_ThrowsArgumentNullExceptionSetup(mocker);
+        }
+
+    }
+}
+";
+
+        await new VerifyCS.Test
+        {
+            TestCode = code,
+            TestState =
+            {
+                GeneratedSources =
+                {
+                    GetSourceFile(expected, "ControllerTests.g.cs")
+                }
+            }
+            
+        }.RunAsync();
+    }
+
+    private static (string FileName, SourceText SourceText) GetSourceFile(string content, string fileName)
+    {
+        return (Path.Combine("Moq.AutoMocker.TestGenerator", "Moq.AutoMocker.TestGenerator.UnitTestSourceGenerator", fileName), SourceText.From(content, Encoding.UTF8));
     }
 }
