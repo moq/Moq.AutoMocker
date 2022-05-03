@@ -1,4 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -66,6 +66,7 @@ public class SyntaxReceiver : ISyntaxContextReceiver
                 int nullIndex = 0;
                 foreach (IParameterSymbol parameter in ctor.Parameters)
                 {
+                    if (parameter.Type.IsValueType) continue;
                     sut.NullConstructorParameterTests.Add(new NullConstructorParameterTest()
                     {
                         Parameters = parameters,

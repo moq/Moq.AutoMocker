@@ -76,6 +76,7 @@ public partial class AutoMocker : IServiceProvider
             new EnumerableResolver(),
             new LazyResolver(),
             new FuncResolver(),
+            new CancellationTokenResolver(),
             new MockResolver(mockBehavior, defaultValue, defaultValueProvider, callBase),
         };
     }
@@ -536,12 +537,12 @@ public partial class AutoMocker : IServiceProvider
     /// </summary>
     /// <typeparam name="TService">The class or interface to search on</typeparam>
     /// <returns>The object that implements TService</returns>
-    public TService Get<TService>() where TService : class?
+    public TService Get<TService>()
     {
         if (Get(typeof(TService)) is TService service)
             return service;
 
-        return null!;
+        return default!;
     }
 
     /// <summary>
@@ -551,12 +552,12 @@ public partial class AutoMocker : IServiceProvider
     /// <typeparam name="TService">The class or interface to search on</typeparam>
     /// <param name="enablePrivate">When true, non-public constructors will also be used to create mocks.</param>
     /// <returns>The object that implements TService</returns>
-    public TService Get<TService>(bool enablePrivate) where TService : class?
+    public TService Get<TService>(bool enablePrivate)
     {
         if (Get(typeof(TService), enablePrivate) is TService service)
             return service;
 
-        return null!;
+        return default!;
     }
 
     /// <summary>
