@@ -24,5 +24,11 @@ public class Controller
         _ = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
+    public Controller(ILogger<Controller> logger, CancellationToken token)
+    {
+        _ = logger ?? throw new ArgumentNullException(nameof(logger));
+        _ = token;
+    }
+
     public string Name { get; } = "";
 }
