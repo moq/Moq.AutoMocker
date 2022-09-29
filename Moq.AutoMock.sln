@@ -12,7 +12,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		Directory.Build.props = Directory.Build.props
 		Directory.Build.targets = Directory.Build.targets
-		.github\workflows\dotnetcore.yml = .github\workflows\dotnetcore.yml
 		LICENSE.md = LICENSE.md
 		README.md = README.md
 	EndProjectSection
@@ -32,6 +31,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.AutoMocker.TestGenerator", "Moq.AutoMocker.TestGenerator\Moq.AutoMocker.TestGenerator.csproj", "{710AF8FE-BB9E-4FE9-ABF7-0CE8BD212BB4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.AutoMocker.TestGenerator.Tests", "Moq.AutoMocker.TestGenerator.Tests\Moq.AutoMocker.TestGenerator.Tests.csproj", "{F3663663-0123-4DA3-9BDD-95C91AFA4596}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{820CF7FE-8E92-4500-BE62-55AF67007838}"
+	ProjectSection(SolutionItems) = preProject
+		.github\dependabot.yml = .github\dependabot.yml
+		.github\workflows\dotnetcore.yml = .github\workflows\dotnetcore.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -84,6 +89,7 @@ Global
 		{BAFB5236-9C52-48D2-8CD5-E214652F38D3} = {1D10BDDE-2E03-42E4-AA7A-B12AF01E7FE8}
 		{0E545A4D-809E-47CA-AC16-5CB80CD231F6} = {1D10BDDE-2E03-42E4-AA7A-B12AF01E7FE8}
 		{586D1D6A-3EE2-4AB8-988A-CEB810EF7787} = {1D10BDDE-2E03-42E4-AA7A-B12AF01E7FE8}
+		{820CF7FE-8E92-4500-BE62-55AF67007838} = {5698188E-884A-49D3-A74B-FF98C782BF15}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1A499C6A-1AB1-4A04-A133-BBCF4759DACA}
