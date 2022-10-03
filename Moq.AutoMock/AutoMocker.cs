@@ -114,6 +114,7 @@ public partial class AutoMocker : IServiceProvider
     /// The keys are the types used when resolving services.
     /// </summary>
     public IReadOnlyDictionary<Type, object?> ResolvedObjects
+        //NB: NonBlocking.ConcurrentDictionary GetEnumerator method returns a snapshot enumerator which is thread-safe
         => TypeMap?.ToDictionary(kvp => kvp.Key, kvp =>
         {
             return kvp.Value switch
@@ -123,7 +124,7 @@ public partial class AutoMocker : IServiceProvider
             };
         }) ?? new Dictionary<Type, object?>();
 
-    private Dictionary<Type, IInstance>? TypeMap
+    private NonBlocking.ConcurrentDictionary<Type, IInstance>? TypeMap
         => Resolvers.OfType<CacheResolver>().FirstOrDefault()?.TypeMap;
 
     private bool TryResolve(Type serviceType,
@@ -1054,7 +1055,7 @@ public partial class AutoMocker : IServiceProvider
         });
     }
 
-    private void WithTypeMap(Action<Dictionary<Type, IInstance>> onTypeMap)
+    private void WithTypeMap(Action<NonBlocking.ConcurrentDictionary<Type, IInstance>> onTypeMap)
     {
         if (TypeMap is { } typeMap)
         {
