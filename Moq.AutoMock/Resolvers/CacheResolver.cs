@@ -5,7 +5,7 @@
 /// </summary>
 public class CacheResolver : IMockResolver
 {
-    internal Dictionary<Type, IInstance> TypeMap { get; } = new();
+    internal NonBlocking.ConcurrentDictionary<Type, IInstance> TypeMap { get; } = new();
 
     /// <inheritdoc />
     public void Resolve(MockResolutionContext context)
