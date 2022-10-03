@@ -54,7 +54,7 @@ public class DescribeGetMock
     {
         var mocker = new AutoMocker();
         var mock = mocker.GetMock<ProtectedConstructor1>();
-        Assert.ThrowsException<InvalidProxyConstructorArgumentsException>(() => mock.Object);
+        Assert.ThrowsException<ArgumentException>(() => mock.Object);
     }
 
     [TestMethod]
