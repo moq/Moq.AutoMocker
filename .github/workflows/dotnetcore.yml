@@ -99,3 +99,15 @@ jobs:
           --source 'https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json' `
           --api-key '${{ github.token }}' `
           --skip-duplicate
+
+  automerge:
+    if: github.event_name == 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      pull-requests: write
+      contents: write
+
+    steps:
+      - uses: fastify/github-action-merge-dependabot@v3.4.0  
