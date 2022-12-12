@@ -96,7 +96,7 @@ public class DescribeCreateInstance
     {
         var mocker = new AutoMocker();
         ArgumentException exception = Assert.ThrowsException<ArgumentException>(() => mocker.CreateInstance<ConstructorThrows>());
-        StringAssert.Contains(exception.StackTrace, typeof(ConstructorThrows).Name);
+        StringAssert.Contains(exception.StackTrace!, typeof(ConstructorThrows).Name);
     }
 
     [TestMethod]
