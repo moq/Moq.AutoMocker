@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq.AutoMock.Resolvers;
-using Moq.AutoMock.Tests.Util;
+﻿using Moq.AutoMock.Resolvers;
 
 namespace Moq.AutoMock.Tests;
 
@@ -16,8 +12,8 @@ public class DescribeCombiningTypes
         mocker.Combine(typeof(IService1), typeof(IService2),
             typeof(IService3));
 
-        Assert.AreSame(mocker.Get<IService2>(), mocker.Get<IService1>());
-        Assert.AreSame(mocker.Get<IService3>(), mocker.Get<IService2>());
+        Assert.AreSame<object>(mocker.Get<IService2>(), mocker.Get<IService1>());
+        Assert.AreSame<object>(mocker.Get<IService3>(), mocker.Get<IService2>());
     }
 
     [TestMethod]
@@ -26,8 +22,8 @@ public class DescribeCombiningTypes
         var mocker = new AutoMocker();
         mocker.Combine<IService1, IService2, IService3>();
 
-        Assert.AreSame(mocker.Get<IService2>(), mocker.Get<IService1>());
-        Assert.AreSame(mocker.Get<IService3>(), mocker.Get<IService2>());
+        Assert.AreSame<object>(mocker.Get<IService2>(), mocker.Get<IService1>());
+        Assert.AreSame<object>(mocker.Get<IService3>(), mocker.Get<IService2>());
     }
 
     [TestMethod]
