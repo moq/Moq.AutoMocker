@@ -1016,7 +1016,7 @@ public partial class AutoMocker : IServiceProvider
                     return false;
                 }
 
-                TryCache(parameters[i].ParameterType, service);
+                EnsureCached(parameters[i].ParameterType, service);
                 arguments[i] = service;
             }
             return true;
@@ -1024,7 +1024,7 @@ public partial class AutoMocker : IServiceProvider
 
     }
 
-    private void TryCache(Type type, IInstance instance)
+    private void EnsureCached(Type type, IInstance instance)
     {
         WithTypeMap(typeMap =>
         {
@@ -1040,7 +1040,7 @@ public partial class AutoMocker : IServiceProvider
         if (TryResolve(type, new ObjectGraphContext(false), out IInstance? instance) &&
             instance is MockInstance mockInstance)
         {
-            TryCache(type, mockInstance);
+            EnsureCached(type, mockInstance);
             return mockInstance.Mock;
         }
         throw new ArgumentException($"{type} does not resolve to a Mock");
