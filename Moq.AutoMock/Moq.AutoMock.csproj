@@ -33,7 +33,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Moq" Version="4.18.4" />
-    <PackageReference Include="NonBlocking" Version="2.1.0" />
+    <PackageReference Include="NonBlocking" Version="2.1.1" />
     <ProjectReference Include="../Generators/Generators.csproj">
       <OutputItemType>Analyzer</OutputItemType>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
