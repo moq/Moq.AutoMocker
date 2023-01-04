@@ -153,7 +153,6 @@ public class DescribeCreateInstance
         Assert.IsTrue(e.Message.StartsWith($"Did not find a best constructor for `{typeof(WithRecursiveDependency)}`"));
     }
 
-
     [TestMethod]
     [Description("Issue 123")]
     public void It_can_use_fixed_value_to_supply_string_parameter()
@@ -174,6 +173,24 @@ public class DescribeCreateInstance
         HasStringParameter sut = mocker.CreateInstance<HasStringParameter>();
 
         Assert.AreEqual("Test string", sut.String);
+    }
+
+    [TestMethod]
+    public void ConcreteDependencyFirst_WhenServiceIsShared_UsesResolvedInstance()
+    {
+        AutoMocker mocker = new();
+        ConcreteDependencyIsFirst constructed = mocker.CreateInstance<ConcreteDependencyIsFirst>();
+
+        Assert.AreSame(constructed.Service, constructed.Dependency.Service);
+    }
+
+    [TestMethod]
+    public void ConcreteDependency_WhenServiceIsShared_UsesResolvedInstance()
+    {
+        AutoMocker mocker = new();
+        ConcreteDependencyIsSecond constructed = mocker.CreateInstance<ConcreteDependencyIsSecond>();
+
+        Assert.AreSame(constructed.Service, constructed.Dependency.Service);
     }
 
     private class CustomStringResolver : IMockResolver
@@ -203,4 +220,9 @@ public class DescribeCreateInstance
 
         public string String { get; }
     }
+
+
+    public record class ConcreteDependency(IService1 Service);
+    public record class ConcreteDependencyIsFirst(ConcreteDependency Dependency, IService1 Service);
+    public record class ConcreteDependencyIsSecond(IService1 Service, ConcreteDependency Dependency);
 }

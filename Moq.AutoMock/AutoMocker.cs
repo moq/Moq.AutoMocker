@@ -225,8 +225,6 @@ public partial class AutoMocker : IServiceProvider
                 nameof(type));
         }
 
-        CacheInstances(arguments.Zip(ctor.GetParameters(), (i, p) => (p.ParameterType, i)));
-
         try
         {
             object?[] parameters = arguments.Select(x => x.Value).ToArray();
@@ -958,7 +956,6 @@ public partial class AutoMocker : IServiceProvider
             TryGetConstructorInvocation(serviceType, objectGraphContext, out ConstructorInfo? ctor, out IInstance[]? arguments))
         {
             constructorArgs = arguments.Select(x => x.Value).ToArray();
-            CacheInstances(arguments.Zip(ctor.GetParameters(), (i, p) => (p.ParameterType, i)));
         }
 
         if (Activator.CreateInstance(mockType, mockBehavior, constructorArgs) is Mock mock)
@@ -1018,10 +1015,24 @@ public partial class AutoMocker : IServiceProvider
                 {
                     return false;
                 }
+
+                TryCache(parameters[i].ParameterType, service);
                 arguments[i] = service;
             }
             return true;
         }
+
+    }
+
+    private void TryCache(Type type, IInstance instance)
+    {
+        WithTypeMap(typeMap =>
+        {
+            if (!typeMap.TryGetValue(type, out _))
+            {
+                typeMap[type] = instance;
+            }
+        });
     }
 
     private Mock GetOrMakeMockFor(Type type)
@@ -1029,30 +1040,10 @@ public partial class AutoMocker : IServiceProvider
         if (TryResolve(type, new ObjectGraphContext(false), out IInstance? instance) &&
             instance is MockInstance mockInstance)
         {
-            WithTypeMap(typeMap =>
-            {
-                if (!typeMap.ContainsKey(type))
-                {
-                    typeMap[type] = mockInstance;
-                }
-            });
+            TryCache(type, mockInstance);
             return mockInstance.Mock;
         }
         throw new ArgumentException($"{type} does not resolve to a Mock");
-    }
-
-    internal void CacheInstances(IEnumerable<(Type, IInstance)> instances)
-    {
-        WithTypeMap(typeMap =>
-        {
-            foreach (var (type, instance) in instances)
-            {
-                if (!typeMap.ContainsKey(type))
-                {
-                    typeMap[type] = instance;
-                }
-            }
-        });
     }
 
     private void WithTypeMap(Action<NonBlocking.ConcurrentDictionary<Type, IInstance>> onTypeMap)
