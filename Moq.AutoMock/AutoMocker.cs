@@ -833,14 +833,22 @@ public partial class AutoMocker : IServiceProvider
     /// <summary>
     /// This is a shortcut for calling `mock.VerifyAll()` on every mock that we have.
     /// </summary>
-    public void VerifyAll()
+    public void VerifyAll(bool ignoreMissingSetups = false)
     {
         if (!(TypeMap is { } typeMap)) throw new InvalidOperationException($"{nameof(CacheResolver)} was not found. Cannot verify expectations without resolver.");
 
+        bool foundSetups = false;
         foreach (var pair in typeMap)
         {
             if (pair.Value is MockInstance instance)
+            {
+                foundSetups |= instance.Mock.Setups.Any();
                 instance.Mock.VerifyAll();
+            }
+        }
+        if (!ignoreMissingSetups && !foundSetups)
+        {
+            throw new InvalidOperationException($"{nameof(VerifyAll)} was called, but there were no setups on any tracked mock instances to verify");
         }
     }
 

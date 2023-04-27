@@ -25,7 +25,7 @@ public class DescribeVerifyAll
         var mocker = new AutoMocker();
         mocker.Use<IService2>(new Service2());
         mocker.CreateInstance<WithService>();
-        mocker.VerifyAll();
+        mocker.VerifyAll(ignoreMissingSetups:true);
     }
 
     [TestMethod]
@@ -35,5 +35,22 @@ public class DescribeVerifyAll
         mocker.Resolvers.Remove(mocker.Resolvers.OfType<CacheResolver>().Single());
 
         Assert.ThrowsException<InvalidOperationException>(() => mocker.VerifyAll());
+    }
+
+    [TestMethod]
+    public void It_throws_if_there_are_no_mocks_with_setups()
+    {
+        AutoMocker mocker = new();
+
+        InvalidOperationException ex = Assert.ThrowsException<InvalidOperationException>(() => mocker.VerifyAll());
+        Assert.AreEqual("VerifyAll was called, but there were no setups on any tracked mock instances to verify", ex.Message);
+    }
+
+    [TestMethod]
+    public void It_does_not_throw_on_missing_setups_when_flag_is_set()
+    {
+        AutoMocker mocker = new();
+
+        mocker.VerifyAll(ignoreMissingSetups: true);
     }
 }
