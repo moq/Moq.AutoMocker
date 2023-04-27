@@ -65,4 +65,63 @@ public class DescribeUsingExplicitObjects
 
         Assert.ThrowsException<InvalidOperationException>(() => mocker.Use(typeof(object), new object()));
     }
+
+    [TestMethod]
+    public void It_throws_if_the_service_has_already_been_added()
+    {
+        AutoMocker mocker = new();
+        Service2 service = new();
+        mocker.Use(service);
+        var ex = Assert.ThrowsException<InvalidOperationException>(() => mocker.Use(service));
+        Assert.AreEqual("The service has already been added.", ex.Message);
+    }
+
+    [TestMethod]
+    public void It_throws_if_the_service_was_created_by_mocker()
+    {
+        AutoMocker mocker = new();
+        Mock<IService1> service = mocker.GetMock<IService1>();
+        var ex = Assert.ThrowsException<InvalidOperationException>(() => mocker.Use(service));
+        Assert.AreEqual("The service has already been added.", ex.Message);
+    }
+
+    [TestMethod]
+    public void It_replaces_previous_service_with_specified_service()
+    {
+        AutoMocker mocker = new();
+        Service2 service1 = new();
+        Service2 service2 = new();
+
+        mocker.Use(service1);
+        mocker.Use(service2);
+        
+        Assert.AreEqual(service2, mocker.Get<Service2>());
+    }
+
+    [TestMethod]
+    public void It_replaces_previous_mock_service_with_specified_service()
+    {
+        AutoMocker mocker = new();
+        //Creates and caches a mock of IService2
+        _ = mocker.GetMock<IService2>();
+        Service2 service2 = new();
+
+        mocker.Use<IService2>(service2);
+
+        Assert.AreEqual(service2, mocker.Get<IService2>());
+    }
+
+    [TestMethod]
+    public void It_replaces_previous_mock_service_with_specified_mock_service()
+    {
+        AutoMocker mocker = new();
+        //Creates and caches a mock of IService2
+        _ = mocker.GetMock<IService2>();
+        
+        Mock<IService2> service2 = new();
+
+        mocker.Use(service2);
+
+        Assert.AreEqual(service2.Object, mocker.Get<IService2>());
+    }
 }

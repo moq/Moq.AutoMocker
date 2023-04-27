@@ -462,6 +462,12 @@ public partial class AutoMocker : IServiceProvider
         }
         WithTypeMap(typeMap =>
         {
+            if (typeMap.TryGetValue(type, out IInstance existingInstance) &&
+                existingInstance is RealInstance realInstance &&
+                Equals(realInstance.Value, service))
+            {
+                throw new InvalidOperationException("The service has already been added.");
+            }
             typeMap[type] = new RealInstance(service);
         });
     }
@@ -476,7 +482,14 @@ public partial class AutoMocker : IServiceProvider
     {
         WithTypeMap(typeMap =>
         {
-            typeMap[typeof(TService)] = new MockInstance(mockedService ?? throw new ArgumentNullException(nameof(mockedService)));
+            Type serviceType = typeof(TService);
+            if (typeMap.TryGetValue(serviceType, out IInstance existingInstance) &&
+                existingInstance is MockInstance mockInstance &&
+                Equals(mockInstance.Mock.Object, mockedService.Object))
+            {
+                throw new InvalidOperationException("The service has already been added.");
+            }
+            typeMap[serviceType] = new MockInstance(mockedService ?? throw new ArgumentNullException(nameof(mockedService)));
         });
     }
 
@@ -766,7 +779,6 @@ public partial class AutoMocker : IServiceProvider
     public Mock<TService> SetupAllProperties<TService>() where TService : class
     {
         var mock = (Mock<TService>)GetOrMakeMockFor(typeof(TService));
-        Use(mock);
         mock.SetupAllProperties();
         return mock;
     }
