@@ -32,17 +32,21 @@ public class CombineGenerator : ISourceGenerator
     {
         return MethodDeclaration(PredefinedType(Token(VoidKeyword)), "Combine")
             .WithModifiers(TokenList(Token(TriviaList(Trivia(Documentation)), PublicKeyword, TriviaList())))
-            .WithTypeParameterList(TypeParameterList(SeparatedList(Enumerable.Range(0, count + 1).Select(type))))
+            .WithTypeParameterList(TypeParameterList(SeparatedList(Enumerable.Range(0, count + 1).Select(Type))))
             .WithExpressionBody(ArrowExpressionClause(
                 InvocationExpression(IdentifierName("Combine"))
-                    .WithArgumentList(ArgumentList(SeparatedList(Enumerable.Range(0, count + 1).Select(argument))))))
+                    .WithArgumentList(ArgumentList(SeparatedList(Enumerable.Range(0, count + 1).Select(Argument))))))
             .WithSemicolonToken(Token(SemicolonToken))
             .WithTrailingTrivia(LineFeed);
 
-        static string identifier(int index) => index is 0 ? "TService" : $"TAsWellAs{index}";
-        static TypeParameterSyntax type(int index) => TypeParameter(identifier(index));
-        static ArgumentSyntax argument(int index) => Argument(TypeOfExpression(IdentifierName(identifier(index))));
+        static string Identifier(int index) => index is 0 ? "TService" : $"TAsWellAs{index}";
+        static TypeParameterSyntax Type(int index) => TypeParameter(Identifier(index));
+        static ArgumentSyntax Argument(int index) => SyntaxFactory.Argument(TypeOfExpression(IdentifierName(Identifier(index))));
     }
+
+#pragma warning disable RS1035 // Do not use APIs banned for analyzers
+    private static string NewLine { get; } = Environment.NewLine;
+#pragma warning restore RS1035 // Do not use APIs banned for analyzers
 
     private DocumentationCommentTriviaSyntax Documentation { get; } = DocumentationComment(
         XmlText(" "),
@@ -53,9 +57,9 @@ public class CombineGenerator : ISourceGenerator
                     @"mock. Some IoC containers call this ""Forwarding"" one type to",
                     "other interfaces. In the end, this just means that all given",
                     "types will be implemnted by the same instance.",
-            }.SelectMany(text => new[] { XmlNewLine(Environment.NewLine), XmlText($" {text}") })
-            .Concat(new[] { XmlNewLine(Environment.NewLine), XmlText(" ") })
+            }.SelectMany(text => new[] { XmlNewLine(NewLine), XmlText($" {text}") })
+            .Concat(new[] { XmlNewLine(NewLine), XmlText(" ") })
             .ToArray()
         ),
-        XmlText($"{Environment.NewLine}        "));
+        XmlText($"{NewLine}        "));
 }
