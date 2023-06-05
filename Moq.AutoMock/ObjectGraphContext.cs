@@ -7,6 +7,8 @@ namespace Moq.AutoMock;
 /// </summary>
 public class ObjectGraphContext
 {
+    private List<string>? _diagnostics;
+
     /// <summary>
     /// Creates an instance with binding flags set according to `enablePrivate`.
     /// </summary>
@@ -43,7 +45,20 @@ public class ObjectGraphContext
     /// </summary>
     public HashSet<Type> VisitedTypes { get; }
 
+    /// <summary>
+    /// A list of diagnostic messages.
+    /// </summary>
+    public IReadOnlyList<string> DiagnosticMessages => _diagnostics ?? (IReadOnlyList<string>)Array.Empty<string>();
 
+    /// <summary>
+    /// Add a new diagnostic message to this context.
+    /// </summary>
+    /// <param name="message">The message to be added</param>
+    public void AddDiagnosticMessage(string message)
+    {
+        _diagnostics ??= new();
+        _diagnostics.Add(message);
+    }
 
     private static BindingFlags GetBindingFlags(bool enablePrivate)
     {

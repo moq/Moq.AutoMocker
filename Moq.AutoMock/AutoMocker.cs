@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
+using System.Text;
 using Moq.AutoMock.Resolvers;
 using Moq.Language;
 using Moq.Language.Flow;
@@ -220,9 +221,9 @@ public partial class AutoMocker : IServiceProvider
         var context = new ObjectGraphContext(enablePrivate);
         if (!TryGetConstructorInvocation(type, context, out ConstructorInfo? ctor, out IInstance[]? arguments))
         {
-            throw new ArgumentException(
+            throw new ObjectCreationException(
                 $"Did not find a best constructor for `{type}`. If any type in the hierarchy has a non-public constructor, set the 'enablePrivate' parameter to true for this {nameof(AutoMocker)} method.",
-                nameof(type));
+                context.DiagnosticMessages);
         }
 
         try
@@ -1020,14 +1021,14 @@ public partial class AutoMocker : IServiceProvider
         [NotNullWhen(true)] out ConstructorInfo? constructor,
         [NotNullWhen(true)] out IInstance[]? arguments)
     {
-        IEnumerable<ConstructorInfo> ctors = type
+        IEnumerable<ConstructorInfo> constructors = type
             .GetConstructors(context.BindingFlags)
             .OrderByDescending(x => x.GetParameters().Length)
             .Concat(new[] { Empty(type) })
             .Where(x => x is not null)!;
 
         context.VisitedTypes.Add(type);
-        foreach (var ctor in ctors)
+        foreach (var ctor in constructors)
         {
             if (TryCreateArguments(ctor, context, out IInstance[] args))
             {
@@ -1053,6 +1054,7 @@ public partial class AutoMocker : IServiceProvider
                 ObjectGraphContext parameterContext = new(context);
                 if (!TryGet(parameters[i].ParameterType, parameterContext, out IInstance? service))
                 {
+                    context.AddDiagnosticMessage($"Rejecting constructor {GetConstructorDisplayString(constructor)}, because {nameof(AutoMocker)} was unable to create parameter '{parameters[i].ParameterType.FullName} {parameters[i].Name}'");
                     return false;
                 }
 
@@ -1062,6 +1064,26 @@ public partial class AutoMocker : IServiceProvider
             return true;
         }
 
+        static string GetConstructorDisplayString(ConstructorInfo constructor)
+        {
+            StringBuilder sb = new();
+            sb.Append(constructor.DeclaringType?.FullName);
+            sb.Append("(");
+            ParameterInfo[] parameters = constructor.GetParameters();
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                sb.Append(parameters[i].ParameterType.FullName);
+                sb.Append(' ');
+                sb.Append(parameters[i].Name);
+                if (i < parameters.Length - 1)
+                {
+                    sb.Append(", ");
+                }
+            }
+            sb.Append(")");
+
+            return sb.ToString();
+        }
     }
 
     private void EnsureCached(Type type, IInstance instance)
