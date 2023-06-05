@@ -149,7 +149,7 @@ public class DescribeCreateInstance
         // I could see this changing to something else in the future, like null. Right now, it seems
         // best to cause early failure to clarify what went wrong. Also, returning null "allows" the
         // behavior, so it's easier to move that direction later without breaking backward compatibility.
-        ArgumentException e = Assert.ThrowsException<ArgumentException>(mocker.CreateInstance<WithRecursiveDependency>);
+        ObjectCreationException e = Assert.ThrowsException<ObjectCreationException>(mocker.CreateInstance<WithRecursiveDependency>);
         Assert.IsTrue(e.Message.StartsWith($"Did not find a best constructor for `{typeof(WithRecursiveDependency)}`"));
     }
 
@@ -193,6 +193,31 @@ public class DescribeCreateInstance
         Assert.AreSame(constructed.Service, constructed.Dependency.Service);
     }
 
+    [TestMethod]
+    public void It_includes_reason_why_constructor_was_rejected()
+    {
+        AutoMocker mocker = new();
+
+        ObjectCreationException ex = Assert.ThrowsException<ObjectCreationException>(() => mocker.CreateInstance<HasStringParameter>());
+
+        Assert.AreEqual(1, ex.DiagnosticMessages.Count);
+        Assert.AreEqual("Rejecting constructor Moq.AutoMock.Tests.DescribeCreateInstance+HasStringParameter(System.String string), because AutoMocker was unable to create parameter 'System.String string'", ex.DiagnosticMessages[0]);
+    }
+
+    [TestMethod]
+    public void It_includes_reason_why_nested_constructor_was_rejected()
+    {
+        AutoMocker mocker = new();
+        //Need to remove this resolver to prevent AM from attempting to simply mock the values (which will throw a Moq exception)
+        mocker.Resolvers.Remove(mocker.Resolvers.OfType<MockResolver>().Single());
+
+        ObjectCreationException ex = Assert.ThrowsException<ObjectCreationException>(() => mocker.CreateInstance<HasMultipleConstructors>());
+
+        Assert.AreEqual(2, ex.DiagnosticMessages.Count);
+        Assert.AreEqual("Rejecting constructor Moq.AutoMock.Tests.DescribeCreateInstance+HasMultipleConstructors(Moq.AutoMock.Tests.DescribeCreateInstance+HasMultipleConstructorsNested nested), because AutoMocker was unable to create parameter 'Moq.AutoMock.Tests.DescribeCreateInstance+HasMultipleConstructorsNested nested'", ex.DiagnosticMessages[0]);
+        Assert.AreEqual("Rejecting constructor Moq.AutoMock.Tests.DescribeCreateInstance+HasMultipleConstructors(Moq.AutoMock.Tests.DescribeCreateInstance+HasStringParameter hasString), because AutoMocker was unable to create parameter 'Moq.AutoMock.Tests.DescribeCreateInstance+HasStringParameter hasString'", ex.DiagnosticMessages[1]);
+    }
+
     private class CustomStringResolver : IMockResolver
     {
         public CustomStringResolver(string stringValue)
@@ -221,6 +246,26 @@ public class DescribeCreateInstance
         public string String { get; }
     }
 
+    public class HasMultipleConstructors
+    {
+        public HasMultipleConstructors(HasMultipleConstructorsNested nested)
+        {
+            
+        }
+
+        public HasMultipleConstructors(HasStringParameter hasString)
+        {
+            
+        }
+    }
+
+    public class HasMultipleConstructorsNested
+    {
+        public HasMultipleConstructorsNested(HasStringParameter hasString)
+        {
+            
+        }
+    }
 
     public record class ConcreteDependency(IService1 Service);
     public record class ConcreteDependencyIsFirst(ConcreteDependency Dependency, IService1 Service);
