@@ -513,32 +513,52 @@ public partial class AutoMocker : IServiceProvider
     /// </summary>
     /// <typeparam name="TService">The service type</typeparam>
     /// <typeparam name="TImplementation">The service implementation type</typeparam>
-    public void With<TService, TImplementation>()
+    /// <returns>The created instance</returns>
+    public TImplementation With<TService, TImplementation>()
         where TImplementation : class, TService
-        => Use<TService>(CreateInstance<TImplementation>());
+    {
+        TImplementation instance = CreateInstance<TImplementation>();
+        Use<TService>(instance);
+        return instance;
+    }
 
     /// <summary>
     /// Creates an instance of <typeparamref name="TImplementation"/> and registers it as for service type <typeparamref name="TImplementation"/>.
     /// This is a convenience method for Use&lt;<typeparamref name="TImplementation"/>&gt;(CreateInstance&lt;<typeparamref name="TImplementation"/>&gt;())
     /// </summary>
     /// <typeparam name="TImplementation">The service implementation type</typeparam>
-    public void With<TImplementation>()
+    /// <returns>The created instance</returns>
+    public TImplementation With<TImplementation>()
         where TImplementation : class
-        => Use(CreateInstance<TImplementation>());
+    {
+        TImplementation instance = CreateInstance<TImplementation>();
+        Use(instance);
+        return instance;
+    }
 
     /// <summary>
     /// Creates an instance of <paramref name="implementationType"/> and registers it for service type <paramref name="serviceType"/>.
     /// This is a convenience method for Use(<paramref name="serviceType"/>, CreateInstance(<paramref name="implementationType"/>))
     /// </summary>
-    public void With(Type serviceType, Type implementationType)
-        => Use(serviceType, CreateInstance(implementationType));
+    /// <returns>The created instance</returns>
+    public object With(Type serviceType, Type implementationType)
+    {
+        object instance = CreateInstance(implementationType);
+        Use(serviceType, instance);
+        return instance;
+    }
 
     /// <summary>
     /// Creates an instance of <paramref name="implementationType"/> and registers it for service type <paramref name="implementationType"/>.
     /// This is a convenience method for Use(<paramref name="implementationType"/>, CreateInstance(<paramref name="implementationType"/>))
     /// </summary>
-    public void With(Type implementationType)
-        => Use(implementationType, CreateInstance(implementationType));
+    /// <returns>The created instance</returns>
+    public object With(Type implementationType)
+    {
+        object instance = CreateInstance(implementationType);
+        Use(implementationType, instance);
+        return instance;
+    }
 
     #endregion Use
 
