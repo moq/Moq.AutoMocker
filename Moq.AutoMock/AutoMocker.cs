@@ -7,9 +7,6 @@ using Moq.AutoMock.Extensions;
 using Moq.AutoMock.Resolvers;
 using Moq.Language;
 using Moq.Language.Flow;
-#if NET45
-using Array = Moq.AutoMock.Resolvers.Array;
-#endif
 
 namespace Moq.AutoMock;
 
@@ -257,7 +254,7 @@ public partial class AutoMocker : IServiceProvider
     /// </summary> 
     /// <typeparam name="T">The instance that you want to build</typeparam> 
     /// <returns>An instance with virtual and abstract members mocked</returns> 
-    public T CreateSelfMock<T>() where T : class?
+    public T CreateSelfMock<T>() where T : class
         => CreateSelfMock<T>(false);
 
     /// <summary>
@@ -269,7 +266,7 @@ public partial class AutoMocker : IServiceProvider
     /// <typeparam name="T">The instance that you want to build</typeparam> 
     /// <param name="enablePrivate">When true, non-public constructors will also be used to create mocks.</param> 
     /// <returns>An instance with virtual and abstract members mocked</returns> 
-    public T CreateSelfMock<T>(bool enablePrivate) where T : class?
+    public T CreateSelfMock<T>(bool enablePrivate) where T : class
         => CreateSelfMock<T>(enablePrivate, MockBehavior, DefaultValue, null, CallBase);
 
     /// <summary>
@@ -281,7 +278,7 @@ public partial class AutoMocker : IServiceProvider
     /// <typeparam name="T">The instance that you want to build</typeparam> 
     /// <param name="enablePrivate">When true, non-public constructors will also be used to create mocks.</param>
     /// <param name="mockBehavior">Sets the Behavior property on the created Mock.</param>
-    /// <param name="defaultValue">Sets the DefaultValue propert on the created Mock.</param>
+    /// <param name="defaultValue">Sets the DefaultValue property on the created Mock.</param>
     /// <param name="defaultValueProvider">The instance that will be used to produce default return values for unexpected invocations.</param>
     /// <param name="callBase">Sets the CallBase property on the created Mock.</param>
     /// <returns>An instance with virtual and abstract members mocked</returns>
@@ -291,7 +288,7 @@ public partial class AutoMocker : IServiceProvider
         DefaultValue? defaultValue = null,
         DefaultValueProvider? defaultValueProvider = null,
         bool? callBase = null)
-        where T : class?
+        where T : class
     {
         return BuildSelfMock<T>(enablePrivate, mockBehavior ?? MockBehavior, defaultValue ?? DefaultValue, defaultValueProvider ?? DefaultValueProvider, callBase ?? CallBase).Object;
     }
@@ -428,7 +425,7 @@ public partial class AutoMocker : IServiceProvider
     }
 
     private Mock<T> BuildSelfMock<T>(bool enablePrivate, MockBehavior mockBehavior, DefaultValue defaultValue, DefaultValueProvider? defaultValueProvider, bool callBase)
-        where T : class?
+        where T : class
     {
         var context = new ObjectGraphContext(enablePrivate);
         return CreateMock(typeof(T), mockBehavior, defaultValue, defaultValueProvider, callBase, context) is Mock<T> mock

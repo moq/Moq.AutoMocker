@@ -52,10 +52,14 @@ public class CombineGenerator : ISourceGenerator
                     "Combines all given types so that they are mocked by the same",
                     @"mock. Some IoC containers call this ""Forwarding"" one type to",
                     "other interfaces. In the end, this just means that all given",
-                    "types will be implemnted by the same instance.",
-            }.SelectMany(text => new[] { XmlNewLine(Environment.NewLine), XmlText($" {text}") })
-            .Concat(new[] { XmlNewLine(Environment.NewLine), XmlText(" ") })
+                    "types will be implemented by the same instance.",
+            }.SelectMany(text => new[] { XmlNewLine(NewLine), XmlText($" {text}") })
+            .Concat(new[] { XmlNewLine(NewLine), XmlText(" ") })
             .ToArray()
         ),
-        XmlText($"{Environment.NewLine}        "));
+        XmlText($"{NewLine}        "));
+
+    //A new line that will respect the checked out state of auto.crlf
+    private const string NewLine = @"
+";
 }

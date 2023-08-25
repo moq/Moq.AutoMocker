@@ -35,7 +35,7 @@ public class DescribeCreateInstance
     {
         var mocker = new AutoMocker();
         var instance = mocker.CreateInstance<WithServiceInternal>(true);
-        Assert.IsNotNull(Mock.Get(instance.Service));
+        Assert.IsNotNull(Mock.Get(instance.Service!));
     }
 
     [TestMethod]
