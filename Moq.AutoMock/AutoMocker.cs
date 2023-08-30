@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Text;
+using Moq.AutoMock.Extensions;
 using Moq.AutoMock.Resolvers;
 using Moq.Language;
 using Moq.Language.Flow;
@@ -78,7 +79,7 @@ public partial class AutoMocker : IServiceProvider
             new LazyResolver(),
             new FuncResolver(),
             new CancellationTokenResolver(),
-            new MockResolver(mockBehavior, defaultValue, defaultValueProvider, callBase),
+            new MockResolver(mockBehavior, defaultValue, defaultValueProvider, callBase)
         };
     }
 
@@ -219,6 +220,12 @@ public partial class AutoMocker : IServiceProvider
         if (type is null) throw new ArgumentNullException(nameof(type));
 
         var context = new ObjectGraphContext(enablePrivate);
+
+        return CreateInstanceInternal(type, context);
+    }
+
+    internal object CreateInstanceInternal(Type type, ObjectGraphContext context)
+    {
         if (!TryGetConstructorInvocation(type, context, out ConstructorInfo? ctor, out IInstance[]? arguments))
         {
             throw new ObjectCreationException(
@@ -987,6 +994,10 @@ public partial class AutoMocker : IServiceProvider
 
     internal Mock? CreateMock(Type serviceType, MockBehavior mockBehavior, DefaultValue defaultValue, DefaultValueProvider? defaultValueProvider, bool callBase, ObjectGraphContext objectGraphContext)
     {
+        if (!serviceType.IsMockable())
+        {
+            return null;
+        }
         var mockType = typeof(Mock<>).MakeGenericType(serviceType);
 
         bool mayHaveDependencies = serviceType.IsClass
