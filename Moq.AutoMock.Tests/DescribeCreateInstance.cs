@@ -206,7 +206,7 @@ public class DescribeCreateInstance
     public void It_includes_reason_why_nested_constructor_was_rejected()
     {
         AutoMocker mocker = new();
-        //Need to remove these resolvers to prevent AM from attempting to simply mock the values (which will throw a Moq exception), or create an instance
+        //Need to remove this resolver to prevent AM from attempting to simply mock the values (which will throw a Moq exception)
         mocker.Resolvers.Remove(mocker.Resolvers.OfType<MockResolver>().Single());
 
         ObjectCreationException ex = Assert.ThrowsException<ObjectCreationException>(() => mocker.CreateInstance<HasMultipleConstructors>());
