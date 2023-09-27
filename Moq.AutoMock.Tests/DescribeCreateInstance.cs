@@ -1,7 +1,5 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿
 using Moq.AutoMock.Resolvers;
-using Moq.AutoMock.Tests.Util;
 
 namespace Moq.AutoMock.Tests;
 
@@ -218,6 +216,16 @@ public class DescribeCreateInstance
         Assert.AreEqual("Rejecting constructor Moq.AutoMock.Tests.DescribeCreateInstance+HasMultipleConstructors(Moq.AutoMock.Tests.DescribeCreateInstance+HasStringParameter hasString), because AutoMocker was unable to create parameter 'Moq.AutoMock.Tests.DescribeCreateInstance+HasStringParameter hasString'", ex.DiagnosticMessages[1]);
     }
 
+    [TestMethod]
+    public void It_can_create_instances_of_nested_sealed_classes()
+    {
+        AutoMocker mocker = new();
+        mocker.Resolvers.Add(new InstanceResolver());
+        var mockWithSealedService = mocker.CreateInstance<HasNestedSealedService>();
+
+        Assert.AreEqual(mockWithSealedService.SealedService, mockWithSealedService.NestedSealedService.SealedService);
+    }
+
     private class CustomStringResolver : IMockResolver
     {
         public CustomStringResolver(string stringValue)
@@ -264,6 +272,18 @@ public class DescribeCreateInstance
         public HasMultipleConstructorsNested(HasStringParameter hasString)
         {
             
+        }
+    }
+
+    public class HasNestedSealedService
+    {
+        public SealedService SealedService { get; set; }
+        public WithSealedService NestedSealedService { get; set; }
+
+        public HasNestedSealedService(SealedService sealedService, WithSealedService nestedSealedService)
+        {
+            SealedService = sealedService;
+            NestedSealedService = nestedSealedService;
         }
     }
 

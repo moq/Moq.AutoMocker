@@ -82,4 +82,12 @@ public class DescribeGetMock
         var service = mocker.GetService(typeof(string));
         Assert.IsNull(service);
     }
+
+    [TestMethod]
+    public void It_throws_when_mocking_a_sealed_class()
+    {
+        var mocker = new AutoMocker();
+        var act = () => mocker.GetMock<SealedService>();
+        Assert.ThrowsException<ArgumentException>(act);
+    }
 }
