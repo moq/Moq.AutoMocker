@@ -54,7 +54,7 @@ jobs:
         dotnet pack --configuration Release --verbosity normal --output .
     
     - name: Upload NuGet
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: NuGet
         if-no-files-found: error
