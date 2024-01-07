@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 
@@ -25,10 +26,14 @@ public class UnitTestSourceGenerator : ISourceGenerator
         }
 
         var testingFramework = GetTestingFramework(context.Compilation.ReferencedAssemblyNames);
-
         foreach (GeneratorTargetClass testClass in rx.TestClasses)
         {
             StringBuilder builder = new();
+
+            if (testClass.Sut!.Alias != context.Compilation.GlobalNamespace.ToDisplayString())
+            {
+                builder.AppendLine($"extern alias {testClass.Sut.Alias};");
+            }
 
             builder.AppendLine($"namespace {testClass.Namespace}");
             builder.AppendLine("{");
@@ -82,7 +87,7 @@ public class UnitTestSourceGenerator : ISourceGenerator
                     builder.AppendLine($"            var {parameter.Name} = mocker.Get<{parameter.ParameterType}>();");
                 }
 
-                string constructorInvocation = $"_ = new {testClass.Sut!.FullName}({string.Join(",", GetParameterNames(test))})";
+                string constructorInvocation = $"_ = new {testClass.Sut!.FullName}({string.Join(", ", GetParameterNames(test))})";
 
                 switch (testingFramework)
                 {
@@ -106,7 +111,6 @@ public class UnitTestSourceGenerator : ISourceGenerator
 
             builder.AppendLine("    }");
             builder.AppendLine("}");
-
             context.AddSource($"{testClass.TestClassName}.g.cs", builder.ToString());
 
         }

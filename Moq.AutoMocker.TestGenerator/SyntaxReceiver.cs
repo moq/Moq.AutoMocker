@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -57,12 +59,13 @@ public class SyntaxReceiver : ISyntaxContextReceiver
             SutClass sut = new()
             {
                 Name = sutType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat),
-                FullName = sutType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+                FullName = GetAssemblyQualifiedName(sutType),
+                Alias = GetAssemblyAlias(sutType)
             };
 
             foreach (IMethodSymbol ctor in sutType.Constructors)
             {
-                var parameters = ctor.Parameters.Select(x => new Parameter(x)).ToList();
+                var parameters = ctor.Parameters.Select(x => new Parameter(x.Name, GetAssemblyQualifiedName(x.Type))).ToList();
                 int nullIndex = 0;
                 foreach (IParameterSymbol parameter in ctor.Parameters)
                 {
@@ -85,6 +88,21 @@ public class SyntaxReceiver : ISyntaxContextReceiver
             };
 
             TestClasses.Add(targetClass);
+        }
+
+        string? GetAssemblyAlias(ISymbol symbol)
+        {
+            return context.SemanticModel.Compilation.GetMetadataReference(symbol.ContainingAssembly)?.Properties.Aliases.FirstOrDefault();
+        }
+
+        string GetAssemblyQualifiedName(ITypeSymbol type)
+        {
+            string? alias = GetAssemblyAlias(type);
+            if (alias != null)
+            {
+                return $"{alias}::{type.ToDisplayString()}";
+            }
+            return type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
         }
     }
 }

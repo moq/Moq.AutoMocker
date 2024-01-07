@@ -1,3 +1,9 @@
+extern alias ExternExample;
+
+using Castle.Core.Logging;
+using System.Xml.Linq;
+using Controller = ExternExample::Moq.AutoMock.Generator.Example.Controller;
+
 namespace Moq.AutoMock.Generator.Example.xUnit;
 
 [ConstructorTests(TargetType = typeof(Controller))]

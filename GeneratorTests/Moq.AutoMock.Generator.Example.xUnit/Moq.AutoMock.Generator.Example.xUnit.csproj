@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
 
     <IsPackable>false</IsPackable>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
@@ -34,7 +33,9 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\Moq.AutoMocker.Generator.Example\Moq.AutoMock.Generator.Example.csproj" />
+    <ProjectReference Include="..\Moq.AutoMocker.Generator.Example\Moq.AutoMock.Generator.Example.csproj">
+      <Aliases>ExternExample</Aliases>
+    </ProjectReference>
   </ItemGroup>
 
 </Project>

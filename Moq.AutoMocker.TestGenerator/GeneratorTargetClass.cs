@@ -15,6 +15,7 @@ public class SutClass
 {
     public string? Name { get; set; }
     public string? FullName { get; set; }
+    public string? Alias { get; set; }
 
     public List<NullConstructorParameterTest> NullConstructorParameterTests { get; } = new();
 }
@@ -29,12 +30,13 @@ public class NullConstructorParameterTest
 
 public class Parameter
 {
-    public Parameter(IParameterSymbol symbol)
+    public Parameter(string name, string fullName)
     {
-        Symbol = symbol;
+        Name = name;
+        ParameterType = fullName;
     }
-    private  IParameterSymbol Symbol { get; }
 
-    public string Name => Symbol.Name;
-    public string ParameterType => Symbol.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+    public string Name { get; }
+
+    public string ParameterType { get; }
 }
