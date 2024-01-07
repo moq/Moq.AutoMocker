@@ -52,6 +52,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="..\Moq.AutoMocker.TestGenerator\bin\Debug\netstandard2.0\Moq.AutoMocker.TestGenerator.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Update="Resources\Strings.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <StronglyTypedNamespace>$(AssemblyName).Resources</StronglyTypedNamespace>
