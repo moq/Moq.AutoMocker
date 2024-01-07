@@ -96,7 +96,7 @@ public class UnitTestSourceGenerator : ISourceGenerator
                         break;
                     case TargetTestingFramework.NUnit:
                         builder.AppendLine($"            System.ArgumentNullException ex = global::NUnit.Framework.Assert.Throws<System.ArgumentNullException>(() => {constructorInvocation});");
-                        builder.AppendLine($"            global::NUnit.Framework.Assert.AreEqual(\"{test.NullParameterName}\", ex.ParamName);");
+                        builder.AppendLine($"            global::NUnit.Framework.Assert.That(\"{test.NullParameterName}\" == ex.ParamName);");
                         break;
                 }
 

@@ -29,11 +29,11 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
+    <PackageReference Include="Microsoft.SourceLink.GitHub">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Moq" Version="4.20.69" />
-    <PackageReference Include="NonBlocking" Version="2.1.2" />
+    <PackageReference Include="Moq" />
+    <PackageReference Include="NonBlocking" />
     <ProjectReference Include="../Generators/Generators.csproj">
       <OutputItemType>Analyzer</OutputItemType>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
