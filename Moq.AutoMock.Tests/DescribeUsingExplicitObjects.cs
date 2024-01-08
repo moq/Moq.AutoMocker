@@ -30,6 +30,27 @@ public class DescribeUsingExplicitObjects
     }
 
     [TestMethod]
+    public void You_can_use_Use_to_explicitly_set_null_for_a_service()
+    {
+        var mocker = new AutoMocker();
+        IService2? service = null;
+        mocker.Use<IService2>(service);
+        var instance = mocker.CreateInstance<WithService>();
+        Assert.IsNull(instance.Service);
+    }
+
+    [TestMethod]
+    public void You_can_use_non_generic_Use_to_explicitly_set_null_for_a_service()
+    {
+        var mocker = new AutoMocker();
+        IService2? service = null;
+        mocker.Use(typeof(IService2), service);
+        var instance = mocker.CreateInstance<WithService>();
+
+        Assert.IsNull(instance.Service);
+    }
+
+    [TestMethod]
     public void Adding_an_instance_will_replace_existing_setups()
     {
         var mocker = new AutoMocker();

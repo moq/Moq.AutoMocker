@@ -304,7 +304,7 @@ public partial class AutoMocker : IServiceProvider
     /// <typeparam name="TImplementation">The implementation type</typeparam>
     /// <param name="enablePrivate">When true, non-public constructors will also be used to create mocks.</param>
     /// <param name="mockBehavior">Sets the Behavior property on the created Mock.</param>
-    /// <param name="defaultValue">Sets the DefaultValue propert on the created Mock.</param>
+    /// <param name="defaultValue">Sets the DefaultValue property on the created Mock.</param>
     /// <param name="defaultValueProvider">The instance that will be used to produce default return values for unexpected invocations.</param>
     /// <param name="callBase">Sets the CallBase property on the created Mock.</param>
     /// <returns>An instance with virtual and abstract members mocked</returns> 
@@ -338,7 +338,7 @@ public partial class AutoMocker : IServiceProvider
     /// <typeparam name="T">The service type</typeparam>
     /// <param name="enablePrivate">When true, non-public constructors will also be used to create mocks.</param>
     /// <param name="mockBehavior">Sets the Behavior property on the created Mock.</param>
-    /// <param name="defaultValue">Sets the DefaultValue propert on the created Mock.</param>
+    /// <param name="defaultValue">Sets the DefaultValue property on the created Mock.</param>
     /// <param name="defaultValueProvider">The instance that will be used to produce default return values for unexpected invocations.</param>
     /// <param name="callBase">Sets the CallBase property on the created Mock.</param>
     /// <returns>An instance with virtual and abstract members mocked</returns> 
@@ -366,7 +366,7 @@ public partial class AutoMocker : IServiceProvider
     /// <param name="implementationType">The implementation type of the service.</param>
     /// <param name="enablePrivate">When true, non-public constructors will also be used to create mocks.</param>
     /// <param name="mockBehavior">Sets the Behavior property on the created Mock.</param>
-    /// <param name="defaultValue">Sets the DefaultValue propert on the created Mock.</param>
+    /// <param name="defaultValue">Sets the DefaultValue property on the created Mock.</param>
     /// <param name="defaultValueProvider">The instance that will be used to produce default return values for unexpected invocations.</param>
     /// <param name="callBase">Sets the CallBase property on the created Mock.</param>
     /// <returns>An instance with virtual and abstract members mocked</returns> 
@@ -401,7 +401,7 @@ public partial class AutoMocker : IServiceProvider
     /// <param name="implementationType">The implementation type of the service.</param>
     /// <param name="enablePrivate">When true, non-public constructors will also be used to create mocks.</param>
     /// <param name="mockBehavior">Sets the Behavior property on the created Mock.</param>
-    /// <param name="defaultValue">Sets the DefaultValue propert on the created Mock.</param>
+    /// <param name="defaultValue">Sets the DefaultValue property on the created Mock.</param>
     /// <param name="defaultValueProvider">The instance that will be used to produce default return values for unexpected invocations.</param>
     /// <param name="callBase">Sets the CallBase property on the created Mock.</param>
     /// <returns>An instance with virtual and abstract members mocked</returns> 
@@ -453,15 +453,15 @@ public partial class AutoMocker : IServiceProvider
     /// </summary>
     /// <typeparam name="TService">The type that the instance will be registered as</typeparam>
     /// <param name="service"></param>
-    public void Use<TService>([DisallowNull] TService service)
-        => Use(typeof(TService), service ?? throw new ArgumentNullException(nameof(service)));
+    public void Use<TService>(TService? service)
+        => Use(typeof(TService), service);
 
     /// <summary>
     /// Adds an instance to the container.
     /// </summary>
     /// <param name="type">The type of service to use</param>
     /// <param name="service">The service to use</param>
-    public void Use(Type type, object service)
+    public void Use(Type type, object? service)
     {
         if (type is null) throw new ArgumentNullException(nameof(type));
         if (service != null && !type.IsInstanceOfType(service))
