@@ -1,14 +1,14 @@
 ﻿namespace Moq.AutoMock.Tests.Util;
 internal class CustomDefaultValueProvider : DefaultValueProvider
 {
-    public Dictionary<Type, object?> DefaultValues { get; } = new();
+    public Dictionary<Type, object> DefaultValues { get; } = new();
 
-    protected override object? GetDefaultValue(Type type, Mock mock)
+    protected override object GetDefaultValue(Type type, Mock mock)
     {
         if (DefaultValues.TryGetValue(type, out object? value))
         {
             return value;
         }
-        return null;
+        throw new NotImplementedException();
     }
 }
