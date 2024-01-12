@@ -67,12 +67,32 @@ public class DescribeGetMock
     }
 
     [TestMethod]
+    public void It_returns_same_mock_via_get()
+    {
+        var mocker = new AutoMocker();
+        var service1 = mocker.Get(typeof(Empty));
+        var service2 = mocker.Get(typeof(Empty));
+
+        Assert.AreEqual(service1, service2);
+    }
+
+    [TestMethod]
     public void It_gets_mocked_object_via_iserviceprovider()
     {
         IServiceProvider mocker = new AutoMocker();
         var service = mocker.GetService(typeof(Empty));
         Assert.IsNotNull(service);
         Assert.IsInstanceOfType(service, typeof(Empty));
+    }
+
+    [TestMethod]
+    public void It_returns_same_mock_via_iserviceprovider()
+    {
+        IServiceProvider mocker = new AutoMocker();
+        var service1 = mocker.GetService(typeof(Empty));
+        var service2 = mocker.GetService(typeof(Empty));
+
+        Assert.AreEqual(service1, service2);
     }
 
     [TestMethod]

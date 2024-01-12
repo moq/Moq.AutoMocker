@@ -652,9 +652,15 @@ public partial class AutoMocker : IServiceProvider
     /// <inheritdoc />
     object? IServiceProvider.GetService(Type serviceType)
     {
-        return TryGet(serviceType, new ObjectGraphContext(false), out IInstance? service)
-            ? service.Value
-            : null;
+        if (TryGet(serviceType, new ObjectGraphContext(false), out IInstance? service))
+        {
+            if (TypeMap is { } typeMap && !typeMap.ContainsKey(serviceType))
+            {
+                typeMap[serviceType] = service;
+            }
+            return service.Value;
+        }
+        return null;
     }
 
     #endregion Get
