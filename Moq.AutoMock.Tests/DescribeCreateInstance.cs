@@ -233,7 +233,7 @@ public class DescribeCreateInstance
 
         PrimaryConstructor instance = mocker.CreateInstance<PrimaryConstructor>();
 
-        Assert.IsInstanceOfType(instance.Service, typeof(Service1));
+        Assert.IsInstanceOfType(instance.Service, typeof(IService1));
     }
 
     private class CustomStringResolver : IMockResolver
