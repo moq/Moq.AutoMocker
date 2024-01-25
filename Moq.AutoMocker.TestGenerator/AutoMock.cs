@@ -10,5 +10,5 @@ public static class AutoMock
 
     public const string NuGetPackageName = "Moq.AutoMock";
 
-
+    public const string IgnoreNullableParametersEnumValue = "IgnoreNullableParameters";
 }

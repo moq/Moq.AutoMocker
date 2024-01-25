@@ -38,6 +38,10 @@ public class Parameter
         {
             IsNullable = symbol.ExplicitDefaultValue is null;
         }
+        else if (symbol.NullableAnnotation is NullableAnnotation.Annotated)
+        {
+            IsNullable = true;
+        }
     }
     private  IParameterSymbol Symbol { get; }
 

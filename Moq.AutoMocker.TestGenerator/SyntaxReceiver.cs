@@ -1,7 +1,8 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Operations;
+
+using static Moq.AutoMocker.TestGenerator.AutoMock;
 
 namespace Moq.AutoMocker.TestGenerator;
 
@@ -28,7 +29,7 @@ public class SyntaxReceiver : ISyntaxContextReceiver
             attributeSyntax.ArgumentList!.Arguments
                 .Select(x => x.Expression)
                 .OfType<MemberAccessExpressionSyntax>()
-                .FirstOrDefault() is { Name.Identifier.ValueText: "SkipNullableReferenceTypes" };
+                .FirstOrDefault() is { Name.Identifier.ValueText: IgnoreNullableParametersEnumValue };
     }
 
     public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
@@ -36,7 +37,7 @@ public class SyntaxReceiver : ISyntaxContextReceiver
         if (context.Node is ClassDeclarationSyntax classDeclaration &&
             context.SemanticModel.GetDeclaredSymbol(classDeclaration) is INamedTypeSymbol symbol &&
             classDeclaration.AttributeLists.SelectMany(x => x.Attributes)
-                .Select(a => context.SemanticModel.GetTypeInfo(a).Type?.Name == AutoMock.ConstructorTestsAttribute ? a : null)
+                .Select(a => context.SemanticModel.GetTypeInfo(a).Type?.Name == ConstructorTestsAttribute ? a : null)
                 .FirstOrDefault(a => a is not null) is { } attribute)
         {
             if (!(GetTargetType(attribute) is { } targetType) ||

@@ -1,6 +1,6 @@
-﻿namespace Moq.AutoMock.Generator.Example.xUnit;
+namespace Moq.AutoMock.Generator.Example.xUnit;
 
-[ConstructorTests(typeof(ControllerString), Behavior = TestGenerationBehavior.SkipNullableReferenceTypes)]
+[ConstructorTests(typeof(ControllerString), Behavior = TestGenerationBehavior.IgnoreNullableParameters)]
 public partial class ControllerStringTests
 {
     partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName)
