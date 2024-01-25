@@ -8,9 +8,3 @@ public partial class ControllerStringTests
         mocker.Use<string>("");
     }
 }
-
-[ConstructorTests(typeof(Controller), Behavior = TestGenerationBehavior.SkipNullableReferenceTypes)]
-public partial class ControllerTests
-{
-
-}
