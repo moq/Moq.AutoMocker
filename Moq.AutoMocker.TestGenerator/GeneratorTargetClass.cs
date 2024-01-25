@@ -8,6 +8,8 @@ public class GeneratorTargetClass
     public string? TestClassName { get; set; }
 
     public SutClass? Sut { get; set; }
+
+    public bool SkipNullableReferenceTypes { get; set; }
 }
 
 

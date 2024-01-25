@@ -41,9 +41,12 @@ public class SyntaxReceiver : ISyntaxContextReceiver
                     }
                     return null;
                 })
-                .FirstOrDefault(a => a is not null) is { } sutType
-            )
+                .FirstOrDefault(a => a is not null) is { } sutType)
         {
+            // Check for the ConstructorTestsAttribute and its Behavior property
+            var constructorTestsAttribute = symbol.GetAttributes().FirstOrDefault(ad => ad.AttributeClass?.Name == nameof(AutoMock.ConstructorTestsAttribute));
+            bool skipNullableReferenceTypes = constructorTestsAttribute?.NamedArguments.FirstOrDefault(na => na.Key == "Behavior").Value.Value is TestGenerationBehavior behavior && behavior == TestGenerationBehavior.SkipNullableReferenceTypes;
+            
             if (!classDeclaration.Modifiers.Any(x => x.IsKind(SyntaxKind.PartialKeyword)))
             {
                 Diagnostic diagnostic = Diagnostics.TestClassesMustBePartial.Create(classDeclaration.GetLocation(),
@@ -81,7 +84,8 @@ public class SyntaxReceiver : ISyntaxContextReceiver
             {
                 Namespace = namespaceDeclaration,
                 TestClassName = testClassName,
-                Sut = sut
+                Sut = sut,
+                SkipNullableReferenceTypes = skipNullableReferenceTypes  // Set the property based on the attribute
             };
 
             TestClasses.Add(targetClass);

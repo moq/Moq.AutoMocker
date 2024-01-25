@@ -40,10 +40,15 @@ public class UnitTestSourceGenerator : ISourceGenerator
 
             HashSet<string> testNames = new();
 
-            foreach (var test in testClass.Sut?.NullConstructorParameterTests ?? Enumerable.Empty<NullConstructorParameterTest>())
+            foreach (NullConstructorParameterTest test in testClass.Sut?.NullConstructorParameterTests ?? Enumerable.Empty<NullConstructorParameterTest>())
             {
+                // If SkipNullableReferenceTypes is true and the parameter is a nullable reference type, skip it
+                if (testClass.SkipNullableReferenceTypes && test.Parameters.ElementAt(test.NullParameterIndex).ParameterType.EndsWith("?"))
+                {
+                    continue;
+                }
                 string testName = "";
-                foreach(var name in TestNameBuilder.CreateTestName(testClass, test))
+                foreach (var name in TestNameBuilder.CreateTestName(testClass, test))
                 {
                     if (testNames.Add(name))
                     {
@@ -115,7 +120,7 @@ public class UnitTestSourceGenerator : ISourceGenerator
         {
             for (int i = 0; i < test.Parameters?.Count; i++)
             {
-                yield return i == test.NullParameterIndex 
+                yield return i == test.NullParameterIndex
                     ? $"default({test.Parameters[i].ParameterType})"
                     : test.Parameters[i].Name;
             }
