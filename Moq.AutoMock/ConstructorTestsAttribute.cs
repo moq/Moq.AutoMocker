@@ -1,5 +1,4 @@
 ﻿namespace Moq.AutoMock;
-using Moq.AutoMocker.TestGenerator;
 /// <summary>
 /// An attribute used by Moq.AutoMock.TestGenerator to generate unit tests for null constructor arguments.
 /// </summary>
@@ -13,7 +12,7 @@ public class ConstructorTestsAttribute : Attribute
     /// <summary>
     /// Controls whether to generate tests for nullable reference types.
     /// </summary>
-    public TestGenerationBehavior Behavior { get; set; } = TestGenerationBehavior.Default;
+    public TestGenerationBehavior Behavior { get; set; }
     /// <summary>
     /// Create a new instance of the ConstructorTestsAttribute
     /// </summary>
@@ -27,4 +26,16 @@ public class ConstructorTestsAttribute : Attribute
     {
         TargetType = targetType;
     }
+
+    /// <summary>
+    /// Create a new instance of the ConstructorTestsAttribute specifying the targetType
+    /// </summary>
+    /// <param name="targetType"></param>
+    /// <param name="behavior"></param>
+    public ConstructorTestsAttribute(Type targetType, TestGenerationBehavior behavior)
+    {
+        TargetType = targetType;
+        Behavior = behavior;
+    }
 }
+

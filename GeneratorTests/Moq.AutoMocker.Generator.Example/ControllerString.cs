@@ -2,12 +2,14 @@
 
 public class ControllerString
 {
-    public ControllerString(string name, string? testName = null)
+    public ControllerString(string name, string? nullableName, string? testName = null)
     {
         Name = name ?? throw new ArgumentNullException(nameof(name));
+        NullableName = nullableName;
         TestName = testName;
     }
 
     public string Name { get; } = "";
+    public string? NullableName { get; }
     public string? TestName { get; }
 }

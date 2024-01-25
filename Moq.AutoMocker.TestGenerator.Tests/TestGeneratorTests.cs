@@ -184,6 +184,50 @@ public class Controller
         }.RunAsync();
     }
 
+    [TestMethod]
+    public async Task Generation_ParameterWithDefaultValue_DoesNotGenerateTest()
+    {
+        var code = @"
+using Moq.AutoMock;
+using System.Threading;
+
+namespace TestNamespace;
+
+[ConstructorTests(typeof(Controller), Behavior = TestGenerationBehavior.SkipNullableReferenceTypes)]
+public partial class ControllerTests
+{
+    
+}
+
+public class Controller
+{
+    public Controller(string token = null) { }
+}
+";
+        string expected = @"namespace TestNamespace
+{
+    partial class ControllerTests
+    {
+        partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+
+    }
+}
+";
+
+        await new VerifyCS.Test
+        {
+            TestCode = code,
+            TestState =
+            {
+                GeneratedSources =
+                {
+                    GetSourceFile(expected, "ControllerTests.g.cs")
+                }
+            }
+
+        }.RunAsync();
+    }
+
     private static (string FileName, SourceText SourceText) GetSourceFile(string content, string fileName)
     {
         return (Path.Combine("Moq.AutoMocker.TestGenerator", "Moq.AutoMocker.TestGenerator.UnitTestSourceGenerator", fileName), SourceText.From(content, Encoding.UTF8));

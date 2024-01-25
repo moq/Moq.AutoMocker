@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 
 namespace Moq.AutoMocker.TestGenerator;
@@ -42,8 +41,8 @@ public class UnitTestSourceGenerator : ISourceGenerator
 
             foreach (NullConstructorParameterTest test in testClass.Sut?.NullConstructorParameterTests ?? Enumerable.Empty<NullConstructorParameterTest>())
             {
-                // If SkipNullableReferenceTypes is true and the parameter is a nullable reference type, skip it
-                if (testClass.SkipNullableReferenceTypes && test.Parameters.ElementAt(test.NullParameterIndex).ParameterType.EndsWith("?"))
+                // If SkipNullableParameters is true and the parameter is a nullable reference type, skip it
+                if (testClass.SkipNullableParameters && test.Parameters?[test.NullParameterIndex].IsNullable == true)
                 {
                     continue;
                 }

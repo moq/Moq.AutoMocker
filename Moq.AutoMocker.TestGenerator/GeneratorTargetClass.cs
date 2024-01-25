@@ -9,7 +9,7 @@ public class GeneratorTargetClass
 
     public SutClass? Sut { get; set; }
 
-    public bool SkipNullableReferenceTypes { get; set; }
+    public bool SkipNullableParameters { get; set; }
 }
 
 
@@ -34,9 +34,14 @@ public class Parameter
     public Parameter(IParameterSymbol symbol)
     {
         Symbol = symbol;
+        if (symbol.HasExplicitDefaultValue)
+        {
+            IsNullable = symbol.ExplicitDefaultValue is null;
+        }
     }
     private  IParameterSymbol Symbol { get; }
 
+    public bool IsNullable { get; }
     public string Name => Symbol.Name;
     public string ParameterType => Symbol.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 }
