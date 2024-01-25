@@ -33,7 +33,10 @@ public class Parameter
 {
     public Parameter(IParameterSymbol symbol)
     {
-        Symbol = symbol;
+        Name = symbol.Name;
+        ParameterType = symbol.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+        IsValueType = symbol.Type.IsValueType;
+
         if (symbol.HasExplicitDefaultValue)
         {
             IsNullable = symbol.ExplicitDefaultValue is null;
@@ -42,13 +45,10 @@ public class Parameter
         {
             IsNullable = true;
         }
-
-        IsValueType = symbol.Type.IsValueType;
     }
-    private  IParameterSymbol Symbol { get; }
 
     public bool IsValueType { get; }
     public bool IsNullable { get; }
-    public string Name => Symbol.Name;
-    public string ParameterType => Symbol.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+    public string Name { get; }
+    public string ParameterType { get; }
 }
