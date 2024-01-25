@@ -41,6 +41,10 @@ public class UnitTestSourceGenerator : ISourceGenerator
 
             foreach (NullConstructorParameterTest test in testClass.Sut?.NullConstructorParameterTests ?? Enumerable.Empty<NullConstructorParameterTest>())
             {
+                if (test.Parameters?[test.NullParameterIndex].IsValueType == true)
+                {
+                    continue;
+                }
                 // If SkipNullableParameters is true and the parameter is a nullable reference type, skip it
                 if (testClass.SkipNullableParameters && test.Parameters?[test.NullParameterIndex].IsNullable == true)
                 {

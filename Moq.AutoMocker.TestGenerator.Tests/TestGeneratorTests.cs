@@ -370,6 +370,111 @@ public class Controller
         }.RunAsync();
     }
 
+    [TestMethod]
+    public async Task Generation_ParameterWithValueType_DoesNotGenerateTest()
+    {
+        var code = @"
+using Moq.AutoMock;
+using System.Threading;
+
+namespace TestNamespace;
+
+[ConstructorTests(typeof(Controller), TestGenerationBehavior.IgnoreNullableParameters)]
+public partial class ControllerTests
+{
+    
+}
+
+public class Controller
+{
+    public Controller(int years)
+    { }
+}
+";
+        string expected = @"namespace TestNamespace
+{
+    partial class ControllerTests
+    {
+        partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+
+    }
+}
+";
+
+        await new VerifyCS.Test
+        {
+            TestCode = code,
+            TestState =
+            {
+                GeneratedSources =
+                {
+                    GetSourceFile(expected, "ControllerTests.g.cs")
+                }
+            }
+
+        }.RunAsync();
+    }
+
+    [TestMethod]
+    public async Task Generation_ParametersTypesWithValueTypeBetweenReferenceTypes_OnlyGeneratesTestsForReferenceType()
+    {
+        var code = @"
+#nullable enable
+using Moq.AutoMock;
+using System.Threading;
+
+namespace TestNamespace;
+
+[ConstructorTests(typeof(Controller), TestGenerationBehavior.IgnoreNullableParameters)]
+public partial class ControllerTests
+{
+    
+}
+
+public class Controller
+{
+    public Controller(
+        string name,
+        int years,
+        string? nullableName)
+    { }
+}
+";
+        string expected = @"namespace TestNamespace
+{
+    partial class ControllerTests
+    {
+        partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+
+        partial void ControllerConstructor_WithNullstring_ThrowsArgumentNullExceptionSetup(Moq.AutoMock.AutoMocker mocker);
+
+        public void ControllerConstructor_WithNullstring_ThrowsArgumentNullException()
+        {
+            Moq.AutoMock.AutoMocker mocker = new Moq.AutoMock.AutoMocker();
+            AutoMockerTestSetup(mocker, ""ControllerConstructor_WithNullstring_ThrowsArgumentNullException"");
+            ControllerConstructor_WithNullstring_ThrowsArgumentNullExceptionSetup(mocker);
+            var years = mocker.Get<int>();
+            var nullableName = mocker.Get<string>();
+        }
+
+    }
+}
+";
+
+        await new VerifyCS.Test
+        {
+            TestCode = code,
+            TestState =
+            {
+                GeneratedSources =
+                {
+                    GetSourceFile(expected, "ControllerTests.g.cs")
+                }
+            }
+
+        }.RunAsync();
+    }
+
     private static (string FileName, SourceText SourceText) GetSourceFile(string content, string fileName)
     {
         return (Path.Combine("Moq.AutoMocker.TestGenerator", "Moq.AutoMocker.TestGenerator.UnitTestSourceGenerator", fileName), SourceText.From(content, Encoding.UTF8));

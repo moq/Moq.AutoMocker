@@ -3,18 +3,14 @@
 public class ControllerString
 {
     public ControllerString(
-        string name, 
+        string name,
+        int years,
         string? nullableName, 
         string? testName = null, 
         string foo = null!, 
-        int? i = null)
+        int? age = null)
     {
-        Name = name ?? throw new ArgumentNullException(nameof(name));
-        NullableName = nullableName;
-        TestName = testName;
+        ArgumentNullException.ThrowIfNull(name);
     }
 
-    public string Name { get; } = "";
-    public string? NullableName { get; }
-    public string? TestName { get; }
 }
