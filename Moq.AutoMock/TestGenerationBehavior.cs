@@ -12,9 +12,11 @@ public enum TestGenerationBehavior
 
     /// <summary>
     /// Skip parameters that meet one of the following criteria:
-    /// - Nullable reference types are enabled and the parameter type is a nullable reference type
-    /// - The parameter is a nullable value type
-    /// - The parameter has a default value of null
+    /// <list type="bullet">
+    /// <item><description>Nullable reference types are enabled and the parameter type is a nullable reference type</description></item>
+    /// <item><description>The parameter is a nullable value type</description></item>
+    /// <item><description>The parameter has a default value of null</description></item>
+    /// </list>
     /// </summary>
     IgnoreNullableParameters
 }
