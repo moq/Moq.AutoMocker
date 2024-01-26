@@ -88,7 +88,7 @@ public class SyntaxReceiver : ISyntaxContextReceiver
                 Namespace = namespaceDeclaration,
                 TestClassName = testClassName,
                 Sut = sut,
-                SkipNullableParameters = skipNullableParameters  // Set the property based on the attribute
+                SkipNullableParameters = skipNullableParameters
             };
 
             TestClasses.Add(targetClass);

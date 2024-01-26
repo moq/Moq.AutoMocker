@@ -45,7 +45,6 @@ public class UnitTestSourceGenerator : ISourceGenerator
                 {
                     continue;
                 }
-                // If SkipNullableParameters is true and the parameter is a nullable reference type, skip it
                 if (testClass.SkipNullableParameters && test.Parameters?[test.NullParameterIndex].IsNullable == true)
                 {
                     continue;

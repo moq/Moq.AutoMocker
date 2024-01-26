@@ -21,7 +21,7 @@ public class ConstructorTestsAttribute : Attribute
     /// <summary>
     /// Create a new instance of the ConstructorTestsAttribute specifying the targetType
     /// </summary>
-    /// <param name="targetType"></param>
+    /// <param name="targetType">The name for which the generator should generate tests for.</param>
     public ConstructorTestsAttribute(Type targetType)
     {
         TargetType = targetType;
@@ -30,12 +30,11 @@ public class ConstructorTestsAttribute : Attribute
     /// <summary>
     /// Create a new instance of the ConstructorTestsAttribute specifying the targetType
     /// </summary>
-    /// <param name="targetType"></param>
-    /// <param name="behavior"></param>
+    /// <param name="targetType">The name for which the generator should generate tests for.</param>
+    /// <param name="behavior">Sets the behavior for the test generator to operate with.</param>
     public ConstructorTestsAttribute(Type targetType, TestGenerationBehavior behavior)
     {
         TargetType = targetType;
         Behavior = behavior;
     }
 }
-
