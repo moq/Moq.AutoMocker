@@ -327,6 +327,51 @@ public class Controller
     }
 
     [TestMethod]
+    public async Task Generation_ParameterWithNullableStringAndDefaultValue_DoesNotGenerateTest()
+    {
+        var code = @"
+#nullable enable
+using Moq.AutoMock;
+using System.Threading;
+
+namespace TestNamespace;
+
+[ConstructorTests(typeof(Controller), TestGenerationBehavior.IgnoreNullableParameters)]
+public partial class ControllerTests
+{
+    
+}
+
+public class Controller
+{
+    public Controller(string? name = null) { }
+}
+";
+        string expected = @"namespace TestNamespace
+{
+    partial class ControllerTests
+    {
+        partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+
+    }
+}
+";
+
+        await new VerifyCS.Test
+        {
+            TestCode = code,
+            TestState =
+            {
+                GeneratedSources =
+                {
+                    GetSourceFile(expected, "ControllerTests.g.cs")
+                }
+            }
+
+        }.RunAsync();
+    }
+
+    [TestMethod]
     public async Task Generation_ParameterWithNullableValueType_DoesNotGenerateTest()
     {
         var code = @"
