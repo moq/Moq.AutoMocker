@@ -8,6 +8,8 @@ public class GeneratorTargetClass
     public string? TestClassName { get; set; }
 
     public SutClass? Sut { get; set; }
+
+    public bool SkipNullableParameters { get; set; }
 }
 
 
@@ -31,10 +33,22 @@ public class Parameter
 {
     public Parameter(IParameterSymbol symbol)
     {
-        Symbol = symbol;
-    }
-    private  IParameterSymbol Symbol { get; }
+        Name = symbol.Name;
+        ParameterType = symbol.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+        IsValueType = symbol.Type.IsValueType;
 
-    public string Name => Symbol.Name;
-    public string ParameterType => Symbol.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+        if (symbol.HasExplicitDefaultValue)
+        {
+            IsNullable = symbol.ExplicitDefaultValue is null;
+        }
+        else if (symbol.NullableAnnotation is NullableAnnotation.Annotated)
+        {
+            IsNullable = true;
+        }
+    }
+
+    public bool IsValueType { get; }
+    public bool IsNullable { get; }
+    public string Name { get; }
+    public string ParameterType { get; }
 }
