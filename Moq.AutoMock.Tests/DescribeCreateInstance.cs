@@ -226,6 +226,16 @@ public class DescribeCreateInstance
         Assert.AreEqual(mockWithSealedService.SealedService, mockWithSealedService.NestedSealedService.SealedService);
     }
 
+    [TestMethod]
+    public void It_can_create_instance_of_class_with_primary_constructor()
+    {
+        AutoMocker mocker = new();
+
+        PrimaryConstructor instance = mocker.CreateInstance<PrimaryConstructor>();
+
+        Assert.IsInstanceOfType(instance.Service, typeof(IService1));
+    }
+
     private class CustomStringResolver : IMockResolver
     {
         public CustomStringResolver(string stringValue)
