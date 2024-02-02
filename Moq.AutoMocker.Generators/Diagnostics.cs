@@ -1,10 +1,10 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace Moq.AutoMocker.TestGenerator;
+namespace Moq.AutoMocker.Generators;
 
 public static class Diagnostics
 {
-    private const string Category = "AutoMocker.TestGenerator";
+    private const string Category = "AutoMocker.Generators";
     public static class TestClassesMustBePartial
     {
         public const string DiagnosticId = "AMG0001";
@@ -25,7 +25,7 @@ public static class Diagnostics
     {
         public const string DiagnosticId = "AMG0002";
         private const string Title = $"Test projects must reference {AutoMock.AssemblyName}";
-        private const string MessageFormat = $"To use Moq.AutoMocker.TestGenerator, your test project must also reference {AutoMock.AssemblyName}";
+        private const string MessageFormat = $"To use Moq.AutoMocker.Generators, your test project must also reference {AutoMock.AssemblyName}";
         private const string Description = $"Add a reference to the {AutoMock.AssemblyName} assembly or reference the {AutoMock.NuGetPackageName} NuGet package by running \"Install-Package Moq.AutoMock\".";
 
         //NB: Do not make a property or use target-typed new expression

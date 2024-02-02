@@ -1,4 +1,4 @@
-﻿namespace Moq.AutoMocker.TestGenerator;
+﻿namespace Moq.AutoMocker.Generators;
 
 public static class AutoMock
 {

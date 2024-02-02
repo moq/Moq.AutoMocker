@@ -40,7 +40,7 @@
       <OutputItemType>Analyzer</OutputItemType>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\Moq.AutoMocker.TestGenerator\Moq.AutoMocker.TestGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\Moq.AutoMocker.Generators\Moq.AutoMocker.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>
@@ -48,11 +48,11 @@
     <None Include="..\assets\NuGetIcon.png" Pack="true" PackagePath="\" />
     <None Include="..\LICENSE" Pack="true" PackagePath="" />
     <Compile Include="..\System.Diagnostics.CodeAnalysis.cs" />
-    <None Include="..\Moq.AutoMocker.TestGenerator\bin\$(Configuration)\netstandard2.0\*.dll" Pack="True" PackagePath="analyzers\dotnet\cs" />
+    <None Include="..\Moq.AutoMocker.Generators\bin\$(Configuration)\netstandard2.0\*.dll" Pack="True" PackagePath="analyzers\dotnet\cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="..\Moq.AutoMocker.TestGenerator\bin\Debug\netstandard2.0\Moq.AutoMocker.TestGenerator.dll" />
+    <None Remove="..\Moq.AutoMocker.Generators\bin\Debug\netstandard2.0\Moq.AutoMocker.Generators.dll" />
   </ItemGroup>
 
   <ItemGroup>
