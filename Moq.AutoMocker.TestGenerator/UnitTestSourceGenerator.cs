@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 
 namespace Moq.AutoMocker.TestGenerator;
@@ -40,10 +39,18 @@ public class UnitTestSourceGenerator : ISourceGenerator
 
             HashSet<string> testNames = new();
 
-            foreach (var test in testClass.Sut?.NullConstructorParameterTests ?? Enumerable.Empty<NullConstructorParameterTest>())
+            foreach (NullConstructorParameterTest test in testClass.Sut?.NullConstructorParameterTests ?? Enumerable.Empty<NullConstructorParameterTest>())
             {
+                if (test.Parameters?[test.NullParameterIndex].IsValueType == true)
+                {
+                    continue;
+                }
+                if (testClass.SkipNullableParameters && test.Parameters?[test.NullParameterIndex].IsNullable == true)
+                {
+                    continue;
+                }
                 string testName = "";
-                foreach(var name in TestNameBuilder.CreateTestName(testClass, test))
+                foreach (var name in TestNameBuilder.CreateTestName(testClass, test))
                 {
                     if (testNames.Add(name))
                     {
@@ -115,7 +122,7 @@ public class UnitTestSourceGenerator : ISourceGenerator
         {
             for (int i = 0; i < test.Parameters?.Count; i++)
             {
-                yield return i == test.NullParameterIndex 
+                yield return i == test.NullParameterIndex
                     ? $"default({test.Parameters[i].ParameterType})"
                     : test.Parameters[i].Name;
             }
