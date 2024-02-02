@@ -89,42 +89,44 @@ public class Controller { }
     [Description("Issue 142")]
     public async Task Generation_WithGenericParameter_RemovesInvalidCharactersFromTestsName()
     {
-        var code = @"
-using Moq.AutoMock;
+        var code = """
+            using Moq.AutoMock;
 
-namespace TestNamespace;
+            namespace TestNamespace;
 
-[ConstructorTests(typeof(Controller))]
-public partial class ControllerTests
-{
+            [ConstructorTests(typeof(Controller))]
+            public partial class ControllerTests
+            {
     
-}
+            }
 
-public class Controller
-{
-    public Controller(ILogger<Controller> logger) { }
-}
+            public class Controller
+            {
+                public Controller(ILogger<Controller> logger) { }
+            }
 
-public interface ILogger<Controller> { }
-";
-        string expected = @"namespace TestNamespace
-{
-    partial class ControllerTests
-    {
-        partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+            public interface ILogger<Controller> { }
+            """;
+        string expected = """
+            namespace TestNamespace
+            {
+                partial class ControllerTests
+                {
+                    partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
 
-        partial void ControllerConstructor_WithNullILoggerController_ThrowsArgumentNullExceptionSetup(Moq.AutoMock.AutoMocker mocker);
+                    partial void ControllerConstructor_WithNullILoggerController_ThrowsArgumentNullExceptionSetup(Moq.AutoMock.AutoMocker mocker);
 
-        public void ControllerConstructor_WithNullILoggerController_ThrowsArgumentNullException()
-        {
-            Moq.AutoMock.AutoMocker mocker = new Moq.AutoMock.AutoMocker();
-            AutoMockerTestSetup(mocker, ""ControllerConstructor_WithNullILoggerController_ThrowsArgumentNullException"");
-            ControllerConstructor_WithNullILoggerController_ThrowsArgumentNullExceptionSetup(mocker);
-        }
+                    public void ControllerConstructor_WithNullILoggerController_ThrowsArgumentNullException()
+                    {
+                        Moq.AutoMock.AutoMocker mocker = new Moq.AutoMock.AutoMocker();
+                        AutoMockerTestSetup(mocker, "ControllerConstructor_WithNullILoggerController_ThrowsArgumentNullException");
+                        ControllerConstructor_WithNullILoggerController_ThrowsArgumentNullExceptionSetup(mocker);
+                    }
 
-    }
-}
-";
+                }
+            }
+
+            """;
 
         await new VerifyCS.Test
         {
