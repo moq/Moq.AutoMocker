@@ -24,6 +24,7 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <PackageIcon>NuGetIcon.png</PackageIcon>
     <NoWarn>$(NoWarn);AMG0002</NoWarn>
   </PropertyGroup>
 
@@ -42,6 +43,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\assets\NuGetIcon.png" Pack="true" PackagePath="\" />
     <None Include="..\LICENSE" Pack="true" PackagePath="" />
     <Compile Include="..\System.Diagnostics.CodeAnalysis.cs" />
     <None Include="..\Moq.AutoMocker.TestGenerator\bin\$(Configuration)\netstandard2.0\*.dll" Pack="True" PackagePath="analyzers\dotnet\cs" />
