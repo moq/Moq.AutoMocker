@@ -4,6 +4,8 @@ on:
   # PRs will be built, and a package posted to GH Packages
   pull_request:
   
+  workflow_dispatch:
+
   push:
     paths-ignore:
     - 'README.md'
@@ -30,9 +32,14 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v4
 
-  # Run unit tests
+    - name: NuGet restore
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+
     - name: Test
-      run: dotnet test --configuration Release --verbosity normal
+      run: dotnet test --configuration Release --no-build --verbosity normal
 
   # Package Release
     - name: Pack
