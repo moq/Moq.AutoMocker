@@ -22,6 +22,7 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PackageIcon>NuGetIcon.png</PackageIcon>
@@ -43,6 +44,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
     <None Include="..\assets\NuGetIcon.png" Pack="true" PackagePath="\" />
     <None Include="..\LICENSE" Pack="true" PackagePath="" />
     <Compile Include="..\System.Diagnostics.CodeAnalysis.cs" />
