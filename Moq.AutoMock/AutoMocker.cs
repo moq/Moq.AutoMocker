@@ -304,8 +304,8 @@ public partial class AutoMocker : IServiceProvider
     /// <param name="defaultValue">Sets the DefaultValue property on the created Mock.</param>
     /// <param name="defaultValueProvider">The instance that will be used to produce default return values for unexpected invocations.</param>
     /// <param name="callBase">Sets the CallBase property on the created Mock.</param>
-    /// <returns>An instance with virtual and abstract members mocked</returns> 
-    public TImplementation WithSelfMock<TService, TImplementation>(
+    /// <returns>A mock of the service</returns> 
+    public Mock<TService> WithSelfMock<TService, TImplementation>(
         bool enablePrivate = false,
         MockBehavior? mockBehavior = null,
         DefaultValue? defaultValue = null,
@@ -320,12 +320,15 @@ public partial class AutoMocker : IServiceProvider
             defaultValue ?? DefaultValue,
             defaultValueProvider ?? DefaultValueProvider,
             callBase ?? CallBase);
+
+        Mock<TService> serviceMock = selfMock.As<TService>();
+
         WithTypeMap(typeMap =>
         {
             typeMap[typeof(TImplementation)] = new MockInstance(selfMock);
-            typeMap[typeof(TService)] = new MockInstance(selfMock.As<TService>());
+            typeMap[typeof(TService)] = new MockInstance(serviceMock);
         });
-        return selfMock.Object;
+        return serviceMock;
     }
 
     /// <summary>

@@ -12,7 +12,7 @@ public class DescribeWithSelfMock
 
         var mock = mocker.WithSelfMock<IService2, Service2>(defaultValue: DefaultValue.Custom, defaultValueProvider: provider);
 
-        Assert.AreEqual(provider, Mock.Get(mock).DefaultValueProvider);
+        Assert.AreEqual(provider, mock.DefaultValueProvider);
     }
 
     [TestMethod]
@@ -24,7 +24,7 @@ public class DescribeWithSelfMock
 
         var mock = mocker.WithSelfMock<IService2, Service2>();
 
-        Assert.AreEqual(provider, Mock.Get(mock).DefaultValueProvider);
+        Assert.AreEqual(provider, mock.DefaultValueProvider);
     }
 
     [TestMethod]
@@ -97,6 +97,15 @@ public class DescribeWithSelfMock
         var mock = (Service2)mocker.WithSelfMock(typeof(Service2));
 
         Assert.AreEqual(provider, Mock.Get(mock).DefaultValueProvider);
+    }
+
+    [TestMethod]
+    public void WithSelfMock_returns_mock_of_service()
+    {
+        var mocker = new AutoMocker();
+        var mockService = mocker.WithSelfMock<IService2, Service2>();
+
+        Assert.IsInstanceOfType<Mock<IService2>>(mockService);
     }
 }
 
