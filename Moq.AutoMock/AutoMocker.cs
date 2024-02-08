@@ -320,12 +320,15 @@ public partial class AutoMocker : IServiceProvider
             defaultValue ?? DefaultValue,
             defaultValueProvider ?? DefaultValueProvider,
             callBase ?? CallBase);
+
+        Mock<TService> serviceMock = selfMock.As<TService>();
+
         WithTypeMap(typeMap =>
         {
             typeMap[typeof(TImplementation)] = new MockInstance(selfMock);
-            typeMap[typeof(TService)] = new MockInstance(selfMock.As<TService>());
+            typeMap[typeof(TService)] = new MockInstance(serviceMock);
         });
-        return selfMock.As<TService>();
+        return serviceMock;
     }
 
     /// <summary>
