@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Microsoft.CodeAnalysis;
 
-namespace Moq.AutoMocker.TestGenerator;
+namespace Moq.AutoMocker.Generators;
 
 [Generator]
 public class UnitTestSourceGenerator : ISourceGenerator

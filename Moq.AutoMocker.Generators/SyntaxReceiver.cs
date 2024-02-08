@@ -2,9 +2,9 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-using static Moq.AutoMocker.TestGenerator.AutoMock;
+using static Moq.AutoMocker.Generators.AutoMock;
 
-namespace Moq.AutoMocker.TestGenerator;
+namespace Moq.AutoMocker.Generators;
 
 public class SyntaxReceiver : ISyntaxContextReceiver
 {
@@ -31,6 +31,7 @@ public class SyntaxReceiver : ISyntaxContextReceiver
                 .OfType<MemberAccessExpressionSyntax>()
                 .FirstOrDefault() is { Name.Identifier.ValueText: IgnoreNullableParametersEnumValue };
     }
+
 
     public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
     {

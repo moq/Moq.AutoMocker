@@ -15,6 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Packages.props = Directory.Packages.props
 		global.json = global.json
 		LICENSE.md = LICENSE.md
+		NuGet.config = NuGet.config
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -30,15 +31,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.AutoMock.Generator.Exam
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.AutoMock.Generator.Example.xUnit", "GeneratorTests\Moq.AutoMock.Generator.Example.xUnit\Moq.AutoMock.Generator.Example.xUnit.csproj", "{586D1D6A-3EE2-4AB8-988A-CEB810EF7787}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.AutoMocker.TestGenerator", "Moq.AutoMocker.TestGenerator\Moq.AutoMocker.TestGenerator.csproj", "{710AF8FE-BB9E-4FE9-ABF7-0CE8BD212BB4}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.AutoMocker.TestGenerator.Tests", "Moq.AutoMocker.TestGenerator.Tests\Moq.AutoMocker.TestGenerator.Tests.csproj", "{F3663663-0123-4DA3-9BDD-95C91AFA4596}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{820CF7FE-8E92-4500-BE62-55AF67007838}"
 	ProjectSection(SolutionItems) = preProject
 		.github\dependabot.yml = .github\dependabot.yml
 		.github\workflows\dotnetcore.yml = .github\workflows\dotnetcore.yml
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.AutoMocker.Generators", "Moq.AutoMocker.Generators\Moq.AutoMocker.Generators.csproj", "{FE1C406B-D16B-4037-9D67-ECE2B6847AEB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.AutoMocker.Generators.Tests", "Moq.AutoMocker.Generators.Tests\Moq.AutoMocker.Generators.Tests.csproj", "{7820E7C8-7169-4A28-9D1B-BB38FC4E2923}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -74,14 +75,14 @@ Global
 		{586D1D6A-3EE2-4AB8-988A-CEB810EF7787}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{586D1D6A-3EE2-4AB8-988A-CEB810EF7787}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{586D1D6A-3EE2-4AB8-988A-CEB810EF7787}.Release|Any CPU.Build.0 = Release|Any CPU
-		{710AF8FE-BB9E-4FE9-ABF7-0CE8BD212BB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{710AF8FE-BB9E-4FE9-ABF7-0CE8BD212BB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{710AF8FE-BB9E-4FE9-ABF7-0CE8BD212BB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{710AF8FE-BB9E-4FE9-ABF7-0CE8BD212BB4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F3663663-0123-4DA3-9BDD-95C91AFA4596}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F3663663-0123-4DA3-9BDD-95C91AFA4596}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F3663663-0123-4DA3-9BDD-95C91AFA4596}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F3663663-0123-4DA3-9BDD-95C91AFA4596}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE1C406B-D16B-4037-9D67-ECE2B6847AEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE1C406B-D16B-4037-9D67-ECE2B6847AEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE1C406B-D16B-4037-9D67-ECE2B6847AEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE1C406B-D16B-4037-9D67-ECE2B6847AEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7820E7C8-7169-4A28-9D1B-BB38FC4E2923}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7820E7C8-7169-4A28-9D1B-BB38FC4E2923}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7820E7C8-7169-4A28-9D1B-BB38FC4E2923}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7820E7C8-7169-4A28-9D1B-BB38FC4E2923}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,6 @@
 ﻿namespace Moq.AutoMock;
 /// <summary>
-/// An attribute used by Moq.AutoMock.TestGenerator to generate unit tests for null constructor arguments.
+/// An attribute used by Moq.AutoMock.Generators to generate unit tests for null constructor arguments.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
 public class ConstructorTestsAttribute : Attribute
