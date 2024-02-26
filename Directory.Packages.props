@@ -14,7 +14,7 @@
     <PackageVersion Include="MSTest.TestAdapter" Version="3.2.2" />
     <PackageVersion Include="MSTest.TestFramework" Version="3.2.1" />
     <PackageVersion Include="NonBlocking" Version="2.1.2" />
-    <PackageVersion Include="NUnit" Version="4.0.1" />
+    <PackageVersion Include="NUnit" Version="4.1.0" />
     <PackageVersion Include="NUnit3TestAdapter" Version="4.5.0" />
     <PackageVersion Include="xunit" Version="2.7.0" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.7" />
