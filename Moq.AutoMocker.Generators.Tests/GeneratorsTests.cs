@@ -28,19 +28,21 @@ public class GeneratorsTests
     [TestMethod]
     public async Task Generation_WithDecoratedNonPartialClass_ProducesDiagnosticError()
     {
-        var code = @"
-using Moq.AutoMock;
+        var code = """
 
-namespace TestNamespace;
+            using Moq.AutoMock;
 
-[ConstructorTests(TargetType = typeof(Controller))]
-public class ControllerTests
-{
-    
-}
+            namespace TestNamespace;
 
-public class Controller { }
-";
+            [ConstructorTests(TargetType = typeof(Controller))]
+            public class ControllerTests
+            {
+                
+            }
+
+            public class Controller { }
+
+            """;
         var expectedResult =
             DiagnosticResult.CompilerError(Diagnostics.TestClassesMustBePartial.DiagnosticId)
                         .WithSpan(6, 1, 10, 2)
@@ -58,19 +60,21 @@ public class Controller { }
     [TestMethod]
     public async Task Generation_WithNoTargetTypeSpecified_ProducesDiagnosticError()
     {
-        var code = @"
-using Moq.AutoMock;
+        var code = """
 
-namespace TestNamespace;
+            using Moq.AutoMock;
 
-[ConstructorTests]
-public class ControllerTests
-{
-    
-}
+            namespace TestNamespace;
 
-public class Controller { }
-";
+            [ConstructorTests]
+            public class ControllerTests
+            {
+                
+            }
+
+            public class Controller { }
+
+            """;
         var expectedResult =
             DiagnosticResult.CompilerError(Diagnostics.MustSpecifyTargetType.DiagnosticId)
                         .WithSpan(6, 2, 6, 18)
@@ -121,6 +125,9 @@ public class Controller { }
                         Moq.AutoMock.AutoMocker mocker = new Moq.AutoMock.AutoMocker();
                         AutoMockerTestSetup(mocker, "ControllerConstructor_WithNullILoggerController_ThrowsArgumentNullException");
                         ControllerConstructor_WithNullILoggerController_ThrowsArgumentNullExceptionSetup(mocker);
+                        using(System.IDisposable __mockerDisposable = mocker.AsDisposable())
+                        {
+                        }
                     }
 
                 }
@@ -145,32 +152,35 @@ public class Controller { }
     [TestMethod]
     public async Task Generation_WithValueTypeParameter_DoesNotGenerateTest()
     {
-        var code = @"
-using Moq.AutoMock;
-using System.Threading;
+        var code = """
+            using Moq.AutoMock;
+            using System.Threading;
 
-namespace TestNamespace;
+            namespace TestNamespace;
 
-[ConstructorTests(typeof(Controller))]
-public partial class ControllerTests
-{
-    
-}
+            [ConstructorTests(typeof(Controller))]
+            public partial class ControllerTests
+            {
+                
+            }
 
-public class Controller
-{
-    public Controller(CancellationToken token) { }
-}
-";
-        string expected = @"namespace TestNamespace
-{
-    partial class ControllerTests
-    {
-        partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+            public class Controller
+            {
+                public Controller(CancellationToken token) { }
+            }
 
-    }
-}
-";
+            """;
+        string expected = """
+            namespace TestNamespace
+            {
+                partial class ControllerTests
+                {
+                    partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+
+                }
+            }
+
+            """;
 
         await new VerifyCS.Test
         {
