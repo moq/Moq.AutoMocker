@@ -27,19 +27,21 @@ public class TestGeneratorTests
     [TestMethod]
     public async Task Generation_WithDecoratedNonPartialClass_ProducesDiagnosticError()
     {
-        var code = @"
-using Moq.AutoMock;
+        var code = """
 
-namespace TestNamespace;
+            using Moq.AutoMock;
 
-[ConstructorTests(TargetType = typeof(Controller))]
-public class ControllerTests
-{
-    
-}
+            namespace TestNamespace;
 
-public class Controller { }
-";
+            [ConstructorTests(TargetType = typeof(Controller))]
+            public class ControllerTests
+            {
+                
+            }
+
+            public class Controller { }
+
+            """;
         var expectedResult =
             DiagnosticResult.CompilerError(Diagnostics.TestClassesMustBePartial.DiagnosticId)
                         .WithSpan(6, 1, 10, 2)
@@ -57,19 +59,21 @@ public class Controller { }
     [TestMethod]
     public async Task Generation_WithNoTargetTypeSpecified_ProducesDiagnosticError()
     {
-        var code = @"
-using Moq.AutoMock;
+        var code = """
 
-namespace TestNamespace;
+            using Moq.AutoMock;
 
-[ConstructorTests]
-public class ControllerTests
-{
-    
-}
+            namespace TestNamespace;
 
-public class Controller { }
-";
+            [ConstructorTests]
+            public class ControllerTests
+            {
+                
+            }
+
+            public class Controller { }
+
+            """;
         var expectedResult =
             DiagnosticResult.CompilerError(Diagnostics.MustSpecifyTargetType.DiagnosticId)
                         .WithSpan(6, 2, 6, 18)
@@ -88,42 +92,49 @@ public class Controller { }
     [Description("Issue 142")]
     public async Task Generation_WithGenericParameter_RemovesInvalidCharactersFromTestsName()
     {
-        var code = @"
-using Moq.AutoMock;
+        var code = """
 
-namespace TestNamespace;
+            using Moq.AutoMock;
 
-[ConstructorTests(typeof(Controller))]
-public partial class ControllerTests
-{
-    
-}
+            namespace TestNamespace;
 
-public class Controller
-{
-    public Controller(ILogger<Controller> logger) { }
-}
+            [ConstructorTests(typeof(Controller))]
+            public partial class ControllerTests
+            {
+                
+            }
 
-public interface ILogger<Controller> { }
-";
-        string expected = @"namespace TestNamespace
-{
-    partial class ControllerTests
-    {
-        partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+            public class Controller
+            {
+                public Controller(ILogger<Controller> logger) { }
+            }
 
-        partial void ControllerConstructor_WithNullILoggerController_ThrowsArgumentNullExceptionSetup(Moq.AutoMock.AutoMocker mocker);
+            public interface ILogger<Controller> { }
 
-        public void ControllerConstructor_WithNullILoggerController_ThrowsArgumentNullException()
-        {
-            Moq.AutoMock.AutoMocker mocker = new Moq.AutoMock.AutoMocker();
-            AutoMockerTestSetup(mocker, ""ControllerConstructor_WithNullILoggerController_ThrowsArgumentNullException"");
-            ControllerConstructor_WithNullILoggerController_ThrowsArgumentNullExceptionSetup(mocker);
-        }
+            """;
+        string expected = """
+            namespace TestNamespace
+            {
+                partial class ControllerTests
+                {
+                    partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
 
-    }
-}
-";
+                    partial void ControllerConstructor_WithNullILoggerController_ThrowsArgumentNullExceptionSetup(Moq.AutoMock.AutoMocker mocker);
+
+                    public void ControllerConstructor_WithNullILoggerController_ThrowsArgumentNullException()
+                    {
+                        Moq.AutoMock.AutoMocker mocker = new Moq.AutoMock.AutoMocker();
+                        AutoMockerTestSetup(mocker, "ControllerConstructor_WithNullILoggerController_ThrowsArgumentNullException");
+                        ControllerConstructor_WithNullILoggerController_ThrowsArgumentNullExceptionSetup(mocker);
+                        using(System.IDisposable __mockerDisposable = mocker.AsDisposable())
+                        {
+                        }
+                    }
+
+                }
+            }
+
+            """;
 
         await new VerifyCS.Test
         {
@@ -142,32 +153,36 @@ public interface ILogger<Controller> { }
     [TestMethod]
     public async Task Generation_WithValueTypeParameter_DoesNotGenerateTest()
     {
-        var code = @"
-using Moq.AutoMock;
-using System.Threading;
+        var code = """
 
-namespace TestNamespace;
+            using Moq.AutoMock;
+            using System.Threading;
 
-[ConstructorTests(typeof(Controller))]
-public partial class ControllerTests
-{
-    
-}
+            namespace TestNamespace;
 
-public class Controller
-{
-    public Controller(CancellationToken token) { }
-}
-";
-        string expected = @"namespace TestNamespace
-{
-    partial class ControllerTests
-    {
-        partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+            [ConstructorTests(typeof(Controller))]
+            public partial class ControllerTests
+            {
+                
+            }
 
-    }
-}
-";
+            public class Controller
+            {
+                public Controller(CancellationToken token) { }
+            }
+
+            """;
+        string expected = """
+            namespace TestNamespace
+            {
+                partial class ControllerTests
+                {
+                    partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+
+                }
+            }
+
+            """;
 
         await new VerifyCS.Test
         {
@@ -186,32 +201,36 @@ public class Controller
     [TestMethod]
     public async Task Generation_ParameterWithDefaultValue_DoesNotGenerateTest()
     {
-        var code = @"
-using Moq.AutoMock;
-using System.Threading;
+        var code = """
 
-namespace TestNamespace;
+            using Moq.AutoMock;
+            using System.Threading;
 
-[ConstructorTests(typeof(Controller), Behavior = TestGenerationBehavior.IgnoreNullableParameters)]
-public partial class ControllerTests
-{
-    
-}
+            namespace TestNamespace;
 
-public class Controller
-{
-    public Controller(string name = null) { }
-}
-";
-        string expected = @"namespace TestNamespace
-{
-    partial class ControllerTests
-    {
-        partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+            [ConstructorTests(typeof(Controller), Behavior = TestGenerationBehavior.IgnoreNullableParameters)]
+            public partial class ControllerTests
+            {
+                
+            }
 
-    }
-}
-";
+            public class Controller
+            {
+                public Controller(string name = null) { }
+            }
+
+            """;
+        string expected = """
+            namespace TestNamespace
+            {
+                partial class ControllerTests
+                {
+                    partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+
+                }
+            }
+
+            """;
 
         await new VerifyCS.Test
         {
@@ -230,41 +249,48 @@ public class Controller
     [TestMethod]
     public async Task Generation_ParameterWithEmptyString_DoesGenerateTest()
     {
-        var code = @"
-using Moq.AutoMock;
-using System.Threading;
+        var code = """
 
-namespace TestNamespace;
+            using Moq.AutoMock;
+            using System.Threading;
 
-[ConstructorTests(typeof(Controller), Behavior = TestGenerationBehavior.IgnoreNullableParameters)]
-public partial class ControllerTests
-{
-    
-}
+            namespace TestNamespace;
 
-public class Controller
-{
-    public Controller(string name = """") { }
-}
-";
-        string expected = @"namespace TestNamespace
-{
-    partial class ControllerTests
-    {
-        partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+            [ConstructorTests(typeof(Controller), Behavior = TestGenerationBehavior.IgnoreNullableParameters)]
+            public partial class ControllerTests
+            {
+                
+            }
 
-        partial void ControllerConstructor_WithNullstring_ThrowsArgumentNullExceptionSetup(Moq.AutoMock.AutoMocker mocker);
+            public class Controller
+            {
+                public Controller(string name = "") { }
+            }
 
-        public void ControllerConstructor_WithNullstring_ThrowsArgumentNullException()
-        {
-            Moq.AutoMock.AutoMocker mocker = new Moq.AutoMock.AutoMocker();
-            AutoMockerTestSetup(mocker, ""ControllerConstructor_WithNullstring_ThrowsArgumentNullException"");
-            ControllerConstructor_WithNullstring_ThrowsArgumentNullExceptionSetup(mocker);
-        }
+            """;
+        string expected = """
+            namespace TestNamespace
+            {
+                partial class ControllerTests
+                {
+                    partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
 
-    }
-}
-";
+                    partial void ControllerConstructor_WithNullstring_ThrowsArgumentNullExceptionSetup(Moq.AutoMock.AutoMocker mocker);
+
+                    public void ControllerConstructor_WithNullstring_ThrowsArgumentNullException()
+                    {
+                        Moq.AutoMock.AutoMocker mocker = new Moq.AutoMock.AutoMocker();
+                        AutoMockerTestSetup(mocker, "ControllerConstructor_WithNullstring_ThrowsArgumentNullException");
+                        ControllerConstructor_WithNullstring_ThrowsArgumentNullExceptionSetup(mocker);
+                        using(System.IDisposable __mockerDisposable = mocker.AsDisposable())
+                        {
+                        }
+                    }
+
+                }
+            }
+
+            """;
 
         await new VerifyCS.Test
         {
@@ -283,33 +309,37 @@ public class Controller
     [TestMethod]
     public async Task Generation_ParameterWithNullableString_DoesNotGenerateTest()
     {
-        var code = @"
-#nullable enable
-using Moq.AutoMock;
-using System.Threading;
+        var code = """
 
-namespace TestNamespace;
+            #nullable enable
+            using Moq.AutoMock;
+            using System.Threading;
 
-[ConstructorTests(typeof(Controller), TestGenerationBehavior.IgnoreNullableParameters)]
-public partial class ControllerTests
-{
-    
-}
+            namespace TestNamespace;
 
-public class Controller
-{
-    public Controller(string? name) { }
-}
-";
-        string expected = @"namespace TestNamespace
-{
-    partial class ControllerTests
-    {
-        partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+            [ConstructorTests(typeof(Controller), TestGenerationBehavior.IgnoreNullableParameters)]
+            public partial class ControllerTests
+            {
+                
+            }
 
-    }
-}
-";
+            public class Controller
+            {
+                public Controller(string? name) { }
+            }
+
+            """;
+        string expected = """
+            namespace TestNamespace
+            {
+                partial class ControllerTests
+                {
+                    partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+
+                }
+            }
+
+            """;
 
         await new VerifyCS.Test
         {
@@ -328,33 +358,37 @@ public class Controller
     [TestMethod]
     public async Task Generation_ParameterWithNullableStringAndDefaultValue_DoesNotGenerateTest()
     {
-        var code = @"
-#nullable enable
-using Moq.AutoMock;
-using System.Threading;
+        var code = """
 
-namespace TestNamespace;
+            #nullable enable
+            using Moq.AutoMock;
+            using System.Threading;
 
-[ConstructorTests(typeof(Controller), TestGenerationBehavior.IgnoreNullableParameters)]
-public partial class ControllerTests
-{
-    
-}
+            namespace TestNamespace;
 
-public class Controller
-{
-    public Controller(string? name = null) { }
-}
-";
-        string expected = @"namespace TestNamespace
-{
-    partial class ControllerTests
-    {
-        partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+            [ConstructorTests(typeof(Controller), TestGenerationBehavior.IgnoreNullableParameters)]
+            public partial class ControllerTests
+            {
+                
+            }
 
-    }
-}
-";
+            public class Controller
+            {
+                public Controller(string? name = null) { }
+            }
+
+            """;
+        string expected = """
+            namespace TestNamespace
+            {
+                partial class ControllerTests
+                {
+                    partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+
+                }
+            }
+
+            """;
 
         await new VerifyCS.Test
         {
@@ -373,32 +407,36 @@ public class Controller
     [TestMethod]
     public async Task Generation_ParameterWithNullableValueType_DoesNotGenerateTest()
     {
-        var code = @"
-using Moq.AutoMock;
-using System.Threading;
+        var code = """
 
-namespace TestNamespace;
+            using Moq.AutoMock;
+            using System.Threading;
 
-[ConstructorTests(typeof(Controller), TestGenerationBehavior.IgnoreNullableParameters)]
-public partial class ControllerTests
-{
-    
-}
+            namespace TestNamespace;
 
-public class Controller
-{
-    public Controller(int? age) { }
-}
-";
-        string expected = @"namespace TestNamespace
-{
-    partial class ControllerTests
-    {
-        partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+            [ConstructorTests(typeof(Controller), TestGenerationBehavior.IgnoreNullableParameters)]
+            public partial class ControllerTests
+            {
+                
+            }
 
-    }
-}
-";
+            public class Controller
+            {
+                public Controller(int? age) { }
+            }
+
+            """;
+        string expected = """
+            namespace TestNamespace
+            {
+                partial class ControllerTests
+                {
+                    partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+
+                }
+            }
+
+            """;
 
         await new VerifyCS.Test
         {
@@ -417,33 +455,37 @@ public class Controller
     [TestMethod]
     public async Task Generation_ParameterWithValueType_DoesNotGenerateTest()
     {
-        var code = @"
-using Moq.AutoMock;
-using System.Threading;
+        var code = """
 
-namespace TestNamespace;
+            using Moq.AutoMock;
+            using System.Threading;
 
-[ConstructorTests(typeof(Controller), TestGenerationBehavior.IgnoreNullableParameters)]
-public partial class ControllerTests
-{
-    
-}
+            namespace TestNamespace;
 
-public class Controller
-{
-    public Controller(int years)
-    { }
-}
-";
-        string expected = @"namespace TestNamespace
-{
-    partial class ControllerTests
-    {
-        partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+            [ConstructorTests(typeof(Controller), TestGenerationBehavior.IgnoreNullableParameters)]
+            public partial class ControllerTests
+            {
+                
+            }
 
-    }
-}
-";
+            public class Controller
+            {
+                public Controller(int years)
+                { }
+            }
+
+            """;
+        string expected = """
+            namespace TestNamespace
+            {
+                partial class ControllerTests
+                {
+                    partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+
+                }
+            }
+
+            """;
 
         await new VerifyCS.Test
         {
@@ -462,48 +504,55 @@ public class Controller
     [TestMethod]
     public async Task Generation_ParametersTypesWithValueTypeBetweenReferenceTypes_OnlyGeneratesTestsForReferenceType()
     {
-        var code = @"
-#nullable enable
-using Moq.AutoMock;
-using System.Threading;
+        var code = """
 
-namespace TestNamespace;
+            #nullable enable
+            using Moq.AutoMock;
+            using System.Threading;
 
-[ConstructorTests(typeof(Controller), TestGenerationBehavior.IgnoreNullableParameters)]
-public partial class ControllerTests
-{
-    
-}
+            namespace TestNamespace;
 
-public class Controller
-{
-    public Controller(
-        string name,
-        int years,
-        string? nullableName)
-    { }
-}
-";
-        string expected = @"namespace TestNamespace
-{
-    partial class ControllerTests
-    {
-        partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+            [ConstructorTests(typeof(Controller), TestGenerationBehavior.IgnoreNullableParameters)]
+            public partial class ControllerTests
+            {
+                
+            }
 
-        partial void ControllerConstructor_WithNullstring_ThrowsArgumentNullExceptionSetup(Moq.AutoMock.AutoMocker mocker);
+            public class Controller
+            {
+                public Controller(
+                    string name,
+                    int years,
+                    string? nullableName)
+                { }
+            }
 
-        public void ControllerConstructor_WithNullstring_ThrowsArgumentNullException()
-        {
-            Moq.AutoMock.AutoMocker mocker = new Moq.AutoMock.AutoMocker();
-            AutoMockerTestSetup(mocker, ""ControllerConstructor_WithNullstring_ThrowsArgumentNullException"");
-            ControllerConstructor_WithNullstring_ThrowsArgumentNullExceptionSetup(mocker);
-            var years = mocker.Get<int>();
-            var nullableName = mocker.Get<string>();
-        }
+            """;
+        string expected = """
+            namespace TestNamespace
+            {
+                partial class ControllerTests
+                {
+                    partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
 
-    }
-}
-";
+                    partial void ControllerConstructor_WithNullstring_ThrowsArgumentNullExceptionSetup(Moq.AutoMock.AutoMocker mocker);
+
+                    public void ControllerConstructor_WithNullstring_ThrowsArgumentNullException()
+                    {
+                        Moq.AutoMock.AutoMocker mocker = new Moq.AutoMock.AutoMocker();
+                        AutoMockerTestSetup(mocker, "ControllerConstructor_WithNullstring_ThrowsArgumentNullException");
+                        ControllerConstructor_WithNullstring_ThrowsArgumentNullExceptionSetup(mocker);
+                        using(System.IDisposable __mockerDisposable = mocker.AsDisposable())
+                        {
+                            var years = mocker.Get<int>();
+                            var nullableName = mocker.Get<string>();
+                        }
+                    }
+
+                }
+            }
+
+            """;
 
         await new VerifyCS.Test
         {
