@@ -58,6 +58,11 @@ public class MockResolutionContext
     internal bool ValueProvided { get; private set; }
 
     /// <summary>
+    /// When set to true, the resolution will not use the cache to resolve resolved instance set in <see cref="Value"/>
+    /// </summary>
+    public bool NoCache { get; set; }
+
+    /// <summary>
     /// Deconstruct this instance into its individual properties.
     /// </summary>
     /// <param name="autoMocker">The <c>AutoMocker</c> instance.</param>

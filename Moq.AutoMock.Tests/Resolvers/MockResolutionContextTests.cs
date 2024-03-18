@@ -1,15 +1,13 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq.AutoMock.Resolvers;
+﻿using Moq.AutoMock.Resolvers;
 
 namespace Moq.AutoMock.Tests.Resolvers;
 
 [TestClass]
-public class MockResolutionContextTests
+[ConstructorTests(typeof(MockResolutionContext))]
+public partial class MockResolutionContextTests
 {
-    [TestMethod]
-    public void Constructor_null_checks_arguments()
-        => ConstructorTest
-        .BuildArgumentNullExceptionsTest<MockResolutionContext>()
-        .Use(new ObjectGraphContext(false))
-        .Run();
+    partial void AutoMockerTestSetup(AutoMocker mocker, string testName)
+    {
+        mocker.Use(new ObjectGraphContext(false));
+    }
 }
