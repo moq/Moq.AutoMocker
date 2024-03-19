@@ -67,7 +67,7 @@ public class UnitTestSourceGenerator : ISourceGenerator
                     case TargetTestingFramework.MSTest:
                         builder.AppendLine("        [global::Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]");
                         break;
-                    case TargetTestingFramework.Xunit:
+                    case TargetTestingFramework.XUnit:
                         builder.AppendLine("        [global::Xunit.Fact]");
                         break;
                     case TargetTestingFramework.NUnit:
@@ -97,7 +97,7 @@ public class UnitTestSourceGenerator : ISourceGenerator
                         builder.AppendLine($"            System.ArgumentNullException ex = global::Microsoft.VisualStudio.TestTools.UnitTesting.Assert.ThrowsException<System.ArgumentNullException>(() => {constructorInvocation});");
                         builder.AppendLine($"            global::Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(\"{test.NullParameterName}\", ex.ParamName);");
                         break;
-                    case TargetTestingFramework.Xunit:
+                    case TargetTestingFramework.XUnit:
                         builder.AppendLine($"            System.ArgumentNullException ex = global::Xunit.Assert.Throws<System.ArgumentNullException>(() => {constructorInvocation});");
                         builder.AppendLine($"            global::Xunit.Assert.Equal(\"{test.NullParameterName}\", ex.ParamName);");
                         break;
@@ -154,7 +154,7 @@ public class UnitTestSourceGenerator : ISourceGenerator
             }
             if (assembly.Name.StartsWith("xunit."))
             {
-                return TargetTestingFramework.Xunit;
+                return TargetTestingFramework.XUnit;
             }
         }
         return TargetTestingFramework.Unknown;
