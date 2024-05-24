@@ -4,6 +4,6 @@ public enum TargetTestingFramework
 {
     Unknown,
     MSTest,
-    Xunit,
+    XUnit,
     NUnit
 }
