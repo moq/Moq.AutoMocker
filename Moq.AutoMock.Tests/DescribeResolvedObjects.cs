@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Diagnostics.CodeAnalysis;
 using Moq.AutoMock.Resolvers;
-using Moq.AutoMock.Tests.Util;
 
 namespace Moq.AutoMock.Tests;
 
@@ -78,7 +74,7 @@ public class DescribeResolvedObjects
     }
 
     [TestMethod]
-    public void ResolvedObjects_custom_resolver_can_prempt_cache_resolver()
+    public void ResolvedObjects_custom_resolver_can_preempt_cache_resolver()
     {
         object singleton = new();
         object used = new();
@@ -88,6 +84,20 @@ public class DescribeResolvedObjects
 
         object resolved = mocker.Get<object>();
         Assert.AreEqual(singleton, resolved);
+    }
+
+    [TestMethod]
+    public void ResolvedObject_does_not_contain_custom_resolved_type_when_excluded()
+    {
+        object singleton = new();
+        AutoMocker mocker = new();
+        var cacheResolver = mocker.Resolvers.OfType<CacheResolver>().Single();
+        var index = mocker.Resolvers.IndexOf(cacheResolver);
+        mocker.Resolvers.Insert(index + 1, new SingletonResolver<object>(singleton) { NoCache = true });
+
+        object resolved = mocker.Get<object>();
+        Assert.AreEqual(singleton, resolved);
+        Assert.IsFalse(mocker.ResolvedObjects.Values.Contains(singleton));
     }
 
     [ExcludeFromCodeCoverage]
@@ -106,11 +116,14 @@ public class DescribeResolvedObjects
 
         public T Value { get; }
 
+        public bool NoCache { get; set; }
+
         public void Resolve(MockResolutionContext context)
         {
             if (context.RequestType == typeof(T))
             {
                 context.Value = Value;
+                context.NoCache = NoCache;
             }
         }
     }

@@ -32,5 +32,10 @@
     <PackageReference Include="MSTest.TestAdapter" />
     <PackageReference Include="MSTest.TestFramework" />
     <ProjectReference Include="..\Moq.AutoMock\Moq.AutoMock.csproj" />
+
+    <ProjectReference Include="..\Moq.AutoMocker.Generators\Moq.AutoMocker.Generators.csproj">
+      <OutputItemType>Analyzer</OutputItemType>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
   </ItemGroup>
 </Project>
