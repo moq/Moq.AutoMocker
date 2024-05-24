@@ -128,12 +128,14 @@ public partial class AutoMocker : IServiceProvider
 
     private bool TryResolve(Type serviceType,
         ObjectGraphContext resolutionContext,
-        [NotNullWhen(true)] out IInstance? instance)
+        [NotNullWhen(true)] out IInstance? instance, 
+        out bool noCache)
     {
         if (resolutionContext.VisitedTypes.Contains(serviceType))
         {
             //Rejected due to circular dependency
             instance = null;
+            noCache = false;
             return false;
         }
 
@@ -156,6 +158,7 @@ public partial class AutoMocker : IServiceProvider
         if (!context.ValueProvided)
         {
             instance = null;
+            noCache = false;
             return false;
         }
 
@@ -165,6 +168,7 @@ public partial class AutoMocker : IServiceProvider
             IInstance i => i,
             _ => new RealInstance(context.Value),
         };
+        noCache = context.NoCache;
         return true;
     }
 
@@ -453,7 +457,8 @@ public partial class AutoMocker : IServiceProvider
     /// </summary>
     /// <typeparam name="TService">The type that the instance will be registered as</typeparam>
     /// <param name="service"></param>
-    public void Use<TService>(TService? service)
+    /// <returns>Itself</returns>
+    public AutoMocker Use<TService>(TService? service)
         => Use(typeof(TService), service);
 
     /// <summary>
@@ -461,7 +466,8 @@ public partial class AutoMocker : IServiceProvider
     /// </summary>
     /// <param name="type">The type of service to use</param>
     /// <param name="service">The service to use</param>
-    public void Use(Type type, object? service)
+    /// <returns>Itself</returns>
+    public AutoMocker Use(Type type, object? service)
     {
         if (type is null) throw new ArgumentNullException(nameof(type));
         if (service != null && !type.IsInstanceOfType(service))
@@ -478,6 +484,8 @@ public partial class AutoMocker : IServiceProvider
             }
             typeMap[type] = new RealInstance(service);
         });
+
+        return this;
     }
 
     /// <summary>
@@ -485,7 +493,8 @@ public partial class AutoMocker : IServiceProvider
     /// </summary>
     /// <typeparam name="TService">The type that the instance will be registered as</typeparam>
     /// <param name="mockedService">The mocked service</param>
-    public void Use<TService>(Mock<TService> mockedService)
+    /// <returns>Itself</returns>
+    public AutoMocker Use<TService>(Mock<TService> mockedService)
         where TService : class
     {
         WithTypeMap(typeMap =>
@@ -499,6 +508,8 @@ public partial class AutoMocker : IServiceProvider
             }
             typeMap[serviceType] = new MockInstance(mockedService ?? throw new ArgumentNullException(nameof(mockedService)));
         });
+
+        return this;
     }
 
     /// <summary>
@@ -506,12 +517,13 @@ public partial class AutoMocker : IServiceProvider
     /// </summary>
     /// <typeparam name="TService">The type that the instance will be registered as</typeparam>
     /// <param name="setup">A shortcut for Mock.Of's syntax</param>
-    public void Use<TService>(Expression<Func<TService, bool>> setup)
+    /// <returns>Itself</returns>
+    public AutoMocker Use<TService>(Expression<Func<TService, bool>> setup)
         where TService : class
     {
         if (setup is null) throw new ArgumentNullException(nameof(setup));
 
-        Use(Mock.Get(Mock.Of(setup)));
+        return Use(Mock.Get(Mock.Of(setup)));
     }
 
     /// <summary>
@@ -625,9 +637,9 @@ public partial class AutoMocker : IServiceProvider
 
     private object Get(Type serviceType, ObjectGraphContext context)
     {
-        if (TryGet(serviceType, context, out IInstance? service))
+        if (TryGet(serviceType, context, out IInstance? service, out bool noCache))
         {
-            if (TypeMap is { } typeMap && !typeMap.ContainsKey(serviceType))
+            if (!noCache && TypeMap is { } typeMap && !typeMap.ContainsKey(serviceType))
             {
                 typeMap[serviceType] = service;
             }
@@ -639,11 +651,12 @@ public partial class AutoMocker : IServiceProvider
     internal bool TryGet(
         Type serviceType,
         ObjectGraphContext context,
-        [NotNullWhen(true)] out IInstance? service)
+        [NotNullWhen(true)] out IInstance? service,
+        out bool noCache)
     {
         if (serviceType is null) throw new ArgumentNullException(nameof(serviceType));
 
-        if (TryResolve(serviceType, context, out IInstance? instance))
+        if (TryResolve(serviceType, context, out IInstance? instance, out noCache))
         {
             service = instance;
             return true;
@@ -655,9 +668,9 @@ public partial class AutoMocker : IServiceProvider
     /// <inheritdoc />
     object? IServiceProvider.GetService(Type serviceType)
     {
-        if (TryGet(serviceType, new ObjectGraphContext(false), out IInstance? service))
+        if (TryGet(serviceType, new ObjectGraphContext(false), out IInstance? service, out bool noCache))
         {
-            if (TypeMap is { } typeMap && !typeMap.ContainsKey(serviceType))
+            if (!noCache && TypeMap is { } typeMap && !typeMap.ContainsKey(serviceType))
             {
                 typeMap[serviceType] = service;
             }
@@ -716,10 +729,10 @@ public partial class AutoMocker : IServiceProvider
 
     private Mock GetMockImplementation(Type serviceType, bool enablePrivate)
     {
-        if (TryResolve(serviceType, new ObjectGraphContext(enablePrivate), out IInstance? instance) &&
+        if (TryResolve(serviceType, new ObjectGraphContext(enablePrivate), out IInstance? instance, out bool noCache) &&
             instance.IsMock)
         {
-            if (TypeMap is { } typeMap && !typeMap.ContainsKey(serviceType))
+            if (!noCache && TypeMap is { } typeMap && !typeMap.ContainsKey(serviceType))
             {
                 typeMap[serviceType] = instance;
             }
@@ -1069,13 +1082,16 @@ public partial class AutoMocker : IServiceProvider
             for (int i = 0; i < parameters.Length; i++)
             {
                 ObjectGraphContext parameterContext = new(context);
-                if (!TryGet(parameters[i].ParameterType, parameterContext, out IInstance? service))
+                if (!TryGet(parameters[i].ParameterType, parameterContext, out IInstance? service, out bool noCache))
                 {
                     context.AddDiagnosticMessage($"Rejecting constructor {GetConstructorDisplayString(constructor)}, because {nameof(AutoMocker)} was unable to create parameter '{parameters[i].ParameterType.FullName} {parameters[i].Name}'");
                     return false;
                 }
 
-                EnsureCached(parameters[i].ParameterType, service);
+                if (!noCache)
+                {
+                    EnsureCached(parameters[i].ParameterType, service);
+                }
                 arguments[i] = service;
             }
             return true;
@@ -1116,8 +1132,8 @@ public partial class AutoMocker : IServiceProvider
 
     private Mock GetOrMakeMockFor(Type type)
     {
-        if (TryResolve(type, new ObjectGraphContext(false), out IInstance? instance) &&
-            instance is MockInstance mockInstance)
+        if (TryResolve(type, new ObjectGraphContext(false), out IInstance? instance, out bool noCache) &&
+            instance is MockInstance mockInstance && !noCache)
         {
             EnsureCached(type, mockInstance);
             return mockInstance.Mock;
