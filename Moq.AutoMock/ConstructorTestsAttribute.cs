@@ -3,7 +3,7 @@
 /// An attribute used by Moq.AutoMock.Generators to generate unit tests for null constructor arguments.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-public class ConstructorTestsAttribute : Attribute
+public sealed class ConstructorTestsAttribute : Attribute
 {
     /// <summary>
     /// The type of service to generate tests for.
