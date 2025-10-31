@@ -1,9 +1,5 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Linq.Expressions;
 using Moq.AutoMock.Resolvers;
-using Moq.AutoMock.Tests.Util;
 
 namespace Moq.AutoMock.Tests;
 
@@ -16,7 +12,7 @@ public class DescribeVerify
         AutoMocker mocker = new();
         mocker.Resolvers.Remove(mocker.Resolvers.OfType<CacheResolver>().Single());
 
-        Assert.ThrowsException<InvalidOperationException>(() => mocker.Verify());
+        Assert.Throws<InvalidOperationException>(() => mocker.Verify());
     }
 
     [TestMethod]
@@ -24,7 +20,7 @@ public class DescribeVerify
     {
         AutoMocker mocker = new();
 
-        Assert.ThrowsException<ArgumentNullException>(() => mocker.Verify<object, object>(null!));
+        Assert.Throws<ArgumentNullException>(() => mocker.Verify<object, object>(null!));
     }
 
     [TestMethod]
@@ -42,7 +38,7 @@ public class DescribeVerify
     {
         AutoMocker mocker = new();
 
-        Assert.ThrowsException<ArgumentNullException>(() => mocker.Verify<IService7, object>(null!, Times.Never()));
+        Assert.Throws<ArgumentNullException>(() => mocker.Verify<IService7, object>(null!, Times.Never()));
     }
 
     [TestMethod]
@@ -60,7 +56,7 @@ public class DescribeVerify
     {
         AutoMocker mocker = new();
 
-        Assert.ThrowsException<ArgumentNullException>(() => mocker.Verify<IService7, object>(null!, Times.Never));
+        Assert.Throws<ArgumentNullException>(() => mocker.Verify<IService7, object>(null!, Times.Never));
     }
 
     [TestMethod]
@@ -68,7 +64,7 @@ public class DescribeVerify
     {
         AutoMocker mocker = new();
 
-        Assert.ThrowsException<ArgumentNullException>(() => mocker.Verify<IService7, object>(x => x.ReturnValue("foo"), (Func<Times>)null!));
+        Assert.Throws<ArgumentNullException>(() => mocker.Verify<IService7, object>(x => x.ReturnValue("foo"), (Func<Times>)null!));
     }
 
     [TestMethod]
@@ -86,7 +82,7 @@ public class DescribeVerify
     {
         AutoMocker mocker = new();
 
-        Assert.ThrowsException<ArgumentNullException>(() => mocker.Verify<IService7, object>(null!, "fail"));
+        Assert.Throws<ArgumentNullException>(() => mocker.Verify<IService7, object>(null!, "fail"));
     }
 
     [TestMethod]
@@ -104,7 +100,7 @@ public class DescribeVerify
     {
         AutoMocker mocker = new();
 
-        Assert.ThrowsException<ArgumentNullException>(() => mocker.Verify<IService7, object>(null!, Times.Never(), "fail"));
+        Assert.Throws<ArgumentNullException>(() => mocker.Verify<IService7, object>(null!, Times.Never(), "fail"));
     }
 
     [TestMethod]
@@ -112,7 +108,7 @@ public class DescribeVerify
     {
         AutoMocker mocker = new();
 
-        Assert.ThrowsException<ArgumentNullException>(() => mocker.Verify<IService7, object>(x => x.ReturnValue("foo"), Times.Never(), null!));
+        Assert.Throws<ArgumentNullException>(() => mocker.Verify<IService7, object>(x => x.ReturnValue("foo"), Times.Never(), null!));
     }
 
     [TestMethod]
@@ -130,7 +126,7 @@ public class DescribeVerify
     {
         AutoMocker mocker = new();
 
-        Assert.ThrowsException<ArgumentNullException>(() => mocker.Verify<IService7>((Expression<Action<IService7>>)null!));
+        Assert.Throws<ArgumentNullException>(() => mocker.Verify<IService7>((Expression<Action<IService7>>)null!));
     }
 
     [TestMethod]
@@ -148,7 +144,7 @@ public class DescribeVerify
     {
         AutoMocker mocker = new();
 
-        Assert.ThrowsException<ArgumentNullException>(() => mocker.Verify<IService7>((Expression<Action<IService7>>)null!, Times.Never()));
+        Assert.Throws<ArgumentNullException>(() => mocker.Verify<IService7>((Expression<Action<IService7>>)null!, Times.Never()));
     }
 
     [TestMethod]
@@ -166,7 +162,7 @@ public class DescribeVerify
     {
         AutoMocker mocker = new();
 
-        Assert.ThrowsException<ArgumentNullException>(() => mocker.Verify<IService7>((Expression<Action<IService7>>)null!, Times.Never));
+        Assert.Throws<ArgumentNullException>(() => mocker.Verify<IService7>((Expression<Action<IService7>>)null!, Times.Never));
     }
 
     [TestMethod]
@@ -174,7 +170,7 @@ public class DescribeVerify
     {
         AutoMocker mocker = new();
 
-        Assert.ThrowsException<ArgumentNullException>(() => mocker.Verify<IService7>(x => x.Void("foo"), (Func<Times>)null!));
+        Assert.Throws<ArgumentNullException>(() => mocker.Verify<IService7>(x => x.Void("foo"), (Func<Times>)null!));
     }
 
     [TestMethod]
@@ -192,7 +188,7 @@ public class DescribeVerify
     {
         AutoMocker mocker = new();
 
-        Assert.ThrowsException<ArgumentNullException>(() => mocker.Verify<IService7>((Expression<Action<IService7>>)null!, "fail"));
+        Assert.Throws<ArgumentNullException>(() => mocker.Verify<IService7>((Expression<Action<IService7>>)null!, "fail"));
     }
 
     [TestMethod]
@@ -210,7 +206,7 @@ public class DescribeVerify
     {
         AutoMocker mocker = new();
 
-        Assert.ThrowsException<ArgumentNullException>(() => mocker.Verify<IService7>((Expression<Action<IService7>>)null!, Times.Never(), "fail"));
+        Assert.Throws<ArgumentNullException>(() => mocker.Verify<IService7>((Expression<Action<IService7>>)null!, Times.Never(), "fail"));
     }
 
     [TestMethod]
@@ -228,7 +224,7 @@ public class DescribeVerify
     {
         AutoMocker mocker = new();
 
-        Assert.ThrowsException<ArgumentNullException>(() => mocker.Verify<IService7>((Expression<Action<IService7>>)null!, Times.Never, "fail"));
+        Assert.Throws<ArgumentNullException>(() => mocker.Verify<IService7>((Expression<Action<IService7>>)null!, Times.Never, "fail"));
     }
 
     [TestMethod]
@@ -236,7 +232,7 @@ public class DescribeVerify
     {
         AutoMocker mocker = new();
 
-        Assert.ThrowsException<ArgumentNullException>(() => mocker.Verify<IService7>(x => x.Void("foo"), null!, "fail"));
+        Assert.Throws<ArgumentNullException>(() => mocker.Verify<IService7>(x => x.Void("foo"), null!, "fail"));
     }
 
     [TestMethod]
@@ -254,7 +250,7 @@ public class DescribeVerify
     {
         AutoMocker mocker = new();
 
-        Assert.ThrowsException<ArgumentNullException>(() => mocker.Verify<IService7>((Expression<Func<IService7, object>>)null!));
+        Assert.Throws<ArgumentNullException>(() => mocker.Verify<IService7>((Expression<Func<IService7, object>>)null!));
     }
 
     [TestMethod]
@@ -262,7 +258,7 @@ public class DescribeVerify
     {
         AutoMocker mocker = new();
 
-        Assert.ThrowsException<NotSupportedException>(() => mocker.Verify<IService7>(x => (int)x.ReturnValue("foo")));
+        Assert.Throws<NotSupportedException>(() => mocker.Verify<IService7>(x => (int)x.ReturnValue("foo")));
     }
 
     [TestMethod]
@@ -280,7 +276,7 @@ public class DescribeVerify
     {
         AutoMocker mocker = new();
 
-        Assert.ThrowsException<ArgumentNullException>(() => mocker.Verify<IService7>((Expression<Func<IService7, object>>)null!, Times.Never()));
+        Assert.Throws<ArgumentNullException>(() => mocker.Verify<IService7>((Expression<Func<IService7, object>>)null!, Times.Never()));
     }
 
     [TestMethod]
@@ -288,7 +284,7 @@ public class DescribeVerify
     {
         AutoMocker mocker = new();
 
-        Assert.ThrowsException<NotSupportedException>(() => mocker.Verify<IService7>(x => (int)x.ReturnValue("foo"), Times.Never()));
+        Assert.Throws<NotSupportedException>(() => mocker.Verify<IService7>(x => (int)x.ReturnValue("foo"), Times.Never()));
     }
 
     [TestMethod]
@@ -306,7 +302,7 @@ public class DescribeVerify
     {
         AutoMocker mocker = new();
 
-        Assert.ThrowsException<ArgumentNullException>(() => mocker.Verify<IService7>((Expression<Func<IService7, object>>)null!, Times.Never));
+        Assert.Throws<ArgumentNullException>(() => mocker.Verify<IService7>((Expression<Func<IService7, object>>)null!, Times.Never));
     }
 
     [TestMethod]
@@ -314,7 +310,7 @@ public class DescribeVerify
     {
         AutoMocker mocker = new();
 
-        Assert.ThrowsException<ArgumentNullException>(() => mocker.Verify<IService7>(x => x.ReturnValue("foo"), (Func<Times>)null!));
+        Assert.Throws<ArgumentNullException>(() => mocker.Verify<IService7>(x => x.ReturnValue("foo"), (Func<Times>)null!));
     }
 
     [TestMethod]
@@ -322,7 +318,7 @@ public class DescribeVerify
     {
         AutoMocker mocker = new();
 
-        Assert.ThrowsException<NotSupportedException>(() => mocker.Verify<IService7>(x => (int)x.ReturnValue("foo"), Times.Never));
+        Assert.Throws<NotSupportedException>(() => mocker.Verify<IService7>(x => (int)x.ReturnValue("foo"), Times.Never));
     }
 
     [TestMethod]
@@ -340,7 +336,7 @@ public class DescribeVerify
     {
         AutoMocker mocker = new();
 
-        Assert.ThrowsException<ArgumentNullException>(() => mocker.Verify<IService7>((Expression<Func<IService7, object>>)null!, "fail"));
+        Assert.Throws<ArgumentNullException>(() => mocker.Verify<IService7>((Expression<Func<IService7, object>>)null!, "fail"));
     }
 
     [TestMethod]
@@ -348,7 +344,7 @@ public class DescribeVerify
     {
         AutoMocker mocker = new();
 
-        Assert.ThrowsException<NotSupportedException>(() => mocker.Verify<IService7>(x => (int)x.ReturnValue("foo"), "fail"));
+        Assert.Throws<NotSupportedException>(() => mocker.Verify<IService7>(x => (int)x.ReturnValue("foo"), "fail"));
     }
 
     [TestMethod]
@@ -366,7 +362,7 @@ public class DescribeVerify
     {
         AutoMocker mocker = new();
 
-        Assert.ThrowsException<ArgumentNullException>(() => mocker.Verify<IService7>((Expression<Func<IService7, object>>)null!, Times.Never(), "fail"));
+        Assert.Throws<ArgumentNullException>(() => mocker.Verify<IService7>((Expression<Func<IService7, object>>)null!, Times.Never(), "fail"));
     }
 
     [TestMethod]
@@ -374,7 +370,7 @@ public class DescribeVerify
     {
         AutoMocker mocker = new();
 
-        Assert.ThrowsException<NotSupportedException>(() => mocker.Verify<IService7>(x => (int)x.ReturnValue("foo"), Times.Never(), "fail"));
+        Assert.Throws<NotSupportedException>(() => mocker.Verify<IService7>(x => (int)x.ReturnValue("foo"), Times.Never(), "fail"));
     }
 
     [TestMethod]

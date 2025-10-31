@@ -54,7 +54,7 @@ public class DescribeGetMock
     {
         var mocker = new AutoMocker();
         var mock = mocker.GetMock<ProtectedConstructor1>();
-        Assert.ThrowsException<ArgumentException>(() => mock.Object);
+        Assert.Throws<ArgumentException>(() => mock.Object);
     }
 
     [TestMethod]
@@ -108,6 +108,6 @@ public class DescribeGetMock
     {
         var mocker = new AutoMocker();
         var act = () => mocker.GetMock<SealedService>();
-        Assert.ThrowsException<ArgumentException>(act);
+        Assert.Throws<ArgumentException>(act);
     }
 }

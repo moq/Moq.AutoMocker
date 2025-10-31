@@ -28,7 +28,7 @@ public class ResolvesEnumerables
         Assert.IsNotNull(enumerable);
 
         var outerArray = enumerable.ToArray();
-        Assert.AreEqual(1, outerArray.Length);
+        Assert.HasCount(1, outerArray);
 
         var innerArray = outerArray[0].ToArray();
         CollectionAssert.AreEquivalent(innerArray, new[] { 42 });

@@ -97,7 +97,7 @@ public class UnitTestSourceGenerator : ISourceGenerator
                 switch (testingFramework)
                 {
                     case TargetTestingFramework.MSTest:
-                        builder.AppendLine($"{indent}System.ArgumentNullException ex = global::Microsoft.VisualStudio.TestTools.UnitTesting.Assert.ThrowsException<System.ArgumentNullException>(() => {constructorInvocation});");
+                        builder.AppendLine($"{indent}System.ArgumentNullException ex = global::Microsoft.VisualStudio.TestTools.UnitTesting.Assert.Throws<System.ArgumentNullException>(() => {constructorInvocation});");
                         builder.AppendLine($"{indent}global::Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(\"{test.NullParameterName}\", ex.ParamName);");
                         break;
 

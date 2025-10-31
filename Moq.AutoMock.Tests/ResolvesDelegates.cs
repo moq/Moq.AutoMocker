@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq.AutoMock.Resolvers;
-using Moq.AutoMock.Tests.Util;
+﻿using Moq.AutoMock.Resolvers;
 
 namespace Moq.AutoMock.Tests;
 
 [TestClass]
 public class ResolvesDelegates
 {
-    [DataTestMethod, DynamicData(nameof(DelegateTypes))]
+    [TestMethod, DynamicData(nameof(DelegateTypes))]
     public void ResolvesFuncReturningDefinedParameter(Type delegateType, object expected)
     {
         var mocker = new AutoMocker { Resolvers = { new FuncResolver() } };

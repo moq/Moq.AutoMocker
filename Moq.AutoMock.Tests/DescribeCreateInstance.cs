@@ -65,7 +65,7 @@ public class DescribeCreateInstance
         WithServiceArray instance = mocker.CreateInstance<WithServiceArray>();
         IService2[] services = instance.Services;
         Assert.IsNotNull(services);
-        Assert.AreEqual(1, services.Length);
+        Assert.HasCount(1, services);
         Assert.IsTrue(services[0] is IService2);
     }
 
@@ -78,7 +78,7 @@ public class DescribeCreateInstance
         WithServiceArray instance = mocker.CreateInstance<WithServiceArray>();
         IService2[] services = instance.Services;
         Assert.IsNotNull(services);
-        Assert.AreEqual(1, services.Length);
+        Assert.HasCount(1, services);
         Assert.AreEqual(expectedService.Object, services[0]);
     }
 
@@ -86,14 +86,14 @@ public class DescribeCreateInstance
     public void It_throws_original_exception_caught_whilst_creating_object()
     {
         var mocker = new AutoMocker();
-        Assert.ThrowsException<ArgumentException>(mocker.CreateInstance<ConstructorThrows>);
+        Assert.Throws<ArgumentException>(mocker.CreateInstance<ConstructorThrows>);
     }
 
     [TestMethod]
     public void It_throws_original_exception_caught_whilst_creating_object_with_original_stack_trace()
     {
         var mocker = new AutoMocker();
-        ArgumentException exception = Assert.ThrowsException<ArgumentException>(() => mocker.CreateInstance<ConstructorThrows>());
+        ArgumentException exception = Assert.Throws<ArgumentException>(() => mocker.CreateInstance<ConstructorThrows>());
         StringAssert.Contains(exception.StackTrace!, typeof(ConstructorThrows).Name);
     }
 
@@ -147,8 +147,8 @@ public class DescribeCreateInstance
         // I could see this changing to something else in the future, like null. Right now, it seems
         // best to cause early failure to clarify what went wrong. Also, returning null "allows" the
         // behavior, so it's easier to move that direction later without breaking backward compatibility.
-        ObjectCreationException e = Assert.ThrowsException<ObjectCreationException>(mocker.CreateInstance<WithRecursiveDependency>);
-        Assert.IsTrue(e.Message.StartsWith($"Did not find a best constructor for `{typeof(WithRecursiveDependency)}`"));
+        ObjectCreationException e = Assert.Throws<ObjectCreationException>(mocker.CreateInstance<WithRecursiveDependency>);
+        Assert.StartsWith($"Did not find a best constructor for `{typeof(WithRecursiveDependency)}`", e.Message);
     }
 
     [TestMethod]
@@ -196,9 +196,9 @@ public class DescribeCreateInstance
     {
         AutoMocker mocker = new();
 
-        ObjectCreationException ex = Assert.ThrowsException<ObjectCreationException>(() => mocker.CreateInstance<HasStringParameter>());
+        ObjectCreationException ex = Assert.Throws<ObjectCreationException>(() => mocker.CreateInstance<HasStringParameter>());
 
-        Assert.AreEqual(1, ex.DiagnosticMessages.Count);
+        Assert.HasCount(1, ex.DiagnosticMessages);
         Assert.AreEqual("Rejecting constructor Moq.AutoMock.Tests.DescribeCreateInstance+HasStringParameter(System.String string), because AutoMocker was unable to create parameter 'System.String string'", ex.DiagnosticMessages[0]);
     }
 
@@ -209,9 +209,9 @@ public class DescribeCreateInstance
         //Need to remove this resolver to prevent AM from attempting to simply mock the values (which will throw a Moq exception)
         mocker.Resolvers.Remove(mocker.Resolvers.OfType<MockResolver>().Single());
 
-        ObjectCreationException ex = Assert.ThrowsException<ObjectCreationException>(() => mocker.CreateInstance<HasMultipleConstructors>());
+        ObjectCreationException ex = Assert.Throws<ObjectCreationException>(() => mocker.CreateInstance<HasMultipleConstructors>());
 
-        Assert.AreEqual(2, ex.DiagnosticMessages.Count);
+        Assert.HasCount(2, ex.DiagnosticMessages);
         Assert.AreEqual("Rejecting constructor Moq.AutoMock.Tests.DescribeCreateInstance+HasMultipleConstructors(Moq.AutoMock.Tests.DescribeCreateInstance+HasMultipleConstructorsNested nested), because AutoMocker was unable to create parameter 'Moq.AutoMock.Tests.DescribeCreateInstance+HasMultipleConstructorsNested nested'", ex.DiagnosticMessages[0]);
         Assert.AreEqual("Rejecting constructor Moq.AutoMock.Tests.DescribeCreateInstance+HasMultipleConstructors(Moq.AutoMock.Tests.DescribeCreateInstance+HasStringParameter hasString), because AutoMocker was unable to create parameter 'Moq.AutoMock.Tests.DescribeCreateInstance+HasStringParameter hasString'", ex.DiagnosticMessages[1]);
     }

@@ -42,7 +42,7 @@ public class DescribeCombiningTypes
     public void Combine_throws_on_null_type()
     {
         AutoMocker mocker = new();
-        var e = Assert.ThrowsException<ArgumentNullException>(() => mocker.Combine(null!));
+        var e = Assert.Throws<ArgumentNullException>(() => mocker.Combine(null!));
         Assert.AreEqual("type", e.ParamName);
     }
 
@@ -52,7 +52,7 @@ public class DescribeCombiningTypes
         AutoMocker mocker = new();
         mocker.Resolvers.Remove(mocker.Resolvers.OfType<CacheResolver>().Single());
 
-        Assert.ThrowsException<InvalidOperationException>(() => mocker.Combine(typeof(object), typeof(object)));
+        Assert.Throws<InvalidOperationException>(() => mocker.Combine(typeof(object), typeof(object)));
     }
 }
 

@@ -13,14 +13,18 @@ public class GeneratorsTests
     [TestMethod]
     public async Task Generation_WithProjectThatDoesNotReferenceAutoMocker_ProducesDiagnosticWarning()
     {
+        var code = """
+            // Empty file
+            """;
         var expectedResult =
             DiagnosticResult.CompilerWarning(Diagnostics.MustReferenceAutoMock.DiagnosticId);
         await new VerifyCS.Test
         {
+            TestCode = code,
             ReferenceAutoMocker = false,
             ExpectedDiagnostics =
             {
-                expectedResult
+               expectedResult
             }
         }.RunAsync();
     }
@@ -145,7 +149,7 @@ public class GeneratorsTests
                     GetSourceFile(expected, "ControllerTests.g.cs")
                 }
             }
-            
+
         }.RunAsync();
     }
 

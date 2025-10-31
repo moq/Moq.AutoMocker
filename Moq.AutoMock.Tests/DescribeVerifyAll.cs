@@ -15,7 +15,7 @@ public class DescribeVerifyAll
         var mocker = new AutoMocker();
         mocker.Use<IService2>(x => x.Other == Mock.Of<IService1>());
         var _ = mocker.CreateInstance<WithService>();
-        var ex = Assert.ThrowsException<MockException>(() => mocker.VerifyAll());
+        var ex = Assert.Throws<MockException>(() => mocker.VerifyAll());
         Assert.IsTrue(ex.IsVerificationError);
     }
 
@@ -34,7 +34,7 @@ public class DescribeVerifyAll
         AutoMocker mocker = new();
         mocker.Resolvers.Remove(mocker.Resolvers.OfType<CacheResolver>().Single());
 
-        Assert.ThrowsException<InvalidOperationException>(() => mocker.VerifyAll());
+        Assert.Throws<InvalidOperationException>(() => mocker.VerifyAll());
     }
 
     [TestMethod]
@@ -42,7 +42,7 @@ public class DescribeVerifyAll
     {
         AutoMocker mocker = new();
 
-        InvalidOperationException ex = Assert.ThrowsException<InvalidOperationException>(() => mocker.VerifyAll());
+        InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() => mocker.VerifyAll());
         Assert.AreEqual("VerifyAll was called, but there were no setups on any tracked mock instances to verify", ex.Message);
     }
 
