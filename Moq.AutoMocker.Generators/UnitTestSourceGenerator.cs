@@ -82,7 +82,7 @@ public sealed class UnitTestSourceGenerator : IIncrementalGenerator
         // Generate the commands
         context.RegisterSourceOutput(commandInfo, static (context, item) =>
         {
-            ImmutableArray<MemberDeclarationSyntax> memberDeclarations = GetMembers(item.Sut);
+            ImmutableArray<MemberDeclarationSyntax> memberDeclarations = GetMembers(item.Sut!);
             CompilationUnitSyntax compilationUnit = GetCompilationUnit(memberDeclarations);
 
             context.AddSource($"{item.TestClassName}.g.cs", compilationUnit);
