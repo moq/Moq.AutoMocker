@@ -60,6 +60,6 @@ public class DescribeExtractingObjects
     {
         var mocker = new AutoMocker();
         mocker.Use<IService2>(new Service2());
-        Assert.ThrowsException<ArgumentException>(() => mocker.GetMock<IService2>());
+        Assert.Throws<ArgumentException>(() => mocker.GetMock<IService2>());
     }
 }

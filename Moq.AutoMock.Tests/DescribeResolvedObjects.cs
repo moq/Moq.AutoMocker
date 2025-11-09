@@ -15,7 +15,7 @@ public class DescribeResolvedObjects
 
         IReadOnlyDictionary<Type, object?> resolved = mocker.ResolvedObjects;
 
-        Assert.AreEqual(1, resolved.Count);
+        Assert.HasCount(1, resolved);
         Assert.AreEqual(service, resolved[typeof(IService2)]);
     }
 
@@ -27,7 +27,7 @@ public class DescribeResolvedObjects
 
         IReadOnlyDictionary<Type, object?> resolved = mocker.ResolvedObjects;
 
-        Assert.AreEqual(1, resolved.Count);
+        Assert.HasCount(1, resolved);
         Assert.IsTrue(resolved[typeof(IService2)] is Mock<IService2>);
     }
 
@@ -39,9 +39,9 @@ public class DescribeResolvedObjects
 
         IReadOnlyDictionary<Type, object?> resolved = mocker.ResolvedObjects;
 
-        Assert.AreEqual(1, resolved.Count);
-        var resolvedArray = resolved[typeof(string[])] as string[];
-        Assert.AreEqual(0, resolvedArray!.Length);
+        Assert.HasCount(1, resolved);
+        var resolvedArray = Assert.IsInstanceOfType<string[]>(resolved[typeof(string[])]);
+        Assert.IsEmpty(resolvedArray);
     }
 
     [TestMethod]
@@ -54,9 +54,9 @@ public class DescribeResolvedObjects
 
         IReadOnlyDictionary<Type, object?> resolved = mocker.ResolvedObjects;
 
-        Assert.AreEqual(2, resolved.Count);
-        var resolvedArray = resolved[typeof(IService2[])] as IService2[];
-        Assert.AreEqual(1, resolvedArray!.Length);
+        Assert.HasCount(2, resolved);
+        var resolvedArray = Assert.IsInstanceOfType<IService2[]>(resolved[typeof(IService2[])]);
+        Assert.HasCount(1, resolvedArray);
         Assert.AreEqual(service, resolvedArray![0]);
     }
 

@@ -43,7 +43,7 @@ public class DescribeSetupWithAny
         string expectedMessage =
             new MissingMethodException(typeof(IService1).Name, "Unknown Method").Message;
 
-        var ex = Assert.ThrowsException<MissingMethodException>(() => mock.SetupWithAny("Unknown Method"));
+        var ex = Assert.Throws<MissingMethodException>(() => mock.SetupWithAny("Unknown Method"));
         Assert.AreEqual(expectedMessage, ex.Message);
     }
 
@@ -52,7 +52,7 @@ public class DescribeSetupWithAny
     {
         Mock<IService7> mock = new();
 
-        Assert.ThrowsException<AmbiguousMatchException>(() => mock.SetupWithAny(nameof(IService7.Void)));
+        Assert.Throws<AmbiguousMatchException>(() => mock.SetupWithAny(nameof(IService7.Void)));
     }
 
     [TestMethod]
@@ -60,7 +60,7 @@ public class DescribeSetupWithAny
     {
         Mock<IService7> mock = new();
 
-        Assert.ThrowsException<AmbiguousMatchException>(() => mock.SetupWithAny(nameof(IService7.ReturnValue)));
+        Assert.Throws<AmbiguousMatchException>(() => mock.SetupWithAny(nameof(IService7.ReturnValue)));
     }
 
     [TestMethod]

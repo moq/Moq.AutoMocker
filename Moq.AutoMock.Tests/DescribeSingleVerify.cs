@@ -47,7 +47,7 @@ public class DescribeSingleVerify
         var mocker = new AutoMocker();
 
         //a method without parameters
-        var ex = Assert.ThrowsException<NotSupportedException>(() => mocker.Verify<IServiceWithPrimitives>(s => s.ReturnsALong(), Times.Once()));
+        var ex = Assert.Throws<NotSupportedException>(() => mocker.Verify<IServiceWithPrimitives>(s => s.ReturnsALong(), Times.Once()));
         Assert.AreEqual(Resources.Strings.VerifyWithValueReturn, ex.Message);
     }
 }

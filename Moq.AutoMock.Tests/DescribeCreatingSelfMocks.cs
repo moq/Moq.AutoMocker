@@ -40,7 +40,7 @@ public class DescribeCreatingSelfMocks
         var mock = Mock.Get(fooService);
         Assert.AreEqual(MockBehavior.Strict, mock.Behavior);
         Assert.AreEqual(DefaultValue.Mock, mock.DefaultValue);
-        Assert.AreEqual(true, mock.CallBase);
+        Assert.IsTrue(mock.CallBase);
     }
 
     [TestMethod]

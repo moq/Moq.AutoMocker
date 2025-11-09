@@ -1,148 +1,326 @@
-﻿using System.Text;
+﻿using System.Collections.Immutable;
+using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxKind;
 
 namespace Moq.AutoMocker.Generators;
 
-[Generator]
-public class UnitTestSourceGenerator : ISourceGenerator
+[Generator(LanguageNames.CSharp)]
+public sealed class UnitTestSourceGenerator : IIncrementalGenerator
 {
-    public void Execute(GeneratorExecutionContext context)
+    public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        if (context.Compilation.Language is not LanguageNames.CSharp) return;
+        // Check if Moq.AutoMock is referenced
+        IncrementalValueProvider<bool> referencesAutoMock = context.CompilationProvider
+            .Select(static (compilation, _) => ReferencesAutoMock(compilation.ReferencedAssemblyNames));
 
-        if (!context.Compilation.ReferencedAssemblyNames.Any(ai => ai.Name.Equals(AutoMock.AssemblyName, StringComparison.OrdinalIgnoreCase)))
+        // Report diagnostic if AutoMock is not referenced
+        context.RegisterSourceOutput(referencesAutoMock, static (context, hasReference) =>
         {
-            context.ReportDiagnostic(Diagnostics.MustReferenceAutoMock.Create());
-            return;
-        }
+            if (!hasReference)
+            {
+                context.ReportDiagnostic(Diagnostics.MustReferenceAutoMock.Create());
+            }
+        });
 
-        SyntaxReceiver rx = (SyntaxReceiver)context.SyntaxContextReceiver!;
+        // Gather info for all annotated command methods (starting from method declarations with at least one attribute)
+        IncrementalValuesProvider<(GeneratorTargetClass? targetClass, ImmutableArray<Diagnostic> diagnostics)> commandInfoWithErrors =
+            context.SyntaxProvider
+            .ForAttributeWithMetadataName(
+                "Moq.AutoMock.ConstructorTestsAttribute",
+                static (node, _) => node is ClassDeclarationSyntax,
+                static (context, token) =>
+                {
+                    var diagnostics = ImmutableArray.CreateBuilder<Diagnostic>();
 
-        foreach (Diagnostic diagnostic in rx.DiagnosticMessages)
+                    if (((CSharpCompilation)context.SemanticModel.Compilation).LanguageVersion < LanguageVersion.CSharp5)
+                    {
+                        return (null, diagnostics.ToImmutable());
+                    }
+
+                    var constructorTestsAttribute = context.Attributes[0];
+
+                    INamedTypeSymbol? sutType = GetTargetSutType(constructorTestsAttribute);
+                    if (sutType is null)
+                    {
+                        // Report diagnostic: must specify target type
+                        INamedTypeSymbol testClassSymbol = (INamedTypeSymbol)context.TargetSymbol;
+                        Diagnostic diagnostic = Diagnostics.MustSpecifyTargetType.Create(
+                            constructorTestsAttribute.ApplicationSyntaxReference?.GetSyntax(token).GetLocation(),
+                            testClassSymbol.OriginalDefinition.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
+                        diagnostics.Add(diagnostic);
+                        return (null, diagnostics.ToImmutable());
+                    }
+                    token.ThrowIfCancellationRequested();
+
+                    INamedTypeSymbol testClassSymbol2 = (INamedTypeSymbol)context.TargetSymbol;
+
+                    // Check if class is partial
+                    var classSyntax = context.TargetNode as ClassDeclarationSyntax;
+                    if (classSyntax != null && !classSyntax.Modifiers.Any(m => m.IsKind(PartialKeyword)))
+                    {
+                        Diagnostic diagnostic = Diagnostics.TestClassesMustBePartial.Create(
+                            classSyntax.GetLocation(),
+                            testClassSymbol2.OriginalDefinition.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
+                        diagnostics.Add(diagnostic);
+                        return (null, diagnostics.ToImmutable());
+                    }
+
+                    SutClass sut = new()
+                    {
+                        Name = sutType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat),
+                        FullName = sutType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+                    };
+                    foreach (IMethodSymbol ctor in sutType.Constructors)
+                    {
+                        var parameters = ctor.Parameters.Select(x => new Parameter(x)).ToList();
+                        int nullIndex = 0;
+                        foreach (IParameterSymbol parameter in ctor.Parameters)
+                        {
+                            sut.NullConstructorParameterTests.Add(new NullConstructorParameterTest()
+                            {
+                                Parameters = parameters,
+                                NullParameterIndex = nullIndex,
+                                NullTypeName = parameter.Type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)
+                            });
+                            nullIndex++;
+                        }
+                        token.ThrowIfCancellationRequested();
+                    }
+
+                    string testClassName = testClassSymbol2.OriginalDefinition.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+                    bool skipNullableParameters = GetSkipNullableParameters(constructorTestsAttribute);
+                    token.ThrowIfCancellationRequested();
+
+                    var targetClass = new GeneratorTargetClass
+                    {
+                        Namespace = testClassSymbol2.ContainingNamespace.ToDisplayString(),
+                        TestClassName = testClassName,
+                        Sut = sut,
+                        SkipNullableParameters = skipNullableParameters
+                    };
+
+                    return ((GeneratorTargetClass?)targetClass, diagnostics.ToImmutable());
+                });
+
+        // Output the diagnostics
+        context.RegisterSourceOutput(commandInfoWithErrors, static (context, item) =>
         {
-            context.ReportDiagnostic(diagnostic);
-        }
+            foreach (var diagnostic in item.diagnostics)
+            {
+                context.ReportDiagnostic(diagnostic);
+            }
+        });
 
-        var testingFramework = GetTestingFramework(context.Compilation.ReferencedAssemblyNames);
+        // Get the filtered sequence to enable caching - only items with valid target classes
+        IncrementalValuesProvider<GeneratorTargetClass> commandInfo =
+            commandInfoWithErrors
+            .Select(static (item, _) => item.targetClass)
+            .Where(static item => item is not null)!;
 
-        foreach (GeneratorTargetClass testClass in rx.TestClasses)
+        // Combine with compilation to get testing framework info
+        IncrementalValueProvider<(Compilation, ImmutableArray<GeneratorTargetClass>)> compilationAndClasses =
+            context.CompilationProvider.Combine(commandInfo.Collect());
+
+        // Generate the commands
+        context.RegisterSourceOutput(compilationAndClasses, static (context, source) =>
         {
-            StringBuilder builder = new();
+            var (compilation, classes) = source;
+            var testingFramework = GetTestingFramework(compilation.ReferencedAssemblyNames);
 
-            builder.AppendLine($"namespace {testClass.Namespace}");
-            builder.AppendLine("{");
+            foreach (var item in classes)
+            {
+                string generatedCode = GenerateTestClass(item, testingFramework);
+                context.AddSource($"{item.TestClassName}.g.cs", generatedCode);
+            }
+        });
+    }
 
-            builder.AppendLine($"    partial class {testClass.TestClassName}");
-            builder.AppendLine("    {");
-            builder.AppendLine($"        partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);");
+    private static string GenerateTestClass(GeneratorTargetClass testClass, TargetTestingFramework testingFramework)
+    {
+        var builder = new StringBuilder();
+
+        builder.AppendLine($"namespace {testClass.Namespace}");
+        builder.AppendLine("{");
+        builder.AppendLine($"    partial class {testClass.TestClassName}");
+        builder.AppendLine("    {");
+        builder.AppendLine("        partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);");
+
+        HashSet<string> testNames = new();
+        bool hasTests = false;
+
+        foreach (NullConstructorParameterTest test in testClass.Sut?.NullConstructorParameterTests ?? Enumerable.Empty<NullConstructorParameterTest>())
+        {
+            if (test.Parameters?[test.NullParameterIndex].IsValueType == true)
+            {
+                continue;
+            }
+            if (testClass.SkipNullableParameters && test.Parameters?[test.NullParameterIndex].IsNullable == true)
+            {
+                continue;
+            }
+
+            string testName = "";
+            foreach (var name in TestNameBuilder.CreateTestName(testClass, test))
+            {
+                if (testNames.Add(name))
+                {
+                    testName = name;
+                    break;
+                }
+            }
+
+            hasTests = true;
+            builder.AppendLine();
+            builder.AppendLine($"        partial void {testName}Setup(Moq.AutoMock.AutoMocker mocker);");
             builder.AppendLine();
 
-            HashSet<string> testNames = new();
-
-            foreach (NullConstructorParameterTest test in testClass.Sut?.NullConstructorParameterTests ?? Enumerable.Empty<NullConstructorParameterTest>())
+            switch (testingFramework)
             {
-                if (test.Parameters?[test.NullParameterIndex].IsValueType == true)
-                {
-                    continue;
-                }
-                if (testClass.SkipNullableParameters && test.Parameters?[test.NullParameterIndex].IsNullable == true)
-                {
-                    continue;
-                }
-                string testName = "";
-                foreach (var name in TestNameBuilder.CreateTestName(testClass, test))
-                {
-                    if (testNames.Add(name))
-                    {
-                        testName = name;
-                        break;
-                    }
-                }
-
-                builder.AppendLine($"        partial void {testName}Setup(Moq.AutoMock.AutoMocker mocker);");
-                builder.AppendLine();
-
-                switch (testingFramework)
-                {
-                    case TargetTestingFramework.MSTest:
-                        builder.AppendLine("        [global::Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]");
-                        break;
-                    case TargetTestingFramework.XUnit:
-                        builder.AppendLine("        [global::Xunit.Fact]");
-                        break;
-                    case TargetTestingFramework.NUnit:
-                        builder.AppendLine("        [global::NUnit.Framework.Test]");
-                        break;
-                }
-
-
-                builder.AppendLine($"        public void {testName}()");
-                builder.AppendLine("        {");
-                builder.AppendLine("            Moq.AutoMock.AutoMocker mocker = new Moq.AutoMock.AutoMocker();");
-                builder.AppendLine($"            AutoMockerTestSetup(mocker, \"{testName}\");");
-                builder.AppendLine($"            {testName}Setup(mocker);");
-                builder.AppendLine($"            using(System.IDisposable __mockerDisposable = mocker.AsDisposable())");
-                builder.AppendLine($"            {{");
-
-                const string indent = "                ";
-                for (int i = 0; i < test.Parameters?.Count; i++)
-                {
-                    if (i == test.NullParameterIndex) continue;
-                    Parameter parameter = test.Parameters[i];
-                    builder.AppendLine($"{indent}var {parameter.Name} = mocker.Get<{parameter.ParameterType}>();");
-                }
-
-                string constructorInvocation = $"_ = new {testClass.Sut!.FullName}({string.Join(",", GetParameterNames(test))})";
-
-                switch (testingFramework)
-                {
-                    case TargetTestingFramework.MSTest:
-                        builder.AppendLine($"{indent}System.ArgumentNullException ex = global::Microsoft.VisualStudio.TestTools.UnitTesting.Assert.ThrowsException<System.ArgumentNullException>(() => {constructorInvocation});");
-                        builder.AppendLine($"{indent}global::Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(\"{test.NullParameterName}\", ex.ParamName);");
-                        break;
-
-                    case TargetTestingFramework.XUnit:
-                        builder.AppendLine($"{indent}System.ArgumentNullException ex = global::Xunit.Assert.Throws<System.ArgumentNullException>(() => {constructorInvocation});");
-                        builder.AppendLine($"{indent}global::Xunit.Assert.Equal(\"{test.NullParameterName}\", ex.ParamName);");
-                        break;
-
-                    case TargetTestingFramework.NUnit:
-                        builder.AppendLine($"{indent}System.ArgumentNullException ex = global::NUnit.Framework.Assert.Throws<System.ArgumentNullException>(() => {constructorInvocation});");
-                        builder.AppendLine($"{indent}global::NUnit.Framework.Assert.That(\"{test.NullParameterName}\" == ex.ParamName);");
-                        break;
-                }
-                builder.AppendLine("            }");
-                builder.AppendLine("        }");
-                builder.AppendLine();
+                case TargetTestingFramework.MSTest:
+                    builder.AppendLine("        [global::Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]");
+                    break;
+                case TargetTestingFramework.XUnit:
+                    builder.AppendLine("        [global::Xunit.Fact]");
+                    break;
+                case TargetTestingFramework.NUnit:
+                    builder.AppendLine("        [global::NUnit.Framework.Test]");
+                    break;
             }
 
-            builder.AppendLine("    }");
-            builder.AppendLine("}");
+            builder.AppendLine($"        public void {testName}()");
+            builder.AppendLine("        {");
+            builder.AppendLine("            Moq.AutoMock.AutoMocker mocker = new Moq.AutoMock.AutoMocker();");
+            builder.AppendLine($"            AutoMockerTestSetup(mocker, \"{testName}\");");
+            builder.AppendLine($"            {testName}Setup(mocker);");
+            builder.AppendLine("            using(System.IDisposable __mockerDisposable = mocker.AsDisposable())");
+            builder.AppendLine("            {");
 
-            context.AddSource($"{testClass.TestClassName}.g.cs", builder.ToString());
-
-        }
-
-        static IEnumerable<string> GetParameterNames(NullConstructorParameterTest test)
-        {
+            const string indent = "                ";
             for (int i = 0; i < test.Parameters?.Count; i++)
             {
-                yield return i == test.NullParameterIndex
-                    ? $"default({test.Parameters[i].ParameterType})"
-                    : test.Parameters[i].Name;
+                if (i == test.NullParameterIndex) continue;
+                Parameter parameter = test.Parameters[i];
+                builder.AppendLine($"{indent}var {parameter.Name} = mocker.Get<{parameter.ParameterType}>();");
             }
+
+            string constructorInvocation = $"_ = new {testClass.Sut!.FullName}({string.Join(", ", GetParameterNames(test))})";
+
+            switch (testingFramework)
+            {
+                case TargetTestingFramework.MSTest:
+                    builder.AppendLine($"{indent}System.ArgumentNullException ex = global::Microsoft.VisualStudio.TestTools.UnitTesting.Assert.Throws<System.ArgumentNullException>(() => {constructorInvocation});");
+                    builder.AppendLine($"{indent}global::Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(\"{test.NullParameterName}\", ex.ParamName);");
+                    break;
+
+                case TargetTestingFramework.XUnit:
+                    builder.AppendLine($"{indent}System.ArgumentNullException ex = global::Xunit.Assert.Throws<System.ArgumentNullException>(() => {constructorInvocation});");
+                    builder.AppendLine($"{indent}global::Xunit.Assert.Equal(\"{test.NullParameterName}\", ex.ParamName);");
+                    break;
+
+                case TargetTestingFramework.NUnit:
+                    builder.AppendLine($"{indent}System.ArgumentNullException ex = global::NUnit.Framework.Assert.Throws<System.ArgumentNullException>(() => {constructorInvocation});");
+                    builder.AppendLine($"{indent}global::NUnit.Framework.Assert.That(\"{test.NullParameterName}\" == ex.ParamName);");
+                    break;
+            }
+
+            builder.AppendLine("            }");
+            builder.AppendLine("        }");
+            builder.AppendLine();
+        }
+        
+        // Only add blank line before closing brace if there are no tests
+        if (!hasTests)
+        {
+            builder.AppendLine();
+        }
+        
+        builder.AppendLine("    }");
+        builder.AppendLine("}");
+
+        return builder.ToString();
+    }
+
+    private static IEnumerable<string> GetParameterNames(NullConstructorParameterTest test)
+    {
+        for (int i = 0; i < test.Parameters?.Count; i++)
+        {
+            yield return i == test.NullParameterIndex
+                ? $"default({test.Parameters[i].ParameterType})"
+                : test.Parameters[i].Name;
         }
     }
 
-    public void Initialize(GeneratorInitializationContext context)
+    private static bool GetSkipNullableParameters(AttributeData constructorTestsAttribute)
     {
-#if DEBUG
-        if (!System.Diagnostics.Debugger.IsAttached)
+        static bool? GetBehavior(TypedConstant arg)
         {
-            //System.Diagnostics.Debugger.Launch();
+            if (arg.Type?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == "global::Moq.AutoMock.TestGenerationBehavior")
+            {
+                // Check if the enum value is IgnoreNullableParameters (value 1)
+                if (arg.Value is int enumValue)
+                {
+                    return enumValue == 1; // 1 = IgnoreNullableParameters
+                }
+            }
+            return null;
         }
-#endif
-        context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
+
+        foreach (var arg in constructorTestsAttribute.ConstructorArguments)
+        {
+            if (GetBehavior(arg) is { } skipNullableParameter)
+            {
+                return skipNullableParameter;
+            }
+        }
+
+        foreach (var arg in constructorTestsAttribute.NamedArguments)
+        {
+            if (arg.Key == "Behavior" &&
+                GetBehavior(arg.Value) is { } skipNullableParameter)
+            {
+                return skipNullableParameter;
+            }
+        }
+        return false;
+    }
+
+    private static INamedTypeSymbol? GetTargetSutType(AttributeData constructorTestsAttribute)
+    {
+        static INamedTypeSymbol? GetSutClass(TypedConstant arg)
+        {
+            // Check if this is a typeof() argument
+            if (arg.Kind == TypedConstantKind.Type &&
+                arg.Value is INamedTypeSymbol targetTypeSymbol)
+            {
+                return targetTypeSymbol;
+            }
+            return null;
+        }
+
+        // Check constructor arguments (e.g., [ConstructorTests(typeof(MyClass))])
+        foreach (var arg in constructorTestsAttribute.ConstructorArguments)
+        {
+            if (GetSutClass(arg) is { } sutClass)
+            {
+                return sutClass;
+            }
+        }
+
+        // Check named arguments (e.g., [ConstructorTests(TargetType = typeof(MyClass))])
+        foreach (var arg in constructorTestsAttribute.NamedArguments)
+        {
+            if (arg.Key == "TargetType" &&
+                GetSutClass(arg.Value) is { } sutClass)
+            {
+                return sutClass;
+            }
+        }
+
+        return null;
     }
 
     private static TargetTestingFramework GetTestingFramework(IEnumerable<AssemblyIdentity> assemblies)
@@ -163,5 +341,17 @@ public class UnitTestSourceGenerator : ISourceGenerator
             }
         }
         return TargetTestingFramework.Unknown;
+    }
+
+    private static bool ReferencesAutoMock(IEnumerable<AssemblyIdentity> assemblies)
+    {
+        foreach (AssemblyIdentity assembly in assemblies)
+        {
+            if (assembly.Name.Equals(AutoMock.AssemblyName, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

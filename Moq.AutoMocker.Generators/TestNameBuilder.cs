@@ -8,36 +8,44 @@ internal static class TestNameBuilder
     public static IEnumerable<string> CreateTestName(GeneratorTargetClass testClass, NullConstructorParameterTest test)
     {
         int testNameIndex = 0;
-        for (string testName = $"{testClass.Sut!.Name}Constructor_WithNull{test.NullTypeName}_ThrowsArgumentNullException";
+        string baseName = $"{testClass.Sut!.Name}Constructor_WithNull{test.NullTypeName}_ThrowsArgumentNullException";
+        
+        // Sanitize the base name first
+        string sanitizedBaseName = SanitizeIdentifier(baseName);
+        
+        for (string testName = sanitizedBaseName;
             ;
-            testName = $"{testClass.Sut!.Name}Constructor_WithNull{test.NullTypeName}{++testNameIndex}_ThrowsArgumentNullException")
+            testName = $"{sanitizedBaseName}{++testNameIndex}")
         {
-            if (!SyntaxFacts.IsValidIdentifier(testName))
+            yield return testName;
+        }
+    }
+    
+    private static string SanitizeIdentifier(string name)
+    {
+        if (SyntaxFacts.IsValidIdentifier(name))
+        {
+            return name;
+        }
+        
+        StringBuilder sb = new(name.Length);
+        for (int i = 0; i < name.Length; i++)
+        {
+            if (sb.Length == 0)
             {
-                StringBuilder sb = new(testName.Length);
-                for (int i = 0; i < testName.Length; i++)
+                if (SyntaxFacts.IsIdentifierStartCharacter(name[i]))
                 {
-                    if (sb.Length == 0)
-                    {
-                        if (SyntaxFacts.IsIdentifierStartCharacter(testName[i]))
-                        {
-                            sb.Append(testName[i]);
-                        }
-                    }
-                    else
-                    {
-                        if (SyntaxFacts.IsIdentifierPartCharacter(testName[i]))
-                        {
-                            sb.Append(testName[i]);
-                        }
-                    }
+                    sb.Append(name[i]);
                 }
-                yield return sb.ToString();
             }
             else
             {
-                yield return testName;
+                if (SyntaxFacts.IsIdentifierPartCharacter(name[i]))
+                {
+                    sb.Append(name[i]);
+                }
             }
         }
+        return sb.ToString();
     }
 }

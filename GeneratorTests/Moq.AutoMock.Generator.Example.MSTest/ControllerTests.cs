@@ -6,7 +6,7 @@ namespace Moq.AutoMock.Generator.Example.MSTest;
 [ConstructorTests(TargetType = typeof(Controller))]
 public partial class ControllerTests
 {
-    partial void ControllerConstructor_WithNullIService3_ThrowsArgumentNullExceptionSetup(AutoMocker mocker)
+    partial void ControllerConstructor_WithNullIService_ThrowsArgumentNullExceptionSetup(AutoMocker mocker)
     {
         mocker.Use<string>("");
     }

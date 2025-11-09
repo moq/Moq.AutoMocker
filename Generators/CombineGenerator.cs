@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -8,56 +6,64 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxKind;
 
 namespace Generators;
 
-[Generator]
-public class CombineGenerator : ISourceGenerator
+[Generator(LanguageNames.CSharp)]
+public sealed class CombineGenerator : IIncrementalGenerator
 {
-    public void Initialize(GeneratorInitializationContext context)
+    public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        context.RegisterPostInitializationOutput(static (context) =>
+        {
+            CompilationUnitSyntax compilationUnit = GetCompilationUnit();
+            context.AddSource($"{nameof(CombineGenerator)}.g.cs", compilationUnit.NormalizeWhitespace().ToFullString());
+        });
     }
 
-    public void Execute(GeneratorExecutionContext context)
+    private static CompilationUnitSyntax GetCompilationUnit()
     {
-        var sourceCode = CompilationUnit()
-            .WithMembers(SingletonList<MemberDeclarationSyntax>(NamespaceDeclaration(QualifiedName(IdentifierName("Moq"), IdentifierName("AutoMock")))
-                .WithMembers(SingletonList<MemberDeclarationSyntax>(ClassDeclaration("AutoMocker")
-                    .WithModifiers(TokenList(Token(PartialKeyword)))
-                    .WithMembers(List(Enumerable.Range(1, 10).Select(Combine)))))))
-            .NormalizeWhitespace()
-            .ToFullString();
+        var methods = Enumerable.Range(1, 10).Select(CreateCombineMethod).ToArray();
 
-        context.AddSource(nameof(CombineGenerator), sourceCode);
+        return CompilationUnit()
+            .WithMembers(SingletonList<MemberDeclarationSyntax>(
+                FileScopedNamespaceDeclaration(QualifiedName(IdentifierName("Moq"), IdentifierName("AutoMock")))
+                    .WithMembers(SingletonList<MemberDeclarationSyntax>(
+                        ClassDeclaration("AutoMocker")
+                            .WithModifiers(TokenList(Token(PartialKeyword)))
+                            .WithMembers(List<MemberDeclarationSyntax>(methods))))));
     }
 
-    private MemberDeclarationSyntax Combine(int count)
+    private static MemberDeclarationSyntax CreateCombineMethod(int count)
     {
         return MethodDeclaration(PredefinedType(Token(VoidKeyword)), "Combine")
-            .WithModifiers(TokenList(Token(TriviaList(Trivia(Documentation)), PublicKeyword, TriviaList())))
-            .WithTypeParameterList(TypeParameterList(SeparatedList(Enumerable.Range(0, count + 1).Select(type))))
+            .WithModifiers(TokenList(Token(TriviaList(Trivia(GetDocumentation())), PublicKeyword, TriviaList())))
+            .WithTypeParameterList(TypeParameterList(SeparatedList(Enumerable.Range(0, count + 1).Select(CreateTypeParameter))))
             .WithExpressionBody(ArrowExpressionClause(
                 InvocationExpression(IdentifierName("Combine"))
-                    .WithArgumentList(ArgumentList(SeparatedList(Enumerable.Range(0, count + 1).Select(argument))))))
+                    .WithArgumentList(ArgumentList(SeparatedList(Enumerable.Range(0, count + 1).Select(CreateArgument))))))
             .WithSemicolonToken(Token(SemicolonToken))
             .WithTrailingTrivia(LineFeed);
 
-        static string identifier(int index) => index is 0 ? "TService" : $"TAsWellAs{index}";
-        static TypeParameterSyntax type(int index) => TypeParameter(identifier(index));
-        static ArgumentSyntax argument(int index) => Argument(TypeOfExpression(IdentifierName(identifier(index))));
+        static string GetIdentifier(int index) => index is 0 ? "TService" : $"TAsWellAs{index}";
+        static TypeParameterSyntax CreateTypeParameter(int index) => TypeParameter(GetIdentifier(index));
+        static ArgumentSyntax CreateArgument(int index) => Argument(TypeOfExpression(IdentifierName(GetIdentifier(index))));
     }
 
-    private DocumentationCommentTriviaSyntax Documentation { get; } = DocumentationComment(
-        XmlText(" "),
-        XmlSummaryElement(
-            new[]
-            {
+    private static DocumentationCommentTriviaSyntax GetDocumentation()
+    {
+        return DocumentationComment(
+            XmlText(" "),
+            XmlSummaryElement(
+                new[]
+                {
                     "Combines all given types so that they are mocked by the same",
                     @"mock. Some IoC containers call this ""Forwarding"" one type to",
                     "other interfaces. In the end, this just means that all given",
                     "types will be implemented by the same instance.",
-            }.SelectMany(text => new[] { XmlNewLine(NewLine), XmlText($" {text}") })
-            .Concat(new[] { XmlNewLine(NewLine), XmlText(" ") })
-            .ToArray()
-        ),
-        XmlText($"{NewLine}        "));
+                }.SelectMany(text => new[] { XmlNewLine(NewLine), XmlText($" {text}") })
+                .Concat([XmlNewLine(NewLine), XmlText(" ")])
+                .ToArray()
+            ),
+            XmlText($"{NewLine}        "));
+    }
 
     //A new line that will respect the checked out state of auto.crlf
     private const string NewLine = @"

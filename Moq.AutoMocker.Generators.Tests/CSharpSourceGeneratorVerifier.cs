@@ -2,18 +2,23 @@ using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Testing;
-using Microsoft.CodeAnalysis.Testing.Verifiers;
+using Microsoft.CodeAnalysis.Testing;
 using Microsoft.Extensions.Options;
 
 namespace Moq.AutoMocker.Generators.Tests;
 
 public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
-    where TSourceGenerator : ISourceGenerator, new()
+    where TSourceGenerator : IIncrementalGenerator, new()
 {
-    public class Test : CSharpSourceGeneratorTest<TSourceGenerator, MSTestVerifier>
+    public class Test : CSharpSourceGeneratorTest<EmptySourceGeneratorProvider, DefaultVerifier>
     {
         public bool ReferenceAutoMocker { get; set; } = true;
         public bool ReferenceOptionsAbstractions { get; set; }
+
+        protected override IEnumerable<Type> GetSourceGenerators()
+        {
+            yield return typeof(TSourceGenerator);
+        }
 
         protected override Project ApplyCompilationOptions(Project project)
         {
