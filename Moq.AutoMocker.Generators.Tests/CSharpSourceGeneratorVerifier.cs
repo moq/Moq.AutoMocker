@@ -8,12 +8,17 @@ using Microsoft.Extensions.Options;
 namespace Moq.AutoMocker.Generators.Tests;
 
 public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
-    where TSourceGenerator : ISourceGenerator, new()
+    where TSourceGenerator : IIncrementalGenerator, new()
 {
-    public class Test : CSharpSourceGeneratorTest<TSourceGenerator, DefaultVerifier>
+    public class Test : CSharpSourceGeneratorTest<EmptySourceGeneratorProvider, DefaultVerifier>
     {
         public bool ReferenceAutoMocker { get; set; } = true;
         public bool ReferenceOptionsAbstractions { get; set; }
+
+        protected override IEnumerable<Type> GetSourceGenerators()
+        {
+            yield return typeof(TSourceGenerator);
+        }
 
         protected override Project ApplyCompilationOptions(Project project)
         {

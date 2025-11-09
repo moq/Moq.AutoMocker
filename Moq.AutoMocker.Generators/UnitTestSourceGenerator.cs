@@ -1,9 +1,9 @@
 ﻿using System.Collections.Immutable;
-using System.Text;
-using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxKind;
 
 namespace Moq.AutoMocker.Generators;
 
@@ -79,95 +79,346 @@ public sealed class UnitTestSourceGenerator : IIncrementalGenerator
             commandInfoWithErrors
             .Where(static item => item.Sut is not null)!;
 
-        // Generate the commands
-        context.RegisterSourceOutput(commandInfo, static (context, item) =>
-        {
-            ImmutableArray<MemberDeclarationSyntax> memberDeclarations = GetMembers(item.Sut!);
-            CompilationUnitSyntax compilationUnit = GetCompilationUnit(memberDeclarations);
+        // Combine with compilation to get testing framework info
+        IncrementalValueProvider<(Compilation, ImmutableArray<GeneratorTargetClass>)> compilationAndClasses =
+            context.CompilationProvider.Combine(commandInfo.Collect());
 
-            context.AddSource($"{item.TestClassName}.g.cs", compilationUnit);
+        // Generate the commands
+        context.RegisterSourceOutput(compilationAndClasses, static (context, source) =>
+        {
+            var (compilation, classes) = source;
+            var testingFramework = GetTestingFramework(compilation.ReferencedAssemblyNames);
+
+            foreach (var item in classes)
+            {
+                ImmutableArray<MemberDeclarationSyntax> memberDeclarations = GetMembers(item, testingFramework);
+                CompilationUnitSyntax compilationUnit = GetCompilationUnit(item, memberDeclarations);
+
+                context.AddSource($"{item.TestClassName}.g.cs", compilationUnit.NormalizeWhitespace().ToFullString());
+            }
         });
     }
 
-    private static ImmutableArray<MemberDeclarationSyntax> GetMembers(SutClass sut)
+    private static ImmutableArray<MemberDeclarationSyntax> GetMembers(GeneratorTargetClass testClass, TargetTestingFramework testingFramework)
     {
-        return ImmutableArray<MemberDeclarationSyntax>.Empty;
+        var members = ImmutableArray.CreateBuilder<MemberDeclarationSyntax>();
+        HashSet<string> testNames = new();
+
+        // Add the AutoMockerTestSetup partial method
+        members.Add(
+            MethodDeclaration(
+                PredefinedType(Token(VoidKeyword)),
+                Identifier("AutoMockerTestSetup"))
+            .WithModifiers(TokenList(Token(PartialKeyword)))
+            .WithParameterList(ParameterList(SeparatedList(new[]
+            {
+                Parameter(Identifier("mocker"))
+                    .WithType(ParseTypeName("Moq.AutoMock.AutoMocker")),
+                Parameter(Identifier("testName"))
+                    .WithType(PredefinedType(Token(StringKeyword)))
+            })))
+            .WithSemicolonToken(Token(SemicolonToken)));
+
+        foreach (NullConstructorParameterTest test in testClass.Sut?.NullConstructorParameterTests ?? Enumerable.Empty<NullConstructorParameterTest>())
+        {
+            if (test.Parameters?[test.NullParameterIndex].IsValueType == true)
+            {
+                continue;
+            }
+            if (testClass.SkipNullableParameters && test.Parameters?[test.NullParameterIndex].IsNullable == true)
+            {
+                continue;
+            }
+
+            string testName = "";
+            foreach (var name in TestNameBuilder.CreateTestName(testClass, test))
+            {
+                if (testNames.Add(name))
+                {
+                    testName = name;
+                    break;
+                }
+            }
+
+            // Add setup partial method for this test
+            members.Add(
+                MethodDeclaration(
+                    PredefinedType(Token(VoidKeyword)),
+                    Identifier($"{testName}Setup"))
+                .WithModifiers(TokenList(Token(PartialKeyword)))
+                .WithParameterList(ParameterList(SingletonSeparatedList(
+                    Parameter(Identifier("mocker"))
+                        .WithType(ParseTypeName("Moq.AutoMock.AutoMocker")))))
+                .WithSemicolonToken(Token(SemicolonToken)));
+
+            // Add the test method
+            members.Add(CreateTestMethod(testClass, test, testName, testingFramework));
+        }
+
+        return members.ToImmutable();
     }
 
-    public CompilationUnitSyntax GetCompilationUnit(
-       ImmutableArray<MemberDeclarationSyntax> memberDeclarations,
-       BaseListSyntax? baseList = null)
+    private static MethodDeclarationSyntax CreateTestMethod(
+        GeneratorTargetClass testClass,
+        NullConstructorParameterTest test,
+        string testName,
+        TargetTestingFramework testingFramework)
     {
-        // Create the partial type declaration with the given member declarations.
-        // This code produces a class declaration as follows:
-        //
-        // /// <inheritdoc/>
-        // partial <TYPE_KIND> TYPE_NAME>
-        // {
-        //     <MEMBERS>
-        // }
-        TypeDeclarationSyntax typeDeclarationSyntax =
-            Hierarchy[0].GetSyntax()
-            .AddModifiers(Token(TriviaList(Comment("/// <inheritdoc/>")), SyntaxKind.PartialKeyword, TriviaList()))
-            .AddMembers(memberDeclarations.ToArray());
+        var attributes = new List<AttributeListSyntax>();
 
-        // Add the base list, if present
-        if (baseList is not null)
+        // Add test attribute based on framework
+        switch (testingFramework)
         {
-            typeDeclarationSyntax = typeDeclarationSyntax.WithBaseList(baseList);
+            case TargetTestingFramework.MSTest:
+                attributes.Add(AttributeList(SingletonSeparatedList(
+                    Attribute(ParseName("global::Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod")))));
+                break;
+            case TargetTestingFramework.XUnit:
+                attributes.Add(AttributeList(SingletonSeparatedList(
+                    Attribute(ParseName("global::Xunit.Fact")))));
+                break;
+            case TargetTestingFramework.NUnit:
+                attributes.Add(AttributeList(SingletonSeparatedList(
+                    Attribute(ParseName("global::NUnit.Framework.Test")))));
+                break;
         }
 
-        // Add all parent types in ascending order, if any
-        foreach (TypeInfo parentType in Hierarchy.AsSpan().Slice(1))
+        var statements = new List<StatementSyntax>
         {
-            typeDeclarationSyntax =
-                parentType.GetSyntax()
-                .AddModifiers(Token(TriviaList(Comment("/// <inheritdoc/>")), SyntaxKind.PartialKeyword, TriviaList()))
-                .AddMembers(typeDeclarationSyntax);
+            // Moq.AutoMock.AutoMocker mocker = new Moq.AutoMock.AutoMocker();
+            LocalDeclarationStatement(
+                VariableDeclaration(ParseTypeName("Moq.AutoMock.AutoMocker"))
+                .WithVariables(SingletonSeparatedList(
+                    VariableDeclarator(Identifier("mocker"))
+                    .WithInitializer(EqualsValueClause(
+                        ObjectCreationExpression(ParseTypeName("Moq.AutoMock.AutoMocker"))
+                        .WithArgumentList(ArgumentList())))))),
+
+            // AutoMockerTestSetup(mocker, "testName");
+            ExpressionStatement(
+                InvocationExpression(IdentifierName("AutoMockerTestSetup"))
+                .WithArgumentList(ArgumentList(SeparatedList(new[]
+                {
+                    Argument(IdentifierName("mocker")),
+                    Argument(LiteralExpression(StringLiteralExpression, Literal(testName)))
+                })))),
+
+            // {testName}Setup(mocker);
+            ExpressionStatement(
+                InvocationExpression(IdentifierName($"{testName}Setup"))
+                .WithArgumentList(ArgumentList(SingletonSeparatedList(
+                    Argument(IdentifierName("mocker"))))))
+        };
+
+        // Build the using statement body
+        var usingStatements = new List<StatementSyntax>();
+
+        // Add Get<> calls for non-null parameters
+        for (int i = 0; i < test.Parameters?.Count; i++)
+        {
+            if (i == test.NullParameterIndex) continue;
+            Parameter parameter = test.Parameters[i];
+
+            usingStatements.Add(
+                LocalDeclarationStatement(
+                    VariableDeclaration(IdentifierName("var"))
+                    .WithVariables(SingletonSeparatedList(
+                        VariableDeclarator(Identifier(parameter.Name))
+                        .WithInitializer(EqualsValueClause(
+                            InvocationExpression(
+                                MemberAccessExpression(
+                                    SimpleMemberAccessExpression,
+                                    IdentifierName("mocker"),
+                                    GenericName(Identifier("Get"))
+                                    .WithTypeArgumentList(TypeArgumentList(SingletonSeparatedList(
+                                        ParseTypeName(parameter.ParameterType))))))
+                            .WithArgumentList(ArgumentList())))))));
         }
 
-        // Prepare the leading trivia for the generated compilation unit.
-        // This will produce code as follows:
-        //
-        // <auto-generated/>
-        // #pragma warning disable
-        // #nullable enable
-        SyntaxTriviaList syntaxTriviaList = TriviaList(
-            Comment("// <auto-generated/>"),
-            Trivia(PragmaWarningDirectiveTrivia(Token(SyntaxKind.DisableKeyword), true)),
-            Trivia(NullableDirectiveTrivia(Token(SyntaxKind.EnableKeyword), true)));
+        // Create constructor invocation with parameter names
+        var parameterNames = GetParameterNames(test).ToList();
+        var constructorArguments = SeparatedList(
+            parameterNames.Select(pName =>
+                Argument(pName.StartsWith("default(")
+                    ? DefaultExpression(ParseTypeName(pName.Substring(8, pName.Length - 9)))
+                    : IdentifierName(pName))));
 
-        if (Namespace is "")
+        var constructorInvocation = 
+            AssignmentExpression(
+                SimpleAssignmentExpression,
+                IdentifierName("_"),
+                ObjectCreationExpression(ParseTypeName(testClass.Sut!.FullName!))
+                    .WithArgumentList(ArgumentList(constructorArguments)));
+
+        // Add assertion based on framework
+        switch (testingFramework)
         {
-            // Special case for top level types with no namespace: we need to re-add the
-            // inheritdoc XML comment, as otherwise the call below would remove it.
-            syntaxTriviaList = syntaxTriviaList.Add(Comment("/// <inheritdoc/>"));
+            case TargetTestingFramework.MSTest:
+                {
+                    var lambda = ParenthesizedLambdaExpression()
+                        .WithParameterList(ParameterList())
+                        .WithExpressionBody(constructorInvocation);
 
-            // If there is no namespace, attach the pragma directly to the declared type,
-            // and skip the namespace declaration. This will produce code as follows:
-            //
-            // <SYNTAX_TRIVIA>
-            // <TYPE_HIERARCHY>
-            return
-                CompilationUnit()
-                .AddMembers(typeDeclarationSyntax.WithLeadingTrivia(syntaxTriviaList))
-                .NormalizeWhitespace();
+                    var throwsInvocation = InvocationExpression(
+                            MemberAccessExpression(
+                                SimpleMemberAccessExpression,
+                                ParseName("global::Microsoft.VisualStudio.TestTools.UnitTesting.Assert"),
+                                GenericName(Identifier("Throws"))
+                                .WithTypeArgumentList(TypeArgumentList(SingletonSeparatedList(
+                                    ParseTypeName("System.ArgumentNullException"))))))
+                        .WithArgumentList(ArgumentList(SingletonSeparatedList(Argument(lambda))));
+
+                    usingStatements.Add(
+                        LocalDeclarationStatement(
+                            VariableDeclaration(ParseTypeName("System.ArgumentNullException"))
+                            .WithVariables(SingletonSeparatedList(
+                                VariableDeclarator(Identifier("ex"))
+                                .WithInitializer(EqualsValueClause(throwsInvocation))))));
+
+                    usingStatements.Add(
+                        ExpressionStatement(
+                            InvocationExpression(
+                                MemberAccessExpression(
+                                    SimpleMemberAccessExpression,
+                                    ParseName("global::Microsoft.VisualStudio.TestTools.UnitTesting.Assert"),
+                                    IdentifierName("AreEqual")))
+                        .WithArgumentList(ArgumentList(SeparatedList(new[]
+                        {
+                            Argument(LiteralExpression(StringLiteralExpression, Literal(test.NullParameterName!))),
+                            Argument(MemberAccessExpression(
+                                SimpleMemberAccessExpression,
+                                IdentifierName("ex"),
+                                IdentifierName("ParamName")))
+                        })))));
+
+                }
+                break;
+
+            case TargetTestingFramework.XUnit:
+                {
+                    var lambda = ParenthesizedLambdaExpression()
+                        .WithParameterList(ParameterList())
+                        .WithExpressionBody(constructorInvocation);
+
+                    var throwsInvocation = InvocationExpression(
+                            MemberAccessExpression(
+                                SimpleMemberAccessExpression,
+                                ParseName("global::Xunit.Assert"),
+                                GenericName(Identifier("Throws"))
+                                .WithTypeArgumentList(TypeArgumentList(SingletonSeparatedList(
+                                    ParseTypeName("System.ArgumentNullException"))))))
+                        .WithArgumentList(ArgumentList(SingletonSeparatedList(Argument(lambda))));
+
+                    usingStatements.Add(
+                        LocalDeclarationStatement(
+                            VariableDeclaration(ParseTypeName("System.ArgumentNullException"))
+                            .WithVariables(SingletonSeparatedList(
+                                VariableDeclarator(Identifier("ex"))
+                                .WithInitializer(EqualsValueClause(throwsInvocation))))));
+
+                    usingStatements.Add(
+                        ExpressionStatement(
+                            InvocationExpression(
+                                MemberAccessExpression(
+                                    SimpleMemberAccessExpression,
+                                    ParseName("global::Xunit.Assert"),
+                                    IdentifierName("Equal")))
+                        .WithArgumentList(ArgumentList(SeparatedList(new[]
+                        {
+                            Argument(LiteralExpression(StringLiteralExpression, Literal(test.NullParameterName!))),
+                            Argument(MemberAccessExpression(
+                                SimpleMemberAccessExpression,
+                                IdentifierName("ex"),
+                                IdentifierName("ParamName")))
+                        })))));
+                }
+                break;
+
+            case TargetTestingFramework.NUnit:
+                {
+                    var lambda = ParenthesizedLambdaExpression()
+                        .WithParameterList(ParameterList())
+                        .WithExpressionBody(constructorInvocation);
+
+                    var throwsInvocation = InvocationExpression(
+                            MemberAccessExpression(
+                                SimpleMemberAccessExpression,
+                                ParseName("global::NUnit.Framework.Assert"),
+                                GenericName(Identifier("Throws"))
+                                .WithTypeArgumentList(TypeArgumentList(SingletonSeparatedList(
+                                    ParseTypeName("System.ArgumentNullException"))))))
+                        .WithArgumentList(ArgumentList(SingletonSeparatedList(Argument(lambda))));
+
+                    usingStatements.Add(
+                        LocalDeclarationStatement(
+                            VariableDeclaration(ParseTypeName("System.ArgumentNullException"))
+                            .WithVariables(SingletonSeparatedList(
+                                VariableDeclarator(Identifier("ex"))
+                                .WithInitializer(EqualsValueClause(throwsInvocation))))));
+
+                    usingStatements.Add(
+                        ExpressionStatement(
+                            InvocationExpression(
+                                MemberAccessExpression(
+                                    SimpleMemberAccessExpression,
+                                    ParseName("global::NUnit.Framework.Assert"),
+                                    IdentifierName("That")))
+                        .WithArgumentList(ArgumentList(SingletonSeparatedList(
+                            Argument(BinaryExpression(
+                                EqualsExpression,
+                                LiteralExpression(StringLiteralExpression, Literal(test.NullParameterName!)),
+                                MemberAccessExpression(
+                                    SimpleMemberAccessExpression,
+                                    IdentifierName("ex"),
+                                    IdentifierName("ParamName")))))))));
+                }
+                break;
         }
 
-        // Create the compilation unit with disabled warnings, target namespace and generated type.
-        // This will produce code as follows:
-        //
-        // <SYNTAX_TRIVIA>
-        // namespace <NAMESPACE>
-        // {
-        //     <TYPE_HIERARCHY>
-        // }
-        return
-            CompilationUnit().AddMembers(
-            NamespaceDeclaration(IdentifierName(Namespace))
-            .WithLeadingTrivia(syntaxTriviaList)
-            .AddMembers(typeDeclarationSyntax))
-            .NormalizeWhitespace();
+        // using(System.IDisposable __mockerDisposable = mocker.AsDisposable()) { ... }
+        statements.Add(
+            UsingStatement(Block(usingStatements))
+            .WithDeclaration(VariableDeclaration(ParseTypeName("System.IDisposable"))
+                .WithVariables(SingletonSeparatedList(
+                    VariableDeclarator(Identifier("__mockerDisposable"))
+                    .WithInitializer(EqualsValueClause(
+                        InvocationExpression(
+                            MemberAccessExpression(
+                                SimpleMemberAccessExpression,
+                                IdentifierName("mocker"),
+                                IdentifierName("AsDisposable")))
+                        .WithArgumentList(ArgumentList())))))));
+
+
+        return MethodDeclaration(
+            PredefinedType(Token(VoidKeyword)),
+            Identifier(testName))
+            .WithAttributeLists(List(attributes))
+            .WithModifiers(TokenList(Token(PublicKeyword)))
+            .WithBody(Block(statements));
+    }
+
+    private static IEnumerable<string> GetParameterNames(NullConstructorParameterTest test)
+    {
+        for (int i = 0; i < test.Parameters?.Count; i++)
+        {
+            yield return i == test.NullParameterIndex
+                ? $"default({test.Parameters[i].ParameterType})"
+                : test.Parameters[i].Name;
+        }
+    }
+
+    private static CompilationUnitSyntax GetCompilationUnit(
+        GeneratorTargetClass testClass,
+        ImmutableArray<MemberDeclarationSyntax> memberDeclarations)
+    {
+        return CompilationUnit()
+            .WithMembers(SingletonList<MemberDeclarationSyntax>(
+                FileScopedNamespaceDeclaration(ParseName(testClass.Namespace!))
+                    .WithMembers(SingletonList<MemberDeclarationSyntax>(
+                        ClassDeclaration(testClass.TestClassName!)
+                            .WithModifiers(TokenList(Token(PartialKeyword)))
+                            .WithMembers(List(memberDeclarations))))));
     }
 
     private static bool GetSkipNullableParameters(AttributeData constructorTestsAttribute)
@@ -244,6 +495,26 @@ public sealed class UnitTestSourceGenerator : IIncrementalGenerator
 
         return null;
     }
+
+    private static TargetTestingFramework GetTestingFramework(IEnumerable<AssemblyIdentity> assemblies)
+    {
+        foreach (AssemblyIdentity assembly in assemblies)
+        {
+            if (assembly.Name.StartsWith("Microsoft.VisualStudio.TestPlatform.TestFramework"))
+            {
+                return TargetTestingFramework.MSTest;
+            }
+            if (assembly.Name.StartsWith("nunit."))
+            {
+                return TargetTestingFramework.NUnit;
+            }
+            if (assembly.Name.StartsWith("xunit."))
+            {
+                return TargetTestingFramework.XUnit;
+            }
+        }
+        return TargetTestingFramework.Unknown;
+    }
 }
 
 //[Generator]
@@ -283,24 +554,24 @@ public sealed class UnitTestSourceGenerator : IIncrementalGenerator
 //            HashSet<string> testNames = new();
 //
 //            foreach (NullConstructorParameterTest test in testClass.Sut?.NullConstructorParameterTests ?? Enumerable.Empty<NullConstructorParameterTest>())
-//            {
-//                if (test.Parameters?[test.NullParameterIndex].IsValueType == true)
-//                {
-//                    continue;
-//                }
-//                if (testClass.SkipNullableParameters && test.Parameters?[test.NullParameterIndex].IsNullable == true)
-//                {
-//                    continue;
-//                }
-//                string testName = "";
-//                foreach (var name in TestNameBuilder.CreateTestName(testClass, test))
-//                {
-//                    if (testNames.Add(name))
-//                    {
-//                        testName = name;
-//                        break;
-//                    }
-//                }
+ //           {
+ //               if (test.Parameters?[test.NullParameterIndex].IsValueType == true)
+ //               {
+ //                   continue;
+ //               }
+ //               if (testClass.SkipNullableParameters && test.Parameters?[test.NullParameterIndex].IsNullable == true)
+ //               {
+ //                   continue;
+ //               }
+ //               string testName = "";
+ //               foreach (var name in TestNameBuilder.CreateTestName(testClass, test))
+ //               {
+ //                   if (testNames.Add(name))
+ //                   {
+ //                       testName = name;
+ //                       break;
+ //                   }
+ //               }
 //
 //                builder.AppendLine($"        partial void {testName}Setup(Moq.AutoMock.AutoMocker mocker);");
 //                builder.AppendLine();
@@ -357,7 +628,7 @@ public sealed class UnitTestSourceGenerator : IIncrementalGenerator
 //                builder.AppendLine("            }");
 //                builder.AppendLine("        }");
 //                builder.AppendLine();
-//            }
+ //           }
 //
 //            builder.AppendLine("    }");
 //            builder.AppendLine("}");
