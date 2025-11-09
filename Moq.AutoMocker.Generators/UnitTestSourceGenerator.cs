@@ -13,16 +13,18 @@ public sealed class UnitTestSourceGenerator : IIncrementalGenerator
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         // Gather info for all annotated command methods (starting from method declarations with at least one attribute)
-        IncrementalValuesProvider<GeneratorTargetClass> commandInfoWithErrors =
+        IncrementalValuesProvider<(GeneratorTargetClass? targetClass, ImmutableArray<Diagnostic> diagnostics)> commandInfoWithErrors =
             context.SyntaxProvider
             .ForAttributeWithMetadataName(
                 "Moq.AutoMock.ConstructorTestsAttribute",
-                static (node, _) => node is ClassDeclarationSyntax classDeclaration,
+                static (node, _) => node is ClassDeclarationSyntax,
                 static (context, token) =>
                 {
+                    var diagnostics = ImmutableArray.CreateBuilder<Diagnostic>();
+                    
                     if (((CSharpCompilation)context.SemanticModel.Compilation).LanguageVersion < LanguageVersion.CSharp5)
                     {
-                        return GeneratorTargetClass.Empty;
+                        return (null, diagnostics.ToImmutable());
                     }
 
                     var constructorTestsAttribute = context.Attributes[0];
@@ -30,9 +32,28 @@ public sealed class UnitTestSourceGenerator : IIncrementalGenerator
                     INamedTypeSymbol? sutType = GetTargetSutType(constructorTestsAttribute);
                     if (sutType is null)
                     {
-                        return GeneratorTargetClass.Empty;
+                        // Report diagnostic: must specify target type
+                        INamedTypeSymbol testClassSymbol = (INamedTypeSymbol)context.TargetSymbol;
+                        Diagnostic diagnostic = Diagnostics.MustSpecifyTargetType.Create(
+                            constructorTestsAttribute.ApplicationSyntaxReference?.GetSyntax(token).GetLocation(),
+                            testClassSymbol.OriginalDefinition.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
+                        diagnostics.Add(diagnostic);
+                        return (null, diagnostics.ToImmutable());
                     }
                     token.ThrowIfCancellationRequested();
+
+                    INamedTypeSymbol testClassSymbol2 = (INamedTypeSymbol)context.TargetSymbol;
+                    
+                    // Check if class is partial
+                    var classSyntax = context.TargetNode as ClassDeclarationSyntax;
+                    if (classSyntax != null && !classSyntax.Modifiers.Any(m => m.IsKind(PartialKeyword)))
+                    {
+                        Diagnostic diagnostic = Diagnostics.TestClassesMustBePartial.Create(
+                            classSyntax.GetLocation(),
+                            testClassSymbol2.OriginalDefinition.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
+                        diagnostics.Add(diagnostic);
+                        return (null, diagnostics.ToImmutable());
+                    }
 
                     SutClass sut = new()
                     {
@@ -56,28 +77,35 @@ public sealed class UnitTestSourceGenerator : IIncrementalGenerator
                         token.ThrowIfCancellationRequested();
                     }
 
-                    INamedTypeSymbol testClassSymbol = (INamedTypeSymbol)context.TargetSymbol;
-                    string testClassName = testClassSymbol.OriginalDefinition.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+                    string testClassName = testClassSymbol2.OriginalDefinition.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
                     bool skipNullableParameters = GetSkipNullableParameters(constructorTestsAttribute);
                     token.ThrowIfCancellationRequested();
-                    return new()
+                    
+                    var targetClass = new GeneratorTargetClass
                     {
-                        Namespace = testClassSymbol.ContainingNamespace.ToDisplayString(),
+                        Namespace = testClassSymbol2.ContainingNamespace.ToDisplayString(),
                         TestClassName = testClassName,
                         Sut = sut,
                         SkipNullableParameters = skipNullableParameters
                     };
-                })
-            .Where(static item => item is not null)!;
+                    
+                    return ((GeneratorTargetClass?)targetClass, diagnostics.ToImmutable());
+                });
 
-        //TODO: Add
         // Output the diagnostics
-        //context.ReportDiagnostics(commandInfoWithErrors.Select(static (item, _) => item.Info.Errors));
+        context.RegisterSourceOutput(commandInfoWithErrors, static (context, item) =>
+        {
+            foreach (var diagnostic in item.diagnostics)
+            {
+                context.ReportDiagnostic(diagnostic);
+            }
+        });
 
-        // Get the filtered sequence to enable caching
+        // Get the filtered sequence to enable caching - only items with valid target classes
         IncrementalValuesProvider<GeneratorTargetClass> commandInfo =
             commandInfoWithErrors
-            .Where(static item => item.Sut is not null)!;
+            .Select(static (item, _) => item.targetClass)
+            .Where(static item => item is not null)!;
 
         // Combine with compilation to get testing framework info
         IncrementalValueProvider<(Compilation, ImmutableArray<GeneratorTargetClass>)> compilationAndClasses =
@@ -454,21 +482,10 @@ public sealed class UnitTestSourceGenerator : IIncrementalGenerator
 
     private static INamedTypeSymbol? GetTargetSutType(AttributeData constructorTestsAttribute)
     {
-        //TODO: Diagnostics
-        /*
-         *             if (!(GetTargetType(attribute) is { } targetType) ||
-                context.SemanticModel.GetTypeInfo(targetType).Type is not INamedTypeSymbol sutType)
-            {
-                Diagnostic diagnostic = Diagnostics.MustSpecifyTargetType.Create(attribute.GetLocation(),
-                    symbol.OriginalDefinition.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
-                DiagnosticMessages.Add(diagnostic);
-                return;
-            }
-        */
-
         static INamedTypeSymbol? GetSutClass(TypedConstant arg)
         {
-            if (arg.Type?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == "System.Type" &&
+            // Check if this is a typeof() argument
+            if (arg.Kind == TypedConstantKind.Type &&
                 arg.Value is INamedTypeSymbol targetTypeSymbol)
             {
                 return targetTypeSymbol;
@@ -476,6 +493,7 @@ public sealed class UnitTestSourceGenerator : IIncrementalGenerator
             return null;
         }
 
+        // Check constructor arguments (e.g., [ConstructorTests(typeof(MyClass))])
         foreach (var arg in constructorTestsAttribute.ConstructorArguments)
         {
             if (GetSutClass(arg) is { } sutClass)
@@ -484,6 +502,7 @@ public sealed class UnitTestSourceGenerator : IIncrementalGenerator
             }
         }
 
+        // Check named arguments (e.g., [ConstructorTests(TargetType = typeof(MyClass))])
         foreach (var arg in constructorTestsAttribute.NamedArguments)
         {
             if (arg.Key == "TargetType" &&
