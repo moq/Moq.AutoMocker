@@ -52,4 +52,20 @@ public static class Diagnostics
         public static Diagnostic Create(Location? location, string className)
             => Diagnostic.Create(Rule, location, className);
     }
+
+    public static class DuplicateTargetType
+    {
+        public const string DiagnosticId = "AMG0004";
+        private const string Title = "Duplicate target type detected";
+        private const string MessageFormat = "The target type '{0}' is already being tested by another test class. Multiple test classes targeting the same type may cause confusion.";
+        private const string Description = "Avoid having multiple test classes with ConstructorTestsAttribute targeting the same type.";
+
+        //NB: Do not make a property or use target-typed new expression
+        //https://github.com/dotnet/roslyn-analyzers/issues/5890?msclkid=db74545bc13811ecac296aa1a3a09b53
+        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat,
+            Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+
+        public static Diagnostic Create(Location? location, string targetTypeName)
+            => Diagnostic.Create(Rule, location, targetTypeName);
+    }
 }
