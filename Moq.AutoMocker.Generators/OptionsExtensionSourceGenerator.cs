@@ -74,7 +74,7 @@ public sealed class OptionsExtensionSourceGenerator : IIncrementalGenerator
                 /// <typeparam name="TClass">The type of Options being configured.</typeparam>
                 /// <returns>The same <see cref="AutoMocker"/> instance passed as parameter, allowing chained calls.</returns>
                 public static AutoMocker WithOptions<TClass>(this AutoMocker mocker, Action<TClass>? configure = null)
-                    where TClass : class, new()
+                    where TClass : class
                 {
                     if (mocker == null)
                     {
