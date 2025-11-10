@@ -100,7 +100,8 @@ public sealed class UnitTestSourceGenerator : IIncrementalGenerator
                         Namespace = testClassSymbol2.ContainingNamespace.ToDisplayString(),
                         TestClassName = testClassName,
                         Sut = sut,
-                        SkipNullableParameters = skipNullableParameters
+                        SkipNullableParameters = skipNullableParameters,
+                        AttributeLocation = constructorTestsAttribute.ApplicationSyntaxReference?.GetSyntax(token).GetLocation()
                     };
 
                     return ((GeneratorTargetClass?)targetClass, diagnostics.ToImmutable());
@@ -131,10 +132,33 @@ public sealed class UnitTestSourceGenerator : IIncrementalGenerator
             var (compilation, classes) = source;
             var testingFramework = GetTestingFramework(compilation.ReferencedAssemblyNames);
 
+            // Track target types to detect duplicates
+            var targetTypeLocations = new Dictionary<string, Location?>();
+
             foreach (var item in classes)
             {
+                // Check for duplicate target types
+                if (item.Sut?.FullName is not null)
+                {
+                    if (targetTypeLocations.TryGetValue(item.Sut.FullName, out var existingLocation))
+                    {
+                        // Report warning for duplicate target type
+                        context.ReportDiagnostic(Diagnostics.DuplicateTargetType.Create(
+                            item.AttributeLocation,
+                            item.Sut.FullName));
+                    }
+                    else
+                    {
+                        targetTypeLocations[item.Sut.FullName] = item.AttributeLocation;
+                    }
+                }
+
                 string generatedCode = GenerateTestClass(item, testingFramework);
-                context.AddSource($"{item.TestClassName}.g.cs", generatedCode);
+                // Use namespace-qualified filename to avoid collisions
+                string fileName = string.IsNullOrEmpty(item.Namespace)
+                    ? $"{item.TestClassName}.g.cs"
+                    : $"{item.Namespace}.{item.TestClassName}.g.cs";
+                context.AddSource(fileName, generatedCode);
             }
         });
     }

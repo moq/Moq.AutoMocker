@@ -146,7 +146,7 @@ public class GeneratorsTests
             {
                 GeneratedSources =
                 {
-                    GetSourceFile(expected, "ControllerTests.g.cs")
+                    GetSourceFile(expected, "TestNamespace.ControllerTests.g.cs")
                 }
             }
 
@@ -193,7 +193,7 @@ public class GeneratorsTests
             {
                 GeneratedSources =
                 {
-                    GetSourceFile(expected, "ControllerTests.g.cs")
+                    GetSourceFile(expected, "TestNamespace.ControllerTests.g.cs")
                 }
             }
 

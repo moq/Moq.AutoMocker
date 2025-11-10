@@ -12,6 +12,8 @@ public sealed class GeneratorTargetClass
     public SutClass? Sut { get; set; }
 
     public bool SkipNullableParameters { get; set; }
+
+    public Location? AttributeLocation { get; set; }
 }
 
 

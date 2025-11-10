@@ -147,7 +147,7 @@ public class TestGeneratorTests
             {
                 GeneratedSources =
                 {
-                    GetSourceFile(expected, "ControllerTests.g.cs")
+                    GetSourceFile(expected, "TestNamespace.ControllerTests.g.cs")
                 }
             }
 
@@ -195,7 +195,7 @@ public class TestGeneratorTests
             {
                 GeneratedSources =
                 {
-                    GetSourceFile(expected, "ControllerTests.g.cs")
+                    GetSourceFile(expected, "TestNamespace.ControllerTests.g.cs")
                 }
             }
 
@@ -243,7 +243,7 @@ public class TestGeneratorTests
             {
                 GeneratedSources =
                 {
-                    GetSourceFile(expected, "ControllerTests.g.cs")
+                    GetSourceFile(expected, "TestNamespace.ControllerTests.g.cs")
                 }
             }
 
@@ -303,7 +303,7 @@ public class TestGeneratorTests
             {
                 GeneratedSources =
                 {
-                    GetSourceFile(expected, "ControllerTests.g.cs")
+                    GetSourceFile(expected, "TestNamespace.ControllerTests.g.cs")
                 }
             }
 
@@ -352,7 +352,7 @@ public class TestGeneratorTests
             {
                 GeneratedSources =
                 {
-                    GetSourceFile(expected, "ControllerTests.g.cs")
+                    GetSourceFile(expected, "TestNamespace.ControllerTests.g.cs")
                 }
             }
 
@@ -401,7 +401,7 @@ public class TestGeneratorTests
             {
                 GeneratedSources =
                 {
-                    GetSourceFile(expected, "ControllerTests.g.cs")
+                    GetSourceFile(expected, "TestNamespace.ControllerTests.g.cs")
                 }
             }
 
@@ -449,7 +449,7 @@ public class TestGeneratorTests
             {
                 GeneratedSources =
                 {
-                    GetSourceFile(expected, "ControllerTests.g.cs")
+                    GetSourceFile(expected, "TestNamespace.ControllerTests.g.cs")
                 }
             }
 
@@ -498,7 +498,7 @@ public class TestGeneratorTests
             {
                 GeneratedSources =
                 {
-                    GetSourceFile(expected, "ControllerTests.g.cs")
+                    GetSourceFile(expected, "TestNamespace.ControllerTests.g.cs")
                 }
             }
 
@@ -565,10 +565,210 @@ public class TestGeneratorTests
             {
                 GeneratedSources =
                 {
-                    GetSourceFile(expected, "ControllerTests.g.cs")
+                    GetSourceFile(expected, "TestNamespace.ControllerTests.g.cs")
                 }
             }
 
+        }.RunAsync();
+    }
+
+    [TestMethod]
+    public async Task Generation_WithDifferentNamespacesAndSameClassName_GeneratesUniqueFileNames()
+    {
+        var code = """
+
+            using Moq.AutoMock;
+
+            namespace FirstNamespace
+            {
+                [ConstructorTests(typeof(Controller))]
+                public partial class ControllerTests
+                {
+                }
+
+                public class Controller
+                {
+                    public Controller(IService service) { }
+                }
+
+                public interface IService { }
+            }
+
+            namespace SecondNamespace
+            {
+                [ConstructorTests(typeof(Controller))]
+                public partial class ControllerTests
+                {
+                }
+
+                public class Controller
+                {
+                    public Controller(ILogger logger) { }
+                }
+
+                public interface ILogger { }
+            }
+
+            """;
+        
+        string expectedFirstNamespace = """
+            namespace FirstNamespace
+            {
+                partial class ControllerTests
+                {
+                    partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+
+                    partial void ControllerConstructor_WithNullIService_ThrowsArgumentNullExceptionSetup(Moq.AutoMock.AutoMocker mocker);
+
+                    public void ControllerConstructor_WithNullIService_ThrowsArgumentNullException()
+                    {
+                        Moq.AutoMock.AutoMocker mocker = new Moq.AutoMock.AutoMocker();
+                        AutoMockerTestSetup(mocker, "ControllerConstructor_WithNullIService_ThrowsArgumentNullException");
+                        ControllerConstructor_WithNullIService_ThrowsArgumentNullExceptionSetup(mocker);
+                        using(System.IDisposable __mockerDisposable = mocker.AsDisposable())
+                        {
+                        }
+                    }
+
+                }
+            }
+
+            """;
+        
+        string expectedSecondNamespace = """
+            namespace SecondNamespace
+            {
+                partial class ControllerTests
+                {
+                    partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+
+                    partial void ControllerConstructor_WithNullILogger_ThrowsArgumentNullExceptionSetup(Moq.AutoMock.AutoMocker mocker);
+
+                    public void ControllerConstructor_WithNullILogger_ThrowsArgumentNullException()
+                    {
+                        Moq.AutoMock.AutoMocker mocker = new Moq.AutoMock.AutoMocker();
+                        AutoMockerTestSetup(mocker, "ControllerConstructor_WithNullILogger_ThrowsArgumentNullException");
+                        ControllerConstructor_WithNullILogger_ThrowsArgumentNullExceptionSetup(mocker);
+                        using(System.IDisposable __mockerDisposable = mocker.AsDisposable())
+                        {
+                        }
+                    }
+
+                }
+            }
+
+            """;
+
+        await new VerifyCS.Test
+        {
+            TestCode = code,
+            TestState =
+            {
+                GeneratedSources =
+                {
+                    GetSourceFile(expectedFirstNamespace, "FirstNamespace.ControllerTests.g.cs"),
+                    GetSourceFile(expectedSecondNamespace, "SecondNamespace.ControllerTests.g.cs")
+                }
+            }
+
+        }.RunAsync();
+    }
+
+    [TestMethod]
+    public async Task Generation_WithSameTargetTypeInMultipleTestClasses_ProducesDuplicateWarning()
+    {
+        var code = """
+
+            using Moq.AutoMock;
+
+            namespace TestNamespace;
+
+            [ConstructorTests(typeof(Controller))]
+            public partial class ControllerTests
+            {
+            }
+
+            [ConstructorTests(typeof(Controller))]
+            public partial class ControllerTests2
+            {
+            }
+
+            public class Controller
+            {
+                public Controller(IService service) { }
+            }
+
+            public interface IService { }
+
+            """;
+        
+        string expectedTests1 = """
+            namespace TestNamespace
+            {
+                partial class ControllerTests
+                {
+                    partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+
+                    partial void ControllerConstructor_WithNullIService_ThrowsArgumentNullExceptionSetup(Moq.AutoMock.AutoMocker mocker);
+
+                    public void ControllerConstructor_WithNullIService_ThrowsArgumentNullException()
+                    {
+                        Moq.AutoMock.AutoMocker mocker = new Moq.AutoMock.AutoMocker();
+                        AutoMockerTestSetup(mocker, "ControllerConstructor_WithNullIService_ThrowsArgumentNullException");
+                        ControllerConstructor_WithNullIService_ThrowsArgumentNullExceptionSetup(mocker);
+                        using(System.IDisposable __mockerDisposable = mocker.AsDisposable())
+                        {
+                        }
+                    }
+
+                }
+            }
+
+            """;
+        
+        string expectedTests2 = """
+            namespace TestNamespace
+            {
+                partial class ControllerTests2
+                {
+                    partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+
+                    partial void ControllerConstructor_WithNullIService_ThrowsArgumentNullExceptionSetup(Moq.AutoMock.AutoMocker mocker);
+
+                    public void ControllerConstructor_WithNullIService_ThrowsArgumentNullException()
+                    {
+                        Moq.AutoMock.AutoMocker mocker = new Moq.AutoMock.AutoMocker();
+                        AutoMockerTestSetup(mocker, "ControllerConstructor_WithNullIService_ThrowsArgumentNullException");
+                        ControllerConstructor_WithNullIService_ThrowsArgumentNullExceptionSetup(mocker);
+                        using(System.IDisposable __mockerDisposable = mocker.AsDisposable())
+                        {
+                        }
+                    }
+
+                }
+            }
+
+            """;
+        
+        var expectedWarning = DiagnosticResult.CompilerWarning(Diagnostics.DuplicateTargetType.DiagnosticId)
+            .WithSpan(11, 2, 11, 38)
+            .WithArguments("global::TestNamespace.Controller");
+
+        await new VerifyCS.Test
+        {
+            TestCode = code,
+            TestState =
+            {
+                GeneratedSources =
+                {
+                    GetSourceFile(expectedTests1, "TestNamespace.ControllerTests.g.cs"),
+                    GetSourceFile(expectedTests2, "TestNamespace.ControllerTests2.g.cs")
+                }
+            },
+            ExpectedDiagnostics =
+            {
+                expectedWarning
+            }
         }.RunAsync();
     }
 
