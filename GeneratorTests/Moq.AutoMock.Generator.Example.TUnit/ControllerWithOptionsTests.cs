@@ -7,10 +7,15 @@ public partial class ControllerWithOptionsTests
     {
         AutoMocker mocker = new();
 
-        mocker.WithOptions<TestsOptions>(options => options.Number = 42);
+        mocker.WithOptions<TestsOptions>(options =>
+        {
+            options.Number = 42;
+            options.Required = "Some Value";
+        });
 
         ControllerWithOptions controller = mocker.CreateInstance<ControllerWithOptions>();
 
         await Assert.That(controller.Options.Value.Number).IsEqualTo(42);
+        await Assert.That(controller.Options.Value.Required).IsEqualTo("Some Value");
     }
 }
