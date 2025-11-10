@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 namespace Moq.AutoMock.Generator.Example.NUnit;
 public class ControllerWithOptionsTests

@@ -149,8 +149,7 @@ public sealed class UnitTestSourceGenerator : IIncrementalGenerator
         builder.AppendLine("    {");
         builder.AppendLine("        partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);");
 
-        HashSet<string> testNames = new();
-        bool hasTests = false;
+        HashSet<string> testNames = [];
 
         foreach (NullConstructorParameterTest test in testClass.Sut?.NullConstructorParameterTests ?? Enumerable.Empty<NullConstructorParameterTest>())
         {
@@ -173,7 +172,6 @@ public sealed class UnitTestSourceGenerator : IIncrementalGenerator
                 }
             }
 
-            hasTests = true;
             builder.AppendLine();
             builder.AppendLine($"        partial void {testName}Setup(Moq.AutoMock.AutoMocker mocker);");
             builder.AppendLine();
@@ -189,9 +187,16 @@ public sealed class UnitTestSourceGenerator : IIncrementalGenerator
                 case TargetTestingFramework.NUnit:
                     builder.AppendLine("        [global::NUnit.Framework.Test]");
                     break;
+                case TargetTestingFramework.TUnit:
+                    builder.AppendLine("        [global::TUnit.Core.Test]");
+                    break;
             }
 
-            builder.AppendLine($"        public void {testName}()");
+            string methodSignature = testingFramework == TargetTestingFramework.TUnit
+                ? $"        public async System.Threading.Tasks.Task {testName}()"
+                : $"        public void {testName}()";
+            
+            builder.AppendLine(methodSignature);
             builder.AppendLine("        {");
             builder.AppendLine("            Moq.AutoMock.AutoMocker mocker = new Moq.AutoMock.AutoMocker();");
             builder.AppendLine($"            AutoMockerTestSetup(mocker, \"{testName}\");");
@@ -225,15 +230,39 @@ public sealed class UnitTestSourceGenerator : IIncrementalGenerator
                     builder.AppendLine($"{indent}System.ArgumentNullException ex = global::NUnit.Framework.Assert.Throws<System.ArgumentNullException>(() => {constructorInvocation});");
                     builder.AppendLine($"{indent}global::NUnit.Framework.Assert.That(\"{test.NullParameterName}\" == ex.ParamName);");
                     break;
+
+                case TargetTestingFramework.TUnit:
+                    builder.AppendLine($"{indent}System.ArgumentNullException ex = global::TUnit.Assertions.Assert.Throws<System.ArgumentNullException>(() => {constructorInvocation});");
+                    builder.AppendLine($"{indent}await global::TUnit.Assertions.Assert.That(ex.ParamName).IsEqualTo(\"{test.NullParameterName}\");");
+                    break;
             }
 
             builder.AppendLine("            }");
             builder.AppendLine("        }");
             builder.AppendLine();
         }
-        
+
+        if (testingFramework == TargetTestingFramework.TUnit && testNames.Count > 0)
+        {
+            builder.AppendLine("""
+                        public static void AddAutoMockerConstuctorTests(DynamicTestBuilderContext context)
+                        {
+                """);
+            foreach (var testName in testNames)
+            {
+                builder.AppendLine(
+                    $$"""
+                                context.AddTest(new DynamicTest<{{testClass.TestClassName}}>
+                                {
+                                    TestMethod = @class => @class.{{testName}}()
+                                });
+                    """);
+            }
+            builder.AppendLine("        }");
+        }
+
         // Only add blank line before closing brace if there are no tests
-        if (!hasTests)
+        if (testNames.Count == 0)
         {
             builder.AppendLine();
         }
@@ -338,6 +367,10 @@ public sealed class UnitTestSourceGenerator : IIncrementalGenerator
             if (assembly.Name.StartsWith("xunit."))
             {
                 return TargetTestingFramework.XUnit;
+            }
+            if (assembly.Name.Equals("TUnit.Core", StringComparison.OrdinalIgnoreCase))
+            {
+                return TargetTestingFramework.TUnit;
             }
         }
         return TargetTestingFramework.Unknown;

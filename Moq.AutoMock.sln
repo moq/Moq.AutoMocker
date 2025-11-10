@@ -31,6 +31,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.AutoMock.Generator.Exam
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.AutoMock.Generator.Example.xUnit", "GeneratorTests\Moq.AutoMock.Generator.Example.xUnit\Moq.AutoMock.Generator.Example.xUnit.csproj", "{586D1D6A-3EE2-4AB8-988A-CEB810EF7787}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.AutoMock.Generator.Example.TUnit", "GeneratorTests\Moq.AutoMock.Generator.Example.TUnit\Moq.AutoMock.Generator.Example.TUnit.csproj", "{A1B2C3D4-E5F6-7890-A1B2-C3D4E5F67890}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{820CF7FE-8E92-4500-BE62-55AF67007838}"
 	ProjectSection(SolutionItems) = preProject
 		.github\dependabot.yml = .github\dependabot.yml
@@ -75,6 +77,10 @@ Global
 		{586D1D6A-3EE2-4AB8-988A-CEB810EF7787}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{586D1D6A-3EE2-4AB8-988A-CEB810EF7787}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{586D1D6A-3EE2-4AB8-988A-CEB810EF7787}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1B2C3D4-E5F6-7890-A1B2-C3D4E5F67890}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-E5F6-7890-A1B2-C3D4E5F67890}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-E5F6-7890-A1B2-C3D4E5F67890}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-E5F6-7890-A1B2-C3D4E5F67890}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FE1C406B-D16B-4037-9D67-ECE2B6847AEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FE1C406B-D16B-4037-9D67-ECE2B6847AEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE1C406B-D16B-4037-9D67-ECE2B6847AEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -92,6 +98,7 @@ Global
 		{BAFB5236-9C52-48D2-8CD5-E214652F38D3} = {1D10BDDE-2E03-42E4-AA7A-B12AF01E7FE8}
 		{0E545A4D-809E-47CA-AC16-5CB80CD231F6} = {1D10BDDE-2E03-42E4-AA7A-B12AF01E7FE8}
 		{586D1D6A-3EE2-4AB8-988A-CEB810EF7787} = {1D10BDDE-2E03-42E4-AA7A-B12AF01E7FE8}
+		{A1B2C3D4-E5F6-7890-A1B2-C3D4E5F67890} = {1D10BDDE-2E03-42E4-AA7A-B12AF01E7FE8}
 		{820CF7FE-8E92-4500-BE62-55AF67007838} = {5698188E-884A-49D3-A74B-FF98C782BF15}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

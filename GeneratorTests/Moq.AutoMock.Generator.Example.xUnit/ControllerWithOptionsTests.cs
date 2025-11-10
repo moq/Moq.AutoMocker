@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using Xunit;
+﻿using Xunit;
 
 namespace Moq.AutoMock.Generator.Example.xUnit;
 public class ControllerWithOptionsTests
