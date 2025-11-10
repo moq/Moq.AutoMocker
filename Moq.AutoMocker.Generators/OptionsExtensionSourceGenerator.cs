@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Moq.AutoMocker.Generators;
 
@@ -7,18 +8,36 @@ public sealed class OptionsExtensionSourceGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        // Check if the generator is enabled via MSBuild property
+        IncrementalValueProvider<bool> isEnabled = context.AnalyzerConfigOptionsProvider
+            .Select(static (provider, _) => IsGeneratorEnabled(provider));
+
         // Check if Microsoft.Extensions.Options is referenced
         IncrementalValueProvider<bool> referencesOptions = context.CompilationProvider
             .Select(static (compilation, _) => ReferencesOptions(compilation.ReferencedAssemblyNames));
 
-        // Only generate source if Options is referenced
-        context.RegisterSourceOutput(referencesOptions, static (context, hasReference) =>
+        // Combine both conditions
+        IncrementalValueProvider<bool> shouldGenerate = isEnabled
+            .Combine(referencesOptions)
+            .Select(static (tuple, _) => tuple.Left && tuple.Right);
+
+        // Only generate source if enabled and Options is referenced
+        context.RegisterSourceOutput(shouldGenerate, static (context, shouldGenerate) =>
         {
-            if (hasReference)
+            if (shouldGenerate)
             {
                 context.AddSource("AutoMockerOptionsExtensions.g.cs", OptionsExtensionContent);
             }
         });
+    }
+
+    private static bool IsGeneratorEnabled(AnalyzerConfigOptionsProvider provider)
+    {
+        if (provider.GlobalOptions.TryGetValue("build_property.EnableMoqAutoMockerOptionsGenerator", out var value))
+        {
+            return !string.Equals(value, "false", StringComparison.OrdinalIgnoreCase);
+        }
+        return true; // Enabled by default
     }
 
     private static bool ReferencesOptions(IEnumerable<AssemblyIdentity> assemblies)

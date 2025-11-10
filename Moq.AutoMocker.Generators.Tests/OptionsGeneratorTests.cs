@@ -83,6 +83,38 @@ public class OptionsGeneratorTests
         }.RunAsync();
     }
 
+    [TestMethod]
+    public async Task WhenGeneratorIsDisabled_NoGenerationOccurs()
+    {
+        var test = new VerifyCS.Test
+        {
+            ReferenceOptionsAbstractions = true,
+            TestCode = ""
+        };
+        test.SetGlobalOption("build_property.EnableMoqAutoMockerOptionsGenerator", "false");
+        await test.RunAsync();
+    }
+
+    [TestMethod]
+    public async Task WhenGeneratorIsExplicitlyEnabled_ExtensionMethodIsGenerated()
+    {
+        var test = new VerifyCS.Test
+        {
+            CompilerDiagnostics = CompilerDiagnostics.None,
+            ReferenceOptionsAbstractions = true,
+            TestCode = "",
+            TestState =
+            {
+                GeneratedSources =
+                {
+                    GetSourceFile(ExpectedOptionsGeneratedFile, "AutoMockerOptionsExtensions.g.cs")
+                }
+            }
+        };
+        test.SetGlobalOption("build_property.EnableMoqAutoMockerOptionsGenerator", "true");
+        await test.RunAsync();
+    }
+
     private static (string FileName, SourceText SourceText) GetSourceFile(string content, string fileName)
     {
         return (Path.Combine("Moq.AutoMocker.Generators", "Moq.AutoMocker.Generators.OptionsExtensionSourceGenerator", fileName), SourceText.From(content, Encoding.UTF8));
