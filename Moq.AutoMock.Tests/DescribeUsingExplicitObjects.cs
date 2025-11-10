@@ -90,7 +90,7 @@ public class DescribeUsingExplicitObjects
         Service2 service = new();
         mocker.Use(service);
         var ex = Assert.Throws<InvalidOperationException>(() => mocker.Use(service));
-        Assert.AreEqual("The service has already been added.", ex.Message);
+        Assert.AreEqual($"The service instance has already been added. You can safely remove this call to AutoMocker.Use", ex.Message);
     }
 
     [TestMethod]

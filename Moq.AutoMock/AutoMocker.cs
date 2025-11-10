@@ -481,7 +481,7 @@ public partial class AutoMocker : IServiceProvider
                 existingInstance is RealInstance realInstance &&
                 Equals(realInstance.Value, service))
             {
-                throw new InvalidOperationException("The service has already been added.");
+                throw new InvalidOperationException($"The service instance has already been added. You can safely remove this call to {nameof(AutoMocker)}.{nameof(Use)}");
             }
             typeMap[type] = new RealInstance(service);
         });
