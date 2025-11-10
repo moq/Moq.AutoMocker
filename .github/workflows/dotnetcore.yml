@@ -61,7 +61,7 @@ jobs:
         dotnet pack /p:ContinuousIntegrationBuild=true --configuration Release --verbosity normal --output . 
     
     - name: Upload NuGet
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: NuGet
         if-no-files-found: error
