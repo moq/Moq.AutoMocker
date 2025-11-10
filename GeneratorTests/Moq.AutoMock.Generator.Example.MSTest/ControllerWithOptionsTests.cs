@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace Moq.AutoMock.Generator.Example.MSUnit;
+﻿namespace Moq.AutoMock.Generator.Example.MSUnit;
 [TestClass]
 public class ControllerWithOptionsTests
 {
