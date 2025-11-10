@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq.AutoMock.Resolvers;
-using Moq.AutoMock.Tests.Util;
+﻿using Moq.AutoMock.Resolvers;
 
 namespace Moq.AutoMock.Tests;
 

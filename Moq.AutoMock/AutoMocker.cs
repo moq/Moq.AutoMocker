@@ -69,6 +69,7 @@ public partial class AutoMocker : IServiceProvider
         Resolvers =
         [
             new CacheResolver(),
+            new CallbackResolver(),
             new SelfResolver(),
             new ArrayResolver(),
             new AutoMockerDisposableResolver(),
@@ -518,12 +519,49 @@ public partial class AutoMocker : IServiceProvider
     /// <typeparam name="TService">The type that the instance will be registered as</typeparam>
     /// <param name="setup">A shortcut for Mock.Of's syntax</param>
     /// <returns>Itself</returns>
+    /// <exception cref="ArgumentNullException">When the setup expression is null.</exception>
     public AutoMocker Use<TService>(Expression<Func<TService, bool>> setup)
         where TService : class
     {
         if (setup is null) throw new ArgumentNullException(nameof(setup));
 
         return Use(Mock.Get(Mock.Of(setup)));
+    }
+
+    /// <summary>
+    /// Adds a callback delegate to the container.
+    /// This delegate will be invoked when the service type is first requested.
+    /// The resulting value will be cached.
+    /// </summary>
+    /// <typeparam name="TService">The type that the instance will be registered as</typeparam>
+    /// <param name="factory">Teh factory callback.</param>
+    /// <returns>Itself</returns>
+    /// <exception cref="ArgumentNullException">When the factory is null.</exception>
+    public AutoMocker Use<TService>(Func<AutoMocker, TService> factory)
+        where TService : class
+    {
+        if (factory is null) throw new ArgumentNullException(nameof(factory));
+
+        CallbackResolver resolver = Resolvers.OfType<CallbackResolver>().FirstOrDefault()
+            ?? throw new InvalidOperationException($"The {nameof(CallbackResolver)} must be a registered resolver.");
+
+        resolver.AddCallback(factory);
+        return this;
+    }
+
+    /// <summary>
+    /// Adds a callback delegate to the container.
+    /// This delegate will be invoked when the service type is first requested.
+    /// The resulting value will be cached.
+    /// </summary>
+    /// <typeparam name="TService">The type that the instance will be registered as</typeparam>
+    /// <param name="factory">Teh factory callback.</param>
+    /// <returns>Itself</returns>
+    /// <exception cref="ArgumentNullException">When the factory is null.</exception>
+    public AutoMocker Use<TService>(Func<TService> factory)
+        where TService : class
+    {
+        return Use(_ => factory());
     }
 
     /// <summary>
