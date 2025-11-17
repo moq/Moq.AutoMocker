@@ -17,6 +17,7 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
         public bool ReferenceAutoMocker { get; set; } = true;
         public bool ReferenceOptionsAbstractions { get; set; }
         public bool ReferenceFakeLogging { get; set; }
+        public bool ReferenceApplicationInsights { get; set; }
 
         public void SetGlobalOption(string key, string value)
         {
@@ -47,7 +48,7 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
         protected override Project ApplyCompilationOptions(Project project)
         {
             //project.AnalyzerOptions.WithAdditionalFiles();
-            if (ReferenceAutoMocker || ReferenceOptionsAbstractions || ReferenceFakeLogging)
+            if (ReferenceAutoMocker || ReferenceOptionsAbstractions || ReferenceFakeLogging || ReferenceApplicationInsights)
             {
                 string fullPath = Path.GetFullPath($"{AutoMock.AssemblyName}.dll");
                 project = project.AddMetadataReference(MetadataReference.CreateFromFile(fullPath));
@@ -69,6 +70,20 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
                     
                     var loggingAssembly = typeof(Microsoft.Extensions.Logging.ILogger).Assembly;
                     project = project.AddMetadataReference(MetadataReference.CreateFromFile(loggingAssembly.Location));
+                }
+                catch
+                {
+                    // If we can't find the assembly, the test will fail, which is appropriate
+                }
+            }
+
+            if (ReferenceApplicationInsights)
+            {
+                // Add reference to Microsoft.ApplicationInsights
+                try
+                {
+                    var appInsightsAssembly = typeof(Microsoft.ApplicationInsights.TelemetryClient).Assembly;
+                    project = project.AddMetadataReference(MetadataReference.CreateFromFile(appInsightsAssembly.Location));
                 }
                 catch
                 {
