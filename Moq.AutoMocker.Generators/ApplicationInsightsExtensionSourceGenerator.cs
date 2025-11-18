@@ -78,7 +78,7 @@ public sealed class ApplicationInsightsExtensionSourceGenerator : IIncrementalGe
                 /// </summary>
                 /// <param name="mocker">The <see cref="AutoMocker"/> instance.</param>
                 /// <returns>The same <see cref="AutoMocker"/> instance passed as parameter, allowing chained calls.</returns>
-                public static AutoMocker AddApplicationInsights(this AutoMocker mocker)
+                public static AutoMocker WithApplicationInsights(this AutoMocker mocker)
                 {
                     if (mocker == null)
                     {
@@ -109,12 +109,12 @@ public sealed class ApplicationInsightsExtensionSourceGenerator : IIncrementalGe
 
                 /// <summary>
                 /// Gets the collection of telemetry items that have been sent through the Application Insights TelemetryClient.
-                /// This method retrieves telemetry from the <see cref="FakeTelemetryChannel"/> that was configured by <see cref="AddApplicationInsights"/>.
+                /// This method retrieves telemetry from the <see cref="FakeTelemetryChannel"/> that was configured by <see cref="WithApplicationInsights"/>.
                 /// </summary>
                 /// <param name="mocker">The <see cref="AutoMocker"/> instance.</param>
                 /// <returns>A read-only list of telemetry items that have been sent.</returns>
                 /// <exception cref="ArgumentNullException">Thrown when <paramref name="mocker"/> is null.</exception>
-                /// <exception cref="InvalidOperationException">Thrown when Application Insights has not been configured using <see cref="AddApplicationInsights"/>.</exception>
+                /// <exception cref="InvalidOperationException">Thrown when Application Insights has not been configured using <see cref="WithApplicationInsights"/>.</exception>
                 public static IReadOnlyList<ITelemetry> GetSentTelemetry(this AutoMocker mocker)
                 {
                     if (mocker == null)
@@ -125,7 +125,7 @@ public sealed class ApplicationInsightsExtensionSourceGenerator : IIncrementalGe
                     var channel = mocker.Get<FakeTelemetryChannel>();
                     if (channel == null)
                     {
-                        throw new InvalidOperationException("Application Insights has not been configured. Call AddApplicationInsights() first.");
+                        throw new InvalidOperationException("Application Insights has not been configured. Call WithApplicationInsights() first.");
                     }
 
                     return channel.SentItems;
