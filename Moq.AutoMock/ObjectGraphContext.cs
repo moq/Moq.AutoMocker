@@ -16,7 +16,7 @@ public class ObjectGraphContext
     public ObjectGraphContext(bool enablePrivate)
     {
         BindingFlags = GetBindingFlags(enablePrivate);
-        VisitedTypes = new HashSet<Type>();
+        VisitedTypes = [];
     }
 
     /// <summary>
@@ -31,7 +31,7 @@ public class ObjectGraphContext
         }
 
         BindingFlags = context.BindingFlags;
-        VisitedTypes = new HashSet<Type>(context.VisitedTypes);
+        VisitedTypes = [.. context.VisitedTypes];
     }
 
     /// <summary>
@@ -48,7 +48,7 @@ public class ObjectGraphContext
     /// <summary>
     /// A list of diagnostic messages.
     /// </summary>
-    public IReadOnlyList<string> DiagnosticMessages => _diagnostics ?? (IReadOnlyList<string>)Array.Empty<string>();
+    public IReadOnlyList<string> DiagnosticMessages => _diagnostics ?? (IReadOnlyList<string>)[];
 
     /// <summary>
     /// Add a new diagnostic message to this context.
@@ -56,7 +56,7 @@ public class ObjectGraphContext
     /// <param name="message">The message to be added</param>
     public void AddDiagnosticMessage(string message)
     {
-        _diagnostics ??= new();
+        _diagnostics ??= [];
         _diagnostics.Add(message);
     }
 
