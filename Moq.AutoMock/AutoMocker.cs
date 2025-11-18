@@ -150,9 +150,9 @@ public partial class AutoMocker : IServiceProvider
             {
                 resolvers[i].Resolve(context);
             }
-            catch
+            catch (Exception ex)
             {
-                //TODO: Should we do anything with exceptions?
+                resolutionContext.AddDiagnosticMessage($"Resolver: {resolvers[i].GetType().FullName} threw an exception while attempting to resolve service of type {serviceType.AssemblyQualifiedName} {ex}");
             }
         }
 

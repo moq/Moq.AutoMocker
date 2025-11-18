@@ -1,9 +1,10 @@
-﻿namespace Moq.AutoMock;
+﻿using System.Diagnostics;
 
-internal sealed class RealInstance : IInstance
+namespace Moq.AutoMock;
+
+[DebuggerDisplay("Real: {Value?.GetType().Name ?? \"null\",nq}")]
+internal sealed class RealInstance(object? value) : IInstance
 {
-    public RealInstance(object? value) => Value = value;
-
-    public object? Value { get; }
+    public object? Value { get; } = value;
     public bool IsMock => false;
 }

@@ -1,13 +1,13 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Moq.AutoMock;
 
-internal sealed class MockInstance : IInstance
+[DebuggerDisplay("Mock: {Mock.Object.GetType().Name,nq}")]
+internal sealed class MockInstance(Mock value) : IInstance
 {
-    public MockInstance(Mock value) => Mock = value;
-
     [NotNull]
     public object? Value => Mock.Object;
-    public Mock Mock { get; }
+    public Mock Mock { get; } = value;
     public bool IsMock => true;
 }

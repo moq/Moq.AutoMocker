@@ -1,11 +1,12 @@
-﻿namespace Moq.AutoMock;
+﻿using System.Diagnostics;
 
-internal sealed class MockArrayInstance : IInstance
+namespace Moq.AutoMock;
+
+[DebuggerDisplay("Array: {_type.Name,nq}[] (Count = {_mocks.Count})")]
+internal sealed class MockArrayInstance(Type type) : IInstance
 {
-    private readonly Type _type;
-    private readonly List<IInstance> _mocks = new List<IInstance>();
-
-    public MockArrayInstance(Type type) => _type = type;
+    private readonly Type _type = type;
+    private readonly List<IInstance> _mocks = [];
 
     public object Value
     {
