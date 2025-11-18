@@ -7,10 +7,10 @@ namespace Moq.AutoMock.Tests;
 public class DescribeApplicationInsights
 {
     [TestMethod]
-    public void AddApplicationInsights_AllowsVerificationOfTrackedEvents()
+    public void WithApplicationInsights_AllowsVerificationOfTrackedEvents()
     {
         var mocker = new AutoMocker();
-        mocker.AddApplicationInsights();
+        mocker.WithApplicationInsights();
 
         var service = mocker.CreateInstance<ServiceWithApplicationInsights>();
 
@@ -28,10 +28,10 @@ public class DescribeApplicationInsights
     }
 
     [TestMethod]
-    public void AddApplicationInsights_AllowsVerificationOfTrackedMetrics()
+    public void WithApplicationInsights_AllowsVerificationOfTrackedMetrics()
     {
         var mocker = new AutoMocker();
-        mocker.AddApplicationInsights();
+        mocker.WithApplicationInsights();
 
         var service = mocker.CreateInstance<ServiceWithApplicationInsights>();
 
@@ -56,7 +56,7 @@ public class DescribeApplicationInsights
     public void GetSentTelemetry_ReturnsAllSentTelemetryItems()
     {
         var mocker = new AutoMocker();
-        mocker.AddApplicationInsights();
+        mocker.WithApplicationInsights();
 
         var service = mocker.CreateInstance<ServiceWithApplicationInsights>();
 
