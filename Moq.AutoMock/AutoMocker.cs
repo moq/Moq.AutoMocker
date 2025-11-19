@@ -237,7 +237,7 @@ public partial class AutoMocker : IServiceProvider
 
         try
         {
-            object?[] parameters = arguments.Select(x => x.Value).ToArray();
+            object?[] parameters = [.. arguments.Select(x => x.Value)];
             return ctor.Invoke(parameters);
         }
         catch (TargetInvocationException e)
@@ -1151,7 +1151,7 @@ public partial class AutoMocker : IServiceProvider
             arguments = new IInstance[parameters.Length];
             for (int i = 0; i < parameters.Length; i++)
             {
-                ObjectGraphContext parameterContext = new(context);
+                ObjectGraphContext parameterContext = new(context, parameters[i]);
                 if (!TryGet(parameters[i].ParameterType, parameterContext, out IInstance? service, out bool noCache))
                 {
                     context.AddDiagnosticMessage($"Rejecting constructor {GetConstructorDisplayString(constructor)}, because {nameof(AutoMocker)} was unable to create parameter '{parameters[i].ParameterType.FullName} {parameters[i].Name}'");
