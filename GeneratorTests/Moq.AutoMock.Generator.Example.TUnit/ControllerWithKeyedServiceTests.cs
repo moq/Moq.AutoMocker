@@ -8,13 +8,16 @@ public class ControllerWithKeyedServiceTests
         AutoMocker mocker = new();
 
         IService service = Mock.Of<IService>();
+        mocker.Use(service);
         IService service2 = Mock.Of<IService>();
-        mocker.WithKeyedService(service, "Test");
+        mocker.WithKeyedService<IService, KeyedServiceWithDependency>("Test");
         mocker.WithKeyedService(service2, "Test2");
 
         ControllerWithKeyedService controller = mocker.CreateInstance<ControllerWithKeyedService>();
 
-        await Assert.That(controller.Service).IsEqualTo(service);
+        await Assert.That(controller.Service).IsTypeOf<KeyedServiceWithDependency>();
+        var keyedService = (KeyedServiceWithDependency)controller.Service;
+        await Assert.That(keyedService.Service).IsEqualTo(service);
         await Assert.That(controller.Service2).IsEqualTo(service2);
     }
 }
