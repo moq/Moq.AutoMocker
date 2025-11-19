@@ -18,6 +18,7 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
         public bool ReferenceOptionsAbstractions { get; set; }
         public bool ReferenceFakeLogging { get; set; }
         public bool ReferenceApplicationInsights { get; set; }
+        public bool ReferenceDependencyInjection { get; set; }
 
         public void SetGlobalOption(string key, string value)
         {
@@ -48,7 +49,7 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
         protected override Project ApplyCompilationOptions(Project project)
         {
             //project.AnalyzerOptions.WithAdditionalFiles();
-            if (ReferenceAutoMocker || ReferenceOptionsAbstractions || ReferenceFakeLogging || ReferenceApplicationInsights)
+            if (ReferenceAutoMocker || ReferenceOptionsAbstractions || ReferenceFakeLogging || ReferenceApplicationInsights || ReferenceDependencyInjection)
             {
                 string fullPath = Path.GetFullPath($"{AutoMock.AssemblyName}.dll");
                 project = project.AddMetadataReference(MetadataReference.CreateFromFile(fullPath));
@@ -84,6 +85,20 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
                 {
                     var appInsightsAssembly = typeof(Microsoft.ApplicationInsights.TelemetryClient).Assembly;
                     project = project.AddMetadataReference(MetadataReference.CreateFromFile(appInsightsAssembly.Location));
+                }
+                catch
+                {
+                    // If we can't find the assembly, the test will fail, which is appropriate
+                }
+            }
+
+            if (ReferenceDependencyInjection)
+            {
+                // Add reference to Microsoft.Extensions.DependencyInjection.Abstractions
+                try
+                {
+                    var diAssembly = typeof(Microsoft.Extensions.DependencyInjection.IKeyedServiceProvider).Assembly;
+                    project = project.AddMetadataReference(MetadataReference.CreateFromFile(diAssembly.Location));
                 }
                 catch
                 {

@@ -4,7 +4,7 @@ Moq.AutoMock includes built-in source generators that provide compile-time code 
 
 ## Available Generators
 
-Moq.AutoMock includes four source generators:
+Moq.AutoMock includes several source generators:
 
 ### 1. [Unit Test Generator](SourceGenerators/UnitTestGenerator.md)
 
@@ -86,6 +86,27 @@ service.DoWork(); // TelemetryClient calls won't hit the cloud
 ```
 
 [Learn more →](SourceGenerators/ApplicationInsightsExtensionGenerator.md)
+
+### 5. [Keyed Services Extension Generator](SourceGenerators/KeyedServicesExtensionGenerator.md)
+
+Generates `WithKeyedService<T>()` extension methods when `Microsoft.Extensions.DependencyInjection` is referenced.
+
+**Key Features:**
+- Enables testing of keyed services via `IKeyedServiceProvider`
+- Supports `[FromKeyedServices]` attribute resolution
+- Provides both eager and lazy service registration
+- Integrates seamlessly with dependency injection
+
+**Quick Example:**
+```csharp
+mocker.WithKeyedService(Mock.Of<IEmailSender>(), "primary");
+mocker.WithKeyedService<ICache, RedisCache>("cache");
+
+var service = mocker.CreateInstance<MyService>();
+// Keyed services are automatically resolved
+```
+
+[Learn more →](SourceGenerators/KeyedServicesExtensionGenerator.md)
 
 ## Tips and Best Practices
 

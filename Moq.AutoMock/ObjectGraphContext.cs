@@ -35,6 +35,18 @@ public class ObjectGraphContext
     }
 
     /// <summary>
+    /// Initializes a new instance of the ObjectGraphContext class by copying the specified context and setting the
+    /// target parameter information.
+    /// </summary>
+    /// <param name="context">The ObjectGraphContext instance to copy state from. Cannot be null.</param>
+    /// <param name="targetParameter">The parameter information to associate with this context. Cannot be null.</param>
+    public ObjectGraphContext(ObjectGraphContext context, ParameterInfo targetParameter)
+        : this(context)
+    {
+        ParameterInfo = targetParameter ?? throw new ArgumentNullException(nameof(targetParameter));
+    }
+
+    /// <summary>
     /// Flags passed to Mock constructor.
     /// </summary>
     public BindingFlags BindingFlags { get; }
@@ -49,6 +61,12 @@ public class ObjectGraphContext
     /// A list of diagnostic messages.
     /// </summary>
     public IReadOnlyList<string> DiagnosticMessages => _diagnostics ?? (IReadOnlyList<string>)[];
+
+    /// <summary>
+    /// The target parameter being resolved. This is only set when recursively resolving
+    /// constructor parameters.
+    /// </summary>
+    public ParameterInfo? ParameterInfo { get; }
 
     /// <summary>
     /// Add a new diagnostic message to this context.
