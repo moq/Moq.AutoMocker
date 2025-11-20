@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.1.31911.260
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11218.70 d18.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.AutoMock", "Moq.AutoMock\Moq.AutoMock.csproj", "{EEEF1922-71E6-443B-A86B-14742AB8E9C0}"
 EndProject
@@ -42,6 +42,11 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.AutoMocker.Generators", "Moq.AutoMocker.Generators\Moq.AutoMocker.Generators.csproj", "{FE1C406B-D16B-4037-9D67-ECE2B6847AEB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moq.AutoMocker.Generators.Tests", "Moq.AutoMocker.Generators.Tests\Moq.AutoMocker.Generators.Tests.csproj", "{7820E7C8-7169-4A28-9D1B-BB38FC4E2923}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "agents", "agents", "{118A5A89-6C5D-4D3C-A480-11048FCAF9CC}"
+	ProjectSection(SolutionItems) = preProject
+		.github\agents\source-generator-docs.md = .github\agents\source-generator-docs.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -100,6 +105,7 @@ Global
 		{586D1D6A-3EE2-4AB8-988A-CEB810EF7787} = {1D10BDDE-2E03-42E4-AA7A-B12AF01E7FE8}
 		{A1B2C3D4-E5F6-7890-A1B2-C3D4E5F67890} = {1D10BDDE-2E03-42E4-AA7A-B12AF01E7FE8}
 		{820CF7FE-8E92-4500-BE62-55AF67007838} = {5698188E-884A-49D3-A74B-FF98C782BF15}
+		{118A5A89-6C5D-4D3C-A480-11048FCAF9CC} = {820CF7FE-8E92-4500-BE62-55AF67007838}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1A499C6A-1AB1-4A04-A133-BBCF4759DACA}

@@ -22,7 +22,7 @@ public class OptionsGeneratorTests
             /// <summary>
             /// This class provides extension methods for interacting with IOptions in an <see cref="AutoMocker"/> instance.
             /// </summary>
-            public static class AutoMockerOptionsExtensions
+            static partial class AutoMockerOptionsExtensions
             {
                 /// <summary>
                 ///  This method sets up <see cref="AutoMocker"/> with various option related services for Microsoft's Option pattern, and allows their interception and manipulation in testing scenarios.

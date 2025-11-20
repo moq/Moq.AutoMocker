@@ -26,7 +26,7 @@ public class KeyedServicesGeneratorTests
             /// <summary>
             /// This class provides extension methods for interacting with keyed services in an <see cref="AutoMocker"/> instance.
             /// </summary>
-            public static class AutoMockerKeyedServicesExtensions
+            static partial class AutoMockerKeyedServicesExtensions
             {
                 /// <summary>
                 /// Registers a keyed service with the <see cref="AutoMocker"/> instance, allowing it to be resolved via <see cref="IKeyedServiceProvider"/>.

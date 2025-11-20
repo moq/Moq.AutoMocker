@@ -24,7 +24,7 @@ public class FakeLoggingGeneratorTests
             /// <summary>
             /// This class provides extension methods for interacting with fake logging in an <see cref="AutoMocker"/> instance.
             /// </summary>
-            public static class AutoMockerFakeLoggingExtensions
+            static partial class AutoMockerFakeLoggingExtensions
             {
                 /// <summary>
                 /// This method sets up <see cref="AutoMocker"/> with fake logging services from Microsoft.Extensions.Logging.Testing,
