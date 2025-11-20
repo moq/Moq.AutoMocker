@@ -69,7 +69,7 @@ public sealed class ApplicationInsightsExtensionSourceGenerator : IIncrementalGe
             /// <summary>
             /// This class provides extension methods for interacting with Application Insights in an <see cref="AutoMocker"/> instance.
             /// </summary>
-            public static class AutoMockerApplicationInsightsExtensions
+            static partial class AutoMockerApplicationInsightsExtensions
             {
                 /// <summary>
                 /// This method sets up <see cref="AutoMocker"/> with Application Insights services,
