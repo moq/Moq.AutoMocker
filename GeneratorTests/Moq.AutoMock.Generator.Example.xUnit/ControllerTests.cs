@@ -1,4 +1,4 @@
-namespace Moq.AutoMock.Generator.Example.xUnit;
+namespace Moq.AutoMock.Generator.Example.xUnit3;
 
 //[ConstructorTests(TargetType = typeof(Controller))]
 [ConstructorTests(typeof(Controller))]
