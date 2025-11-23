@@ -1,0 +1,32 @@
+<Solution>
+  <Folder Name="/GeneratorTests/">
+    <Project Path="GeneratorTests/Moq.AutoMock.Generator.Example.MSTest/Moq.AutoMock.Generator.Example.MSTest.csproj" />
+    <Project Path="GeneratorTests/Moq.AutoMock.Generator.Example.NUnit/Moq.AutoMock.Generator.Example.NUnit.csproj" />
+    <Project Path="GeneratorTests/Moq.AutoMock.Generator.Example.TUnit/Moq.AutoMock.Generator.Example.TUnit.csproj" />
+    <Project Path="GeneratorTests/Moq.AutoMock.Generator.Example.xUnit/Moq.AutoMock.Generator.Example.xUnit.csproj" />
+    <Project Path="GeneratorTests/Moq.AutoMock.Generator.Example.xUnit3/Moq.AutoMock.Generator.Example.xUnit3.csproj" />
+    <Project Path="GeneratorTests/Moq.AutoMocker.Generator.Example/Moq.AutoMock.Generator.Example.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+    <File Path="LICENSE.md" />
+    <File Path="NuGet.config" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/Solution Items/.github/">
+    <File Path=".github/dependabot.yml" />
+    <File Path=".github/workflows/dotnetcore.yml" />
+  </Folder>
+  <Folder Name="/Solution Items/.github/agents/">
+    <File Path=".github/agents/source-generator-docs.md" />
+  </Folder>
+  <Project Path="Generators/Generators.csproj" />
+  <Project Path="Moq.AutoMock.Tests/Moq.AutoMock.Tests.csproj" />
+  <Project Path="Moq.AutoMock/Moq.AutoMock.csproj" />
+  <Project Path="Moq.AutoMocker.Generators.Tests/Moq.AutoMocker.Generators.Tests.csproj" />
+  <Project Path="Moq.AutoMocker.Generators/Moq.AutoMocker.Generators.csproj" />
+</Solution>
