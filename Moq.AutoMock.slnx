@@ -4,7 +4,6 @@
     <Project Path="GeneratorTests/Moq.AutoMock.Generator.Example.NUnit/Moq.AutoMock.Generator.Example.NUnit.csproj" />
     <Project Path="GeneratorTests/Moq.AutoMock.Generator.Example.TUnit/Moq.AutoMock.Generator.Example.TUnit.csproj" />
     <Project Path="GeneratorTests/Moq.AutoMock.Generator.Example.xUnit/Moq.AutoMock.Generator.Example.xUnit.csproj" />
-    <Project Path="GeneratorTests/Moq.AutoMock.Generator.Example.xUnit3/Moq.AutoMock.Generator.Example.xUnit3.csproj" />
     <Project Path="GeneratorTests/Moq.AutoMocker.Generator.Example/Moq.AutoMock.Generator.Example.csproj" />
   </Folder>
   <Folder Name="/Solution Items/">

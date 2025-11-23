@@ -5,6 +5,7 @@
 
     <IsPackable>false</IsPackable>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <EnableNUnitRunner>true</EnableNUnitRunner>
   </PropertyGroup>
 
   <ItemGroup>
