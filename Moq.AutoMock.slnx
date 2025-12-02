@@ -23,6 +23,17 @@
   <Folder Name="/Solution Items/.github/agents/">
     <File Path=".github/agents/source-generator-docs.md" />
   </Folder>
+  <Folder Name="/Solution Items/docs/">
+    <File Path="docs/Moq.AutoMock.md" />
+    <File Path="docs/SourceGenerators.md" />
+  </Folder>
+  <Folder Name="/Solution Items/docs/SourceGenerators/">
+    <File Path="docs/SourceGenerators/ApplicationInsightsExtensionGenerator.md" />
+    <File Path="docs/SourceGenerators/FakeLoggingExtensionGenerator.md" />
+    <File Path="docs/SourceGenerators/KeyedServicesExtensionGenerator.md" />
+    <File Path="docs/SourceGenerators/OptionsExtensionGenerator.md" />
+    <File Path="docs/SourceGenerators/UnitTestGenerator.md" />
+  </Folder>
   <Project Path="Generators/Generators.csproj" />
   <Project Path="Moq.AutoMock.Tests/Moq.AutoMock.Tests.csproj" />
   <Project Path="Moq.AutoMock/Moq.AutoMock.csproj" />

@@ -1,6 +1,6 @@
 # Keyed Services Extension Generator
 
-When your test project references `Microsoft.Extensions.DependencyInjection`, this generator creates `WithKeyedService<T>()` extension methods for `AutoMocker` that enable testing classes that depend on keyed services via `IKeyedServiceProvider`.
+When your test project references `Microsoft.Extensions.DependencyInjection.Abstractions` version 8.x or newer, this generator creates `WithKeyedService<T>()` extension methods for `AutoMocker` that enable testing classes that depend on keyed services via `IKeyedServiceProvider`.
 
 ## Features
 

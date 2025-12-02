@@ -44,9 +44,10 @@ public sealed class KeyedServicesExtensionSourceGenerator : IIncrementalGenerato
     {
         foreach (AssemblyIdentity assembly in assemblies)
         {
-            if (assembly.Name.StartsWith("Microsoft.Extensions.DependencyInjection"))
+            if (assembly.Name.StartsWith("Microsoft.Extensions.DependencyInjection.Abstractions"))
             {
-                return true;
+                // Keyed services were introduced in version 8.0
+                return assembly.Version.Major >= 8;
             }
         }
         return false;
