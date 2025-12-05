@@ -78,7 +78,7 @@ jobs:
         
         <# Build and run the disable tests using the local NuGet package #>
         <# The test project's NuGet.config points to ../../nupkgs relative to the project #>
-        dotnet test ./GeneratorTests/Moq.AutoMock.Generator.DisableTests/Moq.AutoMock.Generator.DisableTests.csproj `
+        dotnet test --project ./GeneratorTests/Moq.AutoMock.Generator.DisableTests/Moq.AutoMock.Generator.DisableTests.csproj `
           --configuration Release `
           --verbosity normal `
           /p:LocalNuGetSource=true
