@@ -1,6 +1,7 @@
 ---
 description: Helps create comprehensive documentation for Moq.AutoMocker source generators
-applyTo: 'docs/SourceGenerators/**'
+
+target: 'docs/SourceGenerators/**'
 ---
 
 # Source Generator Documentation Agent

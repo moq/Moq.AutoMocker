@@ -68,6 +68,20 @@ jobs:
         path: |
           **/*.nupkg
           **/*.snupkg
+
+  # Test that MSBuild properties to disable generators work correctly
+    - name: Test Generator Disable Properties
+      run: |
+        <# Create a local NuGet source directory with the packed packages #>
+        New-Item -ItemType Directory -Force -Path ./nupkgs
+        Copy-Item -Path *.nupkg -Destination ./nupkgs/
+        
+        <# Build and run the disable tests using the local NuGet package #>
+        <# The test project's NuGet.config points to ../../nupkgs relative to the project #>
+        dotnet test ./GeneratorTests/Moq.AutoMock.Generator.DisableTests/Moq.AutoMock.Generator.DisableTests.csproj `
+          --configuration Release `
+          --verbosity normal `
+          /p:LocalNuGetSource=true
       
   # Update the docs
     - name: Update Docs
