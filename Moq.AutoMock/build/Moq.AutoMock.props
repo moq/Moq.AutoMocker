@@ -1,0 +1,12 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- 
+    Make MSBuild properties visible to the Roslyn compiler for source generators.
+    See: https://github.com/dotnet/roslyn/blob/main/docs/features/incremental-generators.cookbook.md#consume-msbuild-properties-and-metadata
+  -->
+  <ItemGroup>
+    <CompilerVisibleProperty Include="EnableMoqAutoMockerOptionsGenerator" />
+    <CompilerVisibleProperty Include="EnableMoqAutoMockerKeyedServicesGenerator" />
+    <CompilerVisibleProperty Include="EnableMoqAutoMockerFakeLoggingGenerator" />
+    <CompilerVisibleProperty Include="EnableMoqAutoMockerApplicationInsightsGenerator" />
+  </ItemGroup>
+</Project>
