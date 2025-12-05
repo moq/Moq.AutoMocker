@@ -31,9 +31,11 @@
     This project references the Moq.AutoMock NuGet package from a local source.
     The CI pipeline will set the LocalNuGetSource property to the directory containing
     the packed .nupkg files.
+    We use VersionOverride to bypass Central Package Management for this package
+    since we're using a locally-built package with a CI version suffix.
   -->
   <ItemGroup Condition="'$(LocalNuGetSource)' != ''">
-    <PackageReference Include="Moq.AutoMock" Version="*-*" />
+    <PackageReference Include="Moq.AutoMock" VersionOverride="*-*" />
   </ItemGroup>
   
   <!-- For local development, use project reference -->
