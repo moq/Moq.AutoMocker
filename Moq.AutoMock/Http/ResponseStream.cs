@@ -10,8 +10,8 @@ namespace Moq.AutoMock.Http;
 /// </summary>
 internal class ResponseStream : Stream
 {
-    private readonly Stream inner;
-    private long position;
+    private readonly Stream _inner;
+    private long _position;
 
     public ResponseStream(Stream stream)
     {
@@ -20,30 +20,30 @@ internal class ResponseStream : Stream
             throw new ArgumentException($"The {nameof(ResponseStream)} wrapper cannot be used with a non-seekable stream.", nameof(stream));
         }
 
-        inner = stream;
-        position = inner.Position;
+        _inner = stream;
+        _position = _inner.Position;
     }
 
     public override int Read(byte[] buffer, int offset, int count)
     {
-        lock (inner)
+        lock (_inner)
         {
             // Switch to wrapper's position
-            long originalPosition = inner.Position;
-            inner.Position = position;
+            long originalPosition = _inner.Position;
+            _inner.Position = _position;
 
             // Read normally
-            int ret = inner.Read(buffer, offset, count);
+            int ret = _inner.Read(buffer, offset, count);
 
             // Swap positions back
-            position = inner.Position;
-            inner.Position = originalPosition;
+            _position = _inner.Position;
+            _inner.Position = originalPosition;
 
             return ret;
         }
     }
 
-    public override bool CanRead => inner.CanRead;
+    public override bool CanRead => _inner.CanRead;
     public override bool CanSeek => false;
     public override bool CanWrite => false;
     public override long Length => throw new NotSupportedException();
