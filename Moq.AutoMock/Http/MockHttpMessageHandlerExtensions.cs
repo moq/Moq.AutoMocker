@@ -111,10 +111,10 @@ public static partial class MockHttpMessageHandlerExtensions
     /// <param name="expression">A lambda expression in the form of <c>x => x.SendAsync(...)</c>.</param>
     private static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> Setup(this ISetupConditionResult<HttpMessageHandler> handler, Expression<Func<IHttpMessageHandler, Task<HttpResponseMessage>>> expression)
     {
-        if (handler == null)
+        if (handler is null)
             throw new ArgumentNullException(nameof(handler));
 
-        if (expression == null)
+        if (expression is null)
             throw new ArgumentNullException(nameof(expression));
 
         // Expression should be a method call
@@ -143,24 +143,24 @@ public static partial class MockHttpMessageHandlerExtensions
         return handler.Setup(rewrittenExpression);
     }
 
-    // <summary>
-    // Verifies that a specific invocation matching the given expression was performed on the mock.
-    // Use in conjunction with the default <see cref="MockBehavior.Loose" />.
-    // </summary>
-    // <typeparam name="TResult">Type of the return value. Typically omitted as it can be inferred from the expression.</typeparam>
-    // <param name="handler">The <see cref="HttpMessageHandler" /> mock.</param>
-    // <param name="expression">Lambda expression that specifies the method invocation.</param>
-    // <param name="times">
-    // Number of times that the invocation is expected to have occurred.
-    // If omitted, assumed to be <see cref="Times.AtLeastOnce" />.
-    // </param>
-    // <param name="failMessage">Message to include in the thrown <see cref="MockException" /> if verification fails.</param>
-    // <exception cref="MockException">The specified invocation did not occur (or did not occur the specified number of times).</exception>
-    //private static void Verify<TResult>(this Mock<HttpMessageHandler> handler, Expression<Func<IHttpMessageHandler, TResult>> expression, Times? times = null, string? failMessage = null)
-    //{
-    //    if (handler == null)
-    //        throw new ArgumentNullException(nameof(handler));
+    /// <summary>
+    /// Verifies that a specific invocation matching the given expression was performed on the mock.
+    /// Use in conjunction with the default <see cref="MockBehavior.Loose" />.
+    /// </summary>
+    /// <typeparam name="TResult">Type of the return value. Typically omitted as it can be inferred from the expression.</typeparam>
+    /// <param name="handler">The <see cref="HttpMessageHandler" /> mock.</param>
+    /// <param name="expression">Lambda expression that specifies the method invocation.</param>
+    /// <param name="times">
+    /// Number of times that the invocation is expected to have occurred.
+    /// If omitted, assumed to be <see cref="Times.AtLeastOnce" />.
+    /// </param>
+    /// <param name="failMessage">Message to include in the thrown <see cref="MockException" /> if verification fails.</param>
+    /// <exception cref="MockException">The specified invocation did not occur (or did not occur the specified number of times).</exception>
+    private static void Verify<TResult>(this Mock<HttpMessageHandler> handler, Expression<Func<IHttpMessageHandler, TResult>> expression, Times? times = null, string? failMessage = null)
+    {
+        if (handler is null)
+            throw new ArgumentNullException(nameof(handler));
 
-    //    handler.Protected().As<IHttpMessageHandler>().Verify(expression, times, failMessage);
-    //}
+        handler.Protected().As<IHttpMessageHandler>().Verify(expression, times, failMessage!);
+    }
 }
