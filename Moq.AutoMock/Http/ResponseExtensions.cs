@@ -248,15 +248,15 @@ public static partial class MockHttpMessageHandlerExtensions
             configure: configure));
     }
 
-    /// <summary>
-    /// Specifies the response to return, as <see cref="JsonContent" /> using System.Text.Json.
-    /// </summary>
-    /// <param name="setup">The setup.</param>
-    /// <param name="statusCode">The status code.</param>
-    /// <param name="value">The value to serialize.</param>
-    /// <param name="options">Options to control the behavior during serialization, the default options are <see
-    /// cref="JsonSerializerDefaults.Web" />.</param>
-    /// <param name="configure">An action to configure the response headers.</param>
+    // <summary>
+    // Specifies the response to return, as <see cref="JsonContent" /> using System.Text.Json.
+    // </summary>
+    // <param name="setup">The setup.</param>
+    // <param name="statusCode">The status code.</param>
+    // <param name="value">The value to serialize.</param>
+    // <param name="options">Options to control the behavior during serialization, the default options are <see
+    // cref="JsonSerializerDefaults.Web" />.</param>
+    // <param name="configure">An action to configure the response headers.</param>
     //public static IReturnsResult<HttpMessageHandler> ReturnsJsonResponse<T>(
     //    this ISetup<HttpMessageHandler, Task<HttpResponseMessage>> setup,
     //    HttpStatusCode statusCode,
