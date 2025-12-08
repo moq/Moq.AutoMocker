@@ -108,6 +108,64 @@ var service = mocker.CreateInstance<MyService>();
 
 [Learn more →](SourceGenerators/KeyedServicesExtensionGenerator.md)
 
+## Important: Generated Classes Are Internal Partials
+
+All extension classes created by these source generators are generated as **partial classes** with **internal visibility**. For example, the Keyed Services generator produces:
+
+```csharp
+internal static partial class AutoMockerKeyedServicesExtensions
+{
+    // Generated extension methods...
+}
+```
+
+### Ambiguous Reference Issues with Multiple Test Projects
+
+This design can cause **ambiguous method call errors** when multiple test projects reference each other and both have the source generators enabled. Since each project generates its own internal partial class with the same name and methods, projects that share visibility (e.g., via `InternalsVisibleTo` or project references) may see duplicate definitions.
+
+**Example error:**
+```
+The call is ambiguous between the following methods or properties:
+'Moq.AutoMock.AutoMockerKeyedServicesExtensions.WithKeyedService(...)' and
+'Moq.AutoMock.AutoMockerKeyedServicesExtensions.WithKeyedService(...)'
+```
+
+This commonly occurs when:
+- An integration test project references a unit test project
+- `InternalsVisibleTo` is used between test projects
+- Both projects reference `Moq.AutoMock` and the same packages that trigger generators (e.g., `Microsoft.Extensions.DependencyInjection.Abstractions`)
+
+**Solution:** Disable the source generator in one of the projects (see [Disabling Source Generators](#disabling-source-generators) below).
+
+For more details, see [Issue #410](https://github.com/moq/Moq.AutoMocker/issues/410).
+
+## Disabling Source Generators
+
+Each source generator can be individually disabled using MSBuild properties in your project's `.csproj` file:
+
+| Generator | MSBuild Property |
+|-----------|-----------------|
+| Options Extension | `EnableMoqAutoMockerOptionsGenerator` |
+| Keyed Services Extension | `EnableMoqAutoMockerKeyedServicesGenerator` |
+| Fake Logging Extension | `EnableMoqAutoMockerFakeLoggingGenerator` |
+| Application Insights Extension | `EnableMoqAutoMockerApplicationInsightsGenerator` |
+
+**Example: Disabling a generator**
+```xml
+<PropertyGroup>
+  <!-- Disable the Keyed Services generator -->
+  <EnableMoqAutoMockerKeyedServicesGenerator>false</EnableMoqAutoMockerKeyedServicesGenerator>
+</PropertyGroup>
+```
+
+**Example: Disabling multiple generators**
+```xml
+<PropertyGroup>
+  <EnableMoqAutoMockerKeyedServicesGenerator>false</EnableMoqAutoMockerKeyedServicesGenerator>
+  <EnableMoqAutoMockerOptionsGenerator>false</EnableMoqAutoMockerOptionsGenerator>
+</PropertyGroup>
+```
+
 ## Tips and Best Practices
 
 ### Review Generated Code

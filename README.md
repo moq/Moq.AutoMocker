@@ -64,3 +64,11 @@ car.Accelerate(42);
 // This method verifies all mocks in the container
 mocker.VerifyAll();
 ```
+
+Documentation
+=============
+
+For more detailed documentation, including information about the built-in source generators that can automatically generate test boilerplate code, see the [docs folder](docs/).
+
+- [AutoMocker API Reference](docs/Moq.AutoMock.md)
+- [Source Generators](docs/SourceGenerators.md) - Learn about automatic code generation for constructor tests, options configuration, logging, and more
