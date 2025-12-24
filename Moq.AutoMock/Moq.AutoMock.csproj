@@ -27,6 +27,10 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PackageIcon>NuGetIcon.png</PackageIcon>
     <NoWarn>$(NoWarn);AMG0002</NoWarn>
+
+    <!-- Package Validation -->
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <PackageValidationBaselineVersion>3.6.0</PackageValidationBaselineVersion>
   </PropertyGroup>
 
 
