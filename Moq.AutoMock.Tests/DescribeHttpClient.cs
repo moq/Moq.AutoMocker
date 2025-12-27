@@ -37,7 +37,7 @@ public class DescribeHttpClient
 
         // Setup the mock handler to return a specific response using Protected() API
         mocker.GetMock<HttpMessageHandler>()
-            .Setup(x => x.SendAsync(It.IsAny<HttpRequestMessage>(), It.IsAny<CancellationToken>()))
+            .SetupHttp(x => x.SendAsync(It.IsAny<HttpRequestMessage>(), It.IsAny<CancellationToken>()))
             .ReturnsResponse(HttpStatusCode.OK, "Hello, World!");
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
@@ -45,7 +45,7 @@ public class DescribeHttpClient
         var response = await service.GetAsync("https://example.com/api/test");
 
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-        var content = await response.Content.ReadAsStringAsync();
+        var content = await response.Content.ReadAsStringAsync(TestContext.CancellationToken);
         Assert.AreEqual("Hello, World!", content);
     }
 
@@ -57,10 +57,7 @@ public class DescribeHttpClient
         mocker.SetupHttpGet("/users")
             .ReturnsResponse(HttpStatusCode.OK, """{"users": []}""");
 
-        mocker.GetMock<HttpMessageHandler>()
-            .Setup(x => x.SendAsync(
-                It.Is<HttpRequestMessage>(r => r.RequestUri!.PathAndQuery.Contains("/products")),
-                It.IsAny<CancellationToken>()))
+        mocker.SetupHttpGet("/products")
             .ReturnsResponse(HttpStatusCode.OK, """{"products": []}""");
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
@@ -68,8 +65,8 @@ public class DescribeHttpClient
         var usersResponse = await service.GetAsync("https://example.com/api/users");
         var productsResponse = await service.GetAsync("https://example.com/api/products");
 
-        var usersContent = await usersResponse.Content.ReadAsStringAsync();
-        var productsContent = await productsResponse.Content.ReadAsStringAsync();
+        var usersContent = await usersResponse.Content.ReadAsStringAsync(TestContext.CancellationToken);
+        var productsContent = await productsResponse.Content.ReadAsStringAsync(TestContext.CancellationToken);
 
         Assert.AreEqual("""{"users": []}""", usersContent);
         Assert.AreEqual("""{"products": []}""", productsContent);
@@ -80,16 +77,11 @@ public class DescribeHttpClient
     {
         var mocker = new AutoMocker();
 
-        mocker.GetMock<HttpMessageHandler>()
-            .Setup(x => x.SendAsync(It.IsAny<HttpRequestMessage>(), It.IsAny<CancellationToken>()))
-            .ReturnsResponse(HttpStatusCode.OK);
-
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 
         await service.GetAsync("https://example.com/api/test");
 
-        mocker.GetMock<HttpMessageHandler>()
-            .Verify(x => x.SendAsync(It.IsAny<HttpRequestMessage>(), It.IsAny<CancellationToken>()), Times.Once());
+        mocker.VerifyHttpGet("https://example.com/api/test", Times.Once());
     }
 
     [TestMethod]
@@ -98,7 +90,7 @@ public class DescribeHttpClient
         var mocker = new AutoMocker();
 
         mocker.GetMock<HttpMessageHandler>()
-            .Setup(x => x.SendAsync(It.IsAny<HttpRequestMessage>(), It.IsAny<CancellationToken>()))
+            .SetupHttp(x => x.SendAsync(It.IsAny<HttpRequestMessage>(), It.IsAny<CancellationToken>()))
             .ReturnsResponse(HttpStatusCode.OK);
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
@@ -141,8 +133,7 @@ public class DescribeHttpClient
     {
         var mocker = new AutoMocker();
 
-        mocker.GetMock<HttpMessageHandler>()
-            .Setup(x => x.SendAsync(It.IsAny<HttpRequestMessage>(), It.IsAny<CancellationToken>()))
+        mocker.SetupHttpGet()
             .ReturnsResponse(HttpStatusCode.InternalServerError, "Server Error");
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
@@ -157,8 +148,7 @@ public class DescribeHttpClient
     {
         var mocker = new AutoMocker();
 
-        mocker.GetMock<HttpMessageHandler>()
-            .Setup(x => x.SendAsync(It.IsAny<HttpRequestMessage>(), It.IsAny<CancellationToken>()))
+        mocker.SetupHttpGet()
             .ReturnsResponse(HttpStatusCode.NotFound);
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
@@ -174,14 +164,13 @@ public class DescribeHttpClient
         var mocker = new AutoMocker();
         var expectedBytes = "Hello"u8.ToArray();
 
-        mocker.GetMock<HttpMessageHandler>()
-            .Setup(x => x.SendAsync(It.IsAny<HttpRequestMessage>(), It.IsAny<CancellationToken>()))
+        mocker.SetupHttpGet()
             .ReturnsResponse(HttpStatusCode.OK, expectedBytes, "application/octet-stream");
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 
         var response = await service.GetAsync("https://example.com/api/binary");
-        var content = await response.Content.ReadAsByteArrayAsync();
+        var content = await response.Content.ReadAsByteArrayAsync(TestContext.CancellationToken);
 
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         CollectionAssert.AreEqual(expectedBytes, content);
@@ -192,8 +181,7 @@ public class DescribeHttpClient
     {
         var mocker = new AutoMocker();
 
-        mocker.GetMock<HttpMessageHandler>()
-            .Setup(x => x.SendAsync(It.IsAny<HttpRequestMessage>(), It.IsAny<CancellationToken>()))
+        mocker.SetupHttpGet()
             .ReturnsResponse(HttpStatusCode.OK, "Response with headers", configure: response =>
             {
                 response.Headers.Add("X-Custom-Header", "CustomValue");
@@ -206,20 +194,6 @@ public class DescribeHttpClient
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         Assert.IsTrue(response.Headers.Contains("X-Custom-Header"));
         Assert.AreEqual("CustomValue", response.Headers.GetValues("X-Custom-Header").First());
-    }
-
-    [TestMethod]
-    public void GetSentHttpRequestMessages_ReturnsAllSentRequests()
-    {
-        var mocker = new AutoMocker();
-
-        // Verify that we can get the HttpClient from the mocker
-        var httpClient = mocker.Get<HttpClient>();
-        Assert.IsNotNull(httpClient);
-
-        // Verify we can get the HttpMessageHandler mock
-        var handlerMock = mocker.GetMock<HttpMessageHandler>();
-        Assert.IsNotNull(handlerMock);
     }
 
     [TestMethod]
@@ -248,4 +222,6 @@ public class DescribeHttpClient
             return httpClient.PostAsync(url, new StringContent(content));
         }
     }
+
+    public TestContext TestContext { get; set; }
 }
