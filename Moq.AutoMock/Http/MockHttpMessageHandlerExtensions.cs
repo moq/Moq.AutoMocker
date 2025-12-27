@@ -18,7 +18,7 @@ public static partial class MockHttpMessageHandlerExtensions
     /// <param name="handler">The <see cref="HttpMessageHandler" /> mock.</param>
     public static HttpClient CreateClient(this Mock<HttpMessageHandler> handler)
     {
-        if (handler == null)
+        if (handler is null)
             throw new ArgumentNullException(nameof(handler));
 
         return new HttpClient(handler.Object, false);
@@ -53,7 +53,7 @@ public static partial class MockHttpMessageHandlerExtensions
     /// </summary>
     /// <param name="mocker">The <see cref="AutoMocker" /> instance.</param>
     /// <param name="requestUri">The requested Uri</param>
-    public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpGet(this AutoMocker mocker, string requestUri)
+    public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpGet(this AutoMocker mocker, string? requestUri = null)
     {
         return mocker.GetMock<HttpMessageHandler>().SetupHttpGet(requestUri);
     }
@@ -61,12 +61,32 @@ public static partial class MockHttpMessageHandlerExtensions
     /// <summary>
     /// Specifies a setup on the mocked type for a call to a value-returning method.
     /// </summary>
+    /// <param name="mocker">The <see cref="AutoMocker" /> instance.</param>
+    /// <param name="match">The predicate used to match the <see cref="HttpRequestMessage"/>.</param>
+    public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpGet(this AutoMocker mocker, Expression<Func<HttpRequestMessage, bool>> match)
+    {
+        return mocker.GetMock<HttpMessageHandler>().SetupHttpGet(match);
+    }
+
+    /// <summary>
+    /// Specifies a setup on the mocked type for a call to a value-returning method.
+    /// </summary>
     /// <param name="handler">The <see cref="HttpMessageHandler" /> mock.</param>
     /// <param name="requestUri">The requested Uri</param>
-    public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpGet(this Mock<HttpMessageHandler> handler, string requestUri)
+    public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpGet(this Mock<HttpMessageHandler> handler, string? requestUri = null)
     {
-        return Setup(handler, x => x.SendAsync(
-                It.Is<HttpRequestMessage>(r => r.Method == HttpMethod.Get && r.RequestUri!.PathAndQuery.Contains(requestUri)),
+        return handler.SetupHttpGet(r => r.Method == HttpMethod.Get && (requestUri == null || r.RequestUri!.PathAndQuery.Contains(requestUri)));
+    }
+
+    /// <summary>
+    /// Specifies a setup on the mocked type for a call to a value-returning method.
+    /// </summary>
+    /// <param name="handler">The <see cref="HttpMessageHandler" /> mock.</param>
+    /// <param name="match">The predicate used to match the <see cref="HttpRequestMessage"/>.</param>
+    public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpGet(this Mock<HttpMessageHandler> handler, Expression<Func<HttpRequestMessage, bool>> match)
+    {
+        return SetupHttp(handler, x => x.SendAsync(
+                It.Is(match),
                 It.IsAny<CancellationToken>()));
     }
 
@@ -89,7 +109,7 @@ public static partial class MockHttpMessageHandlerExtensions
     /// <param name="body">Optional request body content to match.</param>
     public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpPost(this Mock<HttpMessageHandler> handler, string requestUri, string? body = null)
     {
-        return Setup(handler, x => x.SendAsync(
+        return SetupHttp(handler, x => x.SendAsync(
                 It.Is<HttpRequestMessage>(r => r.Method == HttpMethod.Post 
                     && r.RequestUri!.PathAndQuery.Contains(requestUri)
                     && (body == null || (r.Content != null && r.Content.ReadAsStringAsync().Result.Contains(body)))),
@@ -115,7 +135,7 @@ public static partial class MockHttpMessageHandlerExtensions
     /// <param name="body">Optional request body content to match.</param>
     public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpPut(this Mock<HttpMessageHandler> handler, string requestUri, string? body = null)
     {
-        return Setup(handler, x => x.SendAsync(
+        return SetupHttp(handler, x => x.SendAsync(
                 It.Is<HttpRequestMessage>(r => r.Method == HttpMethod.Put 
                     && r.RequestUri!.PathAndQuery.Contains(requestUri)
                     && (body == null || (r.Content != null && r.Content.ReadAsStringAsync().Result.Contains(body)))),
@@ -141,7 +161,7 @@ public static partial class MockHttpMessageHandlerExtensions
     /// <param name="body">Optional request body content to match.</param>
     public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpDelete(this Mock<HttpMessageHandler> handler, string requestUri, string? body = null)
     {
-        return Setup(handler, x => x.SendAsync(
+        return SetupHttp(handler, x => x.SendAsync(
                 It.Is<HttpRequestMessage>(r => r.Method == HttpMethod.Delete 
                     && r.RequestUri!.PathAndQuery.Contains(requestUri)
                     && (body == null || (r.Content != null && r.Content.ReadAsStringAsync().Result.Contains(body)))),
@@ -165,7 +185,7 @@ public static partial class MockHttpMessageHandlerExtensions
     /// <param name="requestUri">The requested Uri</param>
     public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpHead(this Mock<HttpMessageHandler> handler, string requestUri)
     {
-        return Setup(handler, x => x.SendAsync(
+        return SetupHttp(handler, x => x.SendAsync(
                 It.Is<HttpRequestMessage>(r => r.Method == HttpMethod.Head && r.RequestUri!.PathAndQuery.Contains(requestUri)),
                 It.IsAny<CancellationToken>()));
     }
@@ -176,7 +196,7 @@ public static partial class MockHttpMessageHandlerExtensions
     /// <typeparam name="TResult">Type of the return value. Typically omitted as it can be inferred from the expression.</typeparam>
     /// <param name="handler">The <see cref="HttpMessageHandler" /> mock.</param>
     /// <param name="expression">Lambda expression that specifies the expected method invocation.</param>
-    public static ISetup<HttpMessageHandler, TResult> Setup<TResult>(this Mock<HttpMessageHandler> handler, Expression<Func<IHttpMessageHandler, TResult>> expression)
+    public static ISetup<HttpMessageHandler, TResult> SetupHttp<TResult>(this Mock<HttpMessageHandler> handler, Expression<Func<IHttpMessageHandler, TResult>> expression)
     {
         if (handler is null)
             throw new ArgumentNullException(nameof(handler));
@@ -284,5 +304,89 @@ public static partial class MockHttpMessageHandlerExtensions
             throw new ArgumentNullException(nameof(handler));
 
         handler.Protected().As<IHttpMessageHandler>().Verify(expression, times, failMessage!);
+    }
+
+    /// <summary>
+    /// Verifies that a specific invocation matching the given expression was performed on the mock.
+    /// Use in conjunction with the default <see cref="MockBehavior.Loose" />.
+    /// </summary>
+    /// <typeparam name="TResult">Type of the return value. Typically omitted as it can be inferred from the expression.</typeparam>
+    /// <param name="handler">The <see cref="HttpMessageHandler" /> mock.</param>
+    /// <param name="expression">Lambda expression that specifies the method invocation.</param>
+    /// <param name="times">
+    /// Number of times that the invocation is expected to have occurred.
+    /// If omitted, assumed to be <see cref="Times.AtLeastOnce" />.
+    /// </param>
+    /// <param name="failMessage">Message to include in the thrown <see cref="MockException" /> if verification fails.</param>
+    /// <exception cref="MockException">The specified invocation did not occur (or did not occur the specified number of times).</exception>
+    public static void VerifyHttp<TResult>(this Mock<HttpMessageHandler> handler, Expression<Func<IHttpMessageHandler, TResult>> expression, Times? times = null, string? failMessage = null)
+    {
+        if (handler is null)
+            throw new ArgumentNullException(nameof(handler));
+
+        handler.Protected().As<IHttpMessageHandler>().Verify(expression, times, failMessage!);
+    }
+
+    /// <summary>
+    /// Verifies that a specific invocation matching the given expression was performed on the mock.
+    /// Use in conjunction with the default <see cref="MockBehavior.Loose" />.
+    /// </summary>
+    /// <param name="mocker">The <see cref="AutoMocker" /> instance.</param>
+    /// <param name="requestUri">Lambda expression that specifies the method invocation.</param>
+    /// <param name="times">
+    /// Number of times that the invocation is expected to have occurred.
+    /// If omitted, assumed to be <see cref="Times.AtLeastOnce" />.
+    /// </param>
+    /// <param name="failMessage">Message to include in the thrown <see cref="MockException" /> if verification fails.</param>
+    /// <exception cref="MockException">The specified invocation did not occur (or did not occur the specified number of times).</exception>
+    public static void VerifyHttpGet(this AutoMocker mocker, string requestUri, Times? times = null, string? failMessage = null)
+    {
+        if (mocker is null)
+            throw new ArgumentNullException(nameof(mocker));
+
+        mocker.GetMock<HttpMessageHandler>()
+            .VerifyHttpGet(requestUri, times, failMessage);
+    }
+
+    /// <summary>
+    /// Verifies that a specific invocation matching the given expression was performed on the mock.
+    /// Use in conjunction with the default <see cref="MockBehavior.Loose" />.
+    /// </summary>
+    /// <param name="handler">The <see cref="HttpMessageHandler" /> mock.</param>
+    /// <param name="requestUri">Lambda expression that specifies the method invocation.</param>
+    /// <param name="times">
+    /// Number of times that the invocation is expected to have occurred.
+    /// If omitted, assumed to be <see cref="Times.AtLeastOnce" />.
+    /// </param>
+    /// <param name="failMessage">Message to include in the thrown <see cref="MockException" /> if verification fails.</param>
+    /// <exception cref="MockException">The specified invocation did not occur (or did not occur the specified number of times).</exception>
+    public static void VerifyHttpGet(this Mock<HttpMessageHandler> handler, string requestUri, Times? times = null, string? failMessage = null)
+    {
+        if (handler is null)
+            throw new ArgumentNullException(nameof(handler));
+
+        handler.VerifyHttpGet(r => r.Method == HttpMethod.Get && r.RequestUri!.PathAndQuery.Contains(requestUri), times, failMessage);
+    }
+
+    /// <summary>
+    /// Verifies that a specifi>c invocation matching the given expression was performed on the mock.
+    /// Use in conjunction with the default <see cref="MockBehavior.Loose" />.
+    /// </summary>
+    /// <param name="handler">The <see cref="HttpMessageHandler" /> mock.</param>
+    /// <param name="match">The predicate used to match the <see cref="HttpRequestMessage"/>.</param>
+    /// <param name="times">
+    /// Number of times that the invocation is expected to have occurred.
+    /// If omitted, assumed to be <see cref="Times.AtLeastOnce" />.
+    /// </param>
+    /// <param name="failMessage">Message to include in the thrown <see cref="MockException" /> if verification fails.</param>
+    /// <exception cref="MockException">The specified invocation did not occur (or did not occur the specified number of times).</exception>
+    public static void VerifyHttpGet(this Mock<HttpMessageHandler> handler, Expression<Func<HttpRequestMessage, bool>> match, Times? times = null, string? failMessage = null)
+    {
+        if (handler is null)
+            throw new ArgumentNullException(nameof(handler));
+
+        handler.VerifyHttp(x => x.SendAsync(
+            It.Is(match),
+            It.IsAny<CancellationToken>()));
     }
 }

@@ -14,6 +14,12 @@ public class HttpClientResolver : IMockResolver
         if (context.RequestType == typeof(HttpClient))
         {
             var messageHandler = context.AutoMocker.GetMock<HttpMessageHandler>();
+
+            if (context.AutoMocker.MockBehavior == MockBehavior.Loose)
+            {
+                messageHandler.SetupHttp(x => x.SendAsync(It.IsAny<HttpRequestMessage>(), It.IsAny<CancellationToken>()))
+                              .ReturnsAsync(new HttpResponseMessage(System.Net.HttpStatusCode.OK));
+            }
             context.Value = messageHandler.CreateClient();
         }
     }
