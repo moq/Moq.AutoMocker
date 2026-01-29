@@ -48,7 +48,28 @@ public class DescribeUsingWithCallback
 
         _ = mocker.CreateInstance<WithService>();
         _ = mocker.CreateInstance<WithService>();
-        
+
         Assert.AreEqual(1, callbackCount);
+    }
+
+    [TestMethod]
+    public void You_can_register_an_implementation_type_for_a_service_type()
+    {
+        AutoMocker mocker = new();
+        mocker.Use<IService2, Service2>();
+
+        var instance = mocker.Get<IService2>();
+        Assert.IsNotNull(instance);
+    }
+
+    [TestMethod]
+    public void Implementation_type_can_be_used_with_CreateInstance()
+    {
+        AutoMocker mocker = new();
+        mocker.Use<IService2, Service2>();
+
+        var instance = mocker.CreateInstance<WithService>();
+
+        Assert.IsNotNull(instance.Service);
     }
 }

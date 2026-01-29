@@ -1,3 +1,4 @@
+using System.ComponentModel.Design;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -562,6 +563,22 @@ public partial class AutoMocker : IServiceProvider
         where TService : class
     {
         return Use(_ => factory());
+    }
+
+    /// <summary>
+    /// Adds a callback delegate to the container.
+    /// This delegate will be invoked when the service type is first requested.
+    /// The resulting value will be cached.
+    /// </summary>
+    /// <typeparam name="TService">The type that the instance will be registered as</typeparam>
+    /// <typeparam name="TImplementation">The service implementation type</typeparam>
+    /// <returns>Itself</returns>
+    /// <exception cref="ArgumentNullException">When the factory is null.</exception>
+    public AutoMocker Use<TService, TImplementation>()
+        where TService : class
+        where TImplementation: class, TService
+    {
+        return Use(mocker => mocker.Get<TImplementation>());
     }
 
     /// <summary>
