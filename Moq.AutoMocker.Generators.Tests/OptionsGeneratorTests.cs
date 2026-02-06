@@ -63,7 +63,7 @@ public class OptionsGeneratorTests
             TestCode = "",
             ReferenceOptionsAbstractions = false
 
-        }.RunAsync();
+        }.RunAsync(TestContext.CancellationToken);
     }
 
     [TestMethod]
@@ -82,7 +82,7 @@ public class OptionsGeneratorTests
                 }
             }
 
-        }.RunAsync();
+        }.RunAsync(TestContext.CancellationToken);
     }
 
     [TestMethod]
@@ -94,7 +94,7 @@ public class OptionsGeneratorTests
             TestCode = ""
         };
         test.SetGlobalOption("build_property.EnableMoqAutoMockerOptionsGenerator", "false");
-        await test.RunAsync();
+        await test.RunAsync(TestContext.CancellationToken);
     }
 
     [TestMethod]
@@ -114,11 +114,13 @@ public class OptionsGeneratorTests
             }
         };
         test.SetGlobalOption("build_property.EnableMoqAutoMockerOptionsGenerator", "true");
-        await test.RunAsync();
+        await test.RunAsync(TestContext.CancellationToken);
     }
 
     private static (string FileName, SourceText SourceText) GetSourceFile(string content, string fileName)
     {
         return (Path.Combine("Moq.AutoMocker.Generators", "Moq.AutoMocker.Generators.OptionsExtensionSourceGenerator", fileName), SourceText.From(content, Encoding.UTF8));
     }
+
+    public TestContext TestContext { get; set; }
 }

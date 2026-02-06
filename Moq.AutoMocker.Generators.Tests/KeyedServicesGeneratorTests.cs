@@ -256,7 +256,7 @@ public class KeyedServicesGeneratorTests
             TestCode = "",
             ReferenceDependencyInjection = false
 
-        }.RunAsync();
+        }.RunAsync(TestContext.CancellationToken);
     }
 
     [TestMethod]
@@ -275,7 +275,7 @@ public class KeyedServicesGeneratorTests
                 }
             }
 
-        }.RunAsync();
+        }.RunAsync(TestContext.CancellationToken);
     }
 
     [TestMethod]
@@ -287,7 +287,7 @@ public class KeyedServicesGeneratorTests
             TestCode = ""
         };
         test.SetGlobalOption("build_property.EnableMoqAutoMockerKeyedServicesGenerator", "false");
-        await test.RunAsync();
+        await test.RunAsync(TestContext.CancellationToken);
     }
 
     [TestMethod]
@@ -307,11 +307,13 @@ public class KeyedServicesGeneratorTests
             }
         };
         test.SetGlobalOption("build_property.EnableMoqAutoMockerKeyedServicesGenerator", "true");
-        await test.RunAsync();
+        await test.RunAsync(TestContext.CancellationToken);
     }
 
     private static (string FileName, SourceText SourceText) GetSourceFile(string content, string fileName)
     {
         return (Path.Combine("Moq.AutoMocker.Generators", "Moq.AutoMocker.Generators.KeyedServicesExtensionSourceGenerator", fileName), SourceText.From(content, Encoding.UTF8));
     }
+
+    public TestContext TestContext { get; set; }
 }

@@ -26,7 +26,7 @@ public class GeneratorsTests
             {
                expectedResult
             }
-        }.RunAsync();
+        }.RunAsync(TestContext.CancellationToken);
     }
 
     [TestMethod]
@@ -58,7 +58,7 @@ public class GeneratorsTests
             {
                 expectedResult
             }
-        }.RunAsync();
+        }.RunAsync(TestContext.CancellationToken);
     }
 
     [TestMethod]
@@ -90,7 +90,7 @@ public class GeneratorsTests
             {
                 expectedResult
             }
-        }.RunAsync();
+        }.RunAsync(TestContext.CancellationToken);
     }
 
     [TestMethod]
@@ -150,7 +150,7 @@ public class GeneratorsTests
                 }
             }
 
-        }.RunAsync();
+        }.RunAsync(TestContext.CancellationToken);
     }
 
     [TestMethod]
@@ -197,11 +197,13 @@ public class GeneratorsTests
                 }
             }
 
-        }.RunAsync();
+        }.RunAsync(TestContext.CancellationToken);
     }
 
     private static (string FileName, SourceText SourceText) GetSourceFile(string content, string fileName)
     {
         return (Path.Combine("Moq.AutoMocker.Generators", "Moq.AutoMocker.Generators.UnitTestSourceGenerator", fileName), SourceText.From(content, Encoding.UTF8));
     }
+
+    public TestContext TestContext { get; set; }
 }
