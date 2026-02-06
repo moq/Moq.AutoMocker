@@ -90,7 +90,7 @@ public void Test_CombinedSetup()
     AutoMocker mocker = new();
     
     mocker.WithApplicationInsights()
-          .AddFakeLogging()
+          .WithFakeLogging()
           .WithOptions<MySettings>(s => s.Value = "test");
     
     var service = mocker.CreateInstance<MyService>();

@@ -49,7 +49,7 @@ mocker.WithOptions<MySettings>(options =>
 
 ### 3. [Fake Logging Extension Generator](SourceGenerators/FakeLoggingExtensionGenerator.md)
 
-Generates `AddFakeLogging()` extension method when `Microsoft.Extensions.Diagnostics.Testing` is referenced.
+Generates `WithFakeLogging()` extension method when `Microsoft.Extensions.Diagnostics.Testing` is referenced.
 
 **Key Features:**
 - Captures log messages for verification
@@ -58,7 +58,7 @@ Generates `AddFakeLogging()` extension method when `Microsoft.Extensions.Diagnos
 
 **Quick Example:**
 ```csharp
-mocker.AddFakeLogging();
+mocker.WithFakeLogging();
 var provider = mocker.Get<FakeLoggerProvider>();
 
 // ... perform actions ...

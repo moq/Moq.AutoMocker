@@ -10,7 +10,7 @@ public class ControllerWithFakeLoggingTests
     {
         AutoMocker mocker = new();
         
-        mocker.AddFakeLogging();
+        mocker.WithFakeLogging();
 
         ControllerWithFakeLogging controller = mocker.CreateInstance<ControllerWithFakeLogging>();
 
@@ -23,7 +23,7 @@ public class ControllerWithFakeLoggingTests
     {
         AutoMocker mocker = new();
         
-        mocker.AddFakeLogging();
+        mocker.WithFakeLogging();
         var provider = mocker.Get<FakeLoggerProvider>();
 
         ControllerWithFakeLogging controller = mocker.CreateInstance<ControllerWithFakeLogging>();
@@ -41,7 +41,7 @@ public class ControllerWithFakeLoggingTests
     {
         AutoMocker mocker = new();
         
-        mocker.AddFakeLogging();
+        mocker.WithFakeLogging();
 
         ControllerWithFakeLogging controller = mocker.CreateInstance<ControllerWithFakeLogging>(enablePrivate: true);
 

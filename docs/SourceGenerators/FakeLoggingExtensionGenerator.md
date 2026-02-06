@@ -1,6 +1,6 @@
 # Fake Logging Extension Generator
 
-When your test project references `Microsoft.Extensions.Diagnostics.Testing`, this generator creates an `AddFakeLogging()` extension method that sets up fake logging for testing.
+When your test project references `Microsoft.Extensions.Diagnostics.Testing`, this generator creates an `WithFakeLogging()` extension method that sets up fake logging for testing.
 
 ## Features
 
@@ -47,8 +47,8 @@ public class MyServiceTests
     {
         AutoMocker mocker = new();
         
-        // Use the generated AddFakeLogging extension method
-        mocker.AddFakeLogging();
+        // Use the generated WithFakeLogging extension method
+        mocker.WithFakeLogging();
         var provider = mocker.Get<FakeLoggerProvider>();
 
         MyService service = mocker.CreateInstance<MyService>();
@@ -68,7 +68,7 @@ public class MyServiceTests
 The generator creates:
 
 ```csharp
-public static AutoMocker AddFakeLogging(this AutoMocker mocker)
+public static AutoMocker WithFakeLogging(this AutoMocker mocker)
 {
     // Sets up FakeLoggerProvider for capturing log messages
     // Configures AutoMocker to use fake loggers
@@ -77,7 +77,7 @@ public static AutoMocker AddFakeLogging(this AutoMocker mocker)
 
 ## How It Works
 
-The `AddFakeLogging()` method:
+The `WithFakeLogging()` method:
 
 1. Creates a `FakeLoggerProvider` instance
 2. Registers a custom `FakeLoggerResolver` with the `AutoMocker`
@@ -99,7 +99,7 @@ The `FakeLoggerProvider` captures all log messages, allowing you to:
 public void Test_LogLevels()
 {
     AutoMocker mocker = new();
-    mocker.AddFakeLogging();
+    mocker.WithFakeLogging();
     var provider = mocker.Get<FakeLoggerProvider>();
 
     MyService service = mocker.CreateInstance<MyService>();
@@ -121,7 +121,7 @@ public void Test_LogLevels()
 public void Test_LoggerFactory()
 {
     AutoMocker mocker = new();
-    mocker.AddFakeLogging();
+    mocker.WithFakeLogging();
 
     // ILoggerFactory is also available
     var factory = mocker.Get<ILoggerFactory>();
@@ -174,6 +174,6 @@ You can disable this generator using an MSBuild property in your test project's 
 
 ### Logs Not Being Captured
 
-1. Make sure you're calling `AddFakeLogging()` before creating your instance
+1. Make sure you're calling `WithFakeLogging()` before creating your instance
 2. Verify you're getting the `FakeLoggerProvider` from the same `AutoMocker` instance
 3. Check that your service is actually using the injected logger
