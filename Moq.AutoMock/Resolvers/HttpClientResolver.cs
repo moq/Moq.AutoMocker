@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System.Net;
+using System.Net.Http;
 using Moq.AutoMock.Http;
 
 namespace Moq.AutoMock.Resolvers;
@@ -14,13 +15,29 @@ public class HttpClientResolver : IMockResolver
         if (context.RequestType == typeof(HttpClient))
         {
             var messageHandler = context.AutoMocker.GetMock<HttpMessageHandler>();
-
-            if (context.AutoMocker.MockBehavior == MockBehavior.Loose)
-            {
-                messageHandler.SetupHttp(x => x.SendAsync(It.IsAny<HttpRequestMessage>(), It.IsAny<CancellationToken>()))
-                              .ReturnsAsync(new HttpResponseMessage(System.Net.HttpStatusCode.OK));
-            }
+            messageHandler.DefaultValueProvider = HttpMessageHandlerDefaultValueProvider.Instance;
             context.Value = messageHandler.CreateClient();
+        }
+    }
+
+    /// <summary>
+    /// The testable HTTP Client handler. It will return empty 200 responsees to all requests.
+    /// </summary>
+    private class HttpMessageHandlerDefaultValueProvider : DefaultValueProvider
+    {
+        public static HttpMessageHandlerDefaultValueProvider Instance { get; } = new();
+
+        protected override object GetDefaultValue(Type type, Mock mock)
+        {
+            if (type == typeof(Task<HttpResponseMessage>))
+            {
+                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent(string.Empty)
+                });
+            }
+
+            throw new InvalidOperationException($"Unknown return type '{type.FullName}' for default value on mock '{mock.Object.GetType().FullName}'");
         }
     }
 }

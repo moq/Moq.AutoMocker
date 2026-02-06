@@ -7,6 +7,7 @@ using Moq.Protected;
 
 namespace Moq.AutoMock.Http;
 
+using System.Net;
 using System.Net.Http;
 
 [EditorBrowsable(EditorBrowsableState.Never)]
@@ -75,7 +76,7 @@ public static partial class MockHttpMessageHandlerExtensions
     /// <param name="requestUri">The requested Uri</param>
     public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpGet(this Mock<HttpMessageHandler> handler, string? requestUri = null)
     {
-        return handler.SetupHttpGet(r => r.Method == HttpMethod.Get && (requestUri == null || r.RequestUri!.PathAndQuery.Contains(requestUri)));
+        return handler.SetupHttpGet(r => r.Method == HttpMethod.Get && (requestUri == null || r.ToString().Contains(requestUri)));
     }
 
     /// <summary>
@@ -111,7 +112,7 @@ public static partial class MockHttpMessageHandlerExtensions
     {
         return SetupHttp(handler, x => x.SendAsync(
                 It.Is<HttpRequestMessage>(r => r.Method == HttpMethod.Post 
-                    && r.RequestUri!.PathAndQuery.Contains(requestUri)
+                    && r.ToString().Contains(requestUri)
                     && (body == null || (r.Content != null && r.Content.ReadAsStringAsync().Result.Contains(body)))),
                 It.IsAny<CancellationToken>()));
     }
@@ -137,7 +138,7 @@ public static partial class MockHttpMessageHandlerExtensions
     {
         return SetupHttp(handler, x => x.SendAsync(
                 It.Is<HttpRequestMessage>(r => r.Method == HttpMethod.Put 
-                    && r.RequestUri!.PathAndQuery.Contains(requestUri)
+                    && r.ToString().Contains(requestUri)
                     && (body == null || (r.Content != null && r.Content.ReadAsStringAsync().Result.Contains(body)))),
                 It.IsAny<CancellationToken>()));
     }
@@ -163,7 +164,7 @@ public static partial class MockHttpMessageHandlerExtensions
     {
         return SetupHttp(handler, x => x.SendAsync(
                 It.Is<HttpRequestMessage>(r => r.Method == HttpMethod.Delete 
-                    && r.RequestUri!.PathAndQuery.Contains(requestUri)
+                    && r.ToString().Contains(requestUri)
                     && (body == null || (r.Content != null && r.Content.ReadAsStringAsync().Result.Contains(body)))),
                 It.IsAny<CancellationToken>()));
     }
@@ -186,7 +187,7 @@ public static partial class MockHttpMessageHandlerExtensions
     public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpHead(this Mock<HttpMessageHandler> handler, string requestUri)
     {
         return SetupHttp(handler, x => x.SendAsync(
-                It.Is<HttpRequestMessage>(r => r.Method == HttpMethod.Head && r.RequestUri!.PathAndQuery.Contains(requestUri)),
+                It.Is<HttpRequestMessage>(r => r.Method == HttpMethod.Head && r.ToString().Contains(requestUri)),
                 It.IsAny<CancellationToken>()));
     }
 
@@ -387,6 +388,8 @@ public static partial class MockHttpMessageHandlerExtensions
 
         handler.VerifyHttp(x => x.SendAsync(
             It.Is(match),
-            It.IsAny<CancellationToken>()));
+            It.IsAny<CancellationToken>()),
+            times,
+            failMessage);
     }
 }

@@ -85,6 +85,16 @@ public class DescribeHttpClient
     }
 
     [TestMethod]
+    public async Task HttpClient_WithStrickMocks_ThrowsWithoutSetup()
+    {
+        var mocker = new AutoMocker(MockBehavior.Strict);
+
+        var service = mocker.CreateInstance<ServiceWithHttpClient>();
+
+        await Assert.ThrowsAsync<MockException>(() => service.GetAsync("https://example.com/api/test"));
+    }
+
+    [TestMethod]
     public async Task HttpClient_CanVerifySpecificRequestsWereMade()
     {
         var mocker = new AutoMocker();

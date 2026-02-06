@@ -42,6 +42,18 @@ public static partial class MockHttpMessageHandlerExtensions
     }
 
     /// <summary>
+    /// Specifies the response is an HTTP OK (200).
+    /// </summary>
+    /// <param name="setup">The setup.</param>
+    /// <param name="configure">An action to configure the response headers.</param>
+    public static IReturnsResult<HttpMessageHandler> ReturnsOK(
+        this ISetup<HttpMessageHandler, Task<HttpResponseMessage>> setup,
+        Action<HttpResponseMessage>? configure = null)
+    {
+        return setup.ReturnsResponse(HttpStatusCode.OK, configure);
+    }
+
+    /// <summary>
     /// Specifies the response to return.
     /// </summary>
     /// <param name="setup">The setup.</param>
@@ -52,13 +64,11 @@ public static partial class MockHttpMessageHandlerExtensions
         HttpStatusCode statusCode,
         Action<HttpResponseMessage>? configure = null)
     {
-        return setup.ReturnsAsync((HttpRequestMessage request, CancellationToken _) =>
-        {
-            return CreateResponse(
+        return setup.ReturnsAsync((HttpRequestMessage request, CancellationToken _) 
+            => CreateResponse(
                 request: request,
                 statusCode: statusCode,
-                configure: configure);
-        });
+                configure: configure));
     }
 
     /// <summary>
