@@ -365,7 +365,7 @@ public static partial class MockHttpMessageHandlerExtensions
         if (handler is null)
             throw new ArgumentNullException(nameof(handler));
 
-        handler.VerifyHttpGet(r => r.Method == HttpMethod.Get && r.RequestUri!.PathAndQuery.Contains(requestUri), times, failMessage);
+        handler.VerifyHttpGet(r => r.Method == HttpMethod.Get && r.ToString().Contains(requestUri), times, failMessage);
     }
 
     /// <summary>
