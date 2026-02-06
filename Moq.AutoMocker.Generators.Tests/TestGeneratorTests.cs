@@ -25,7 +25,7 @@ public class TestGeneratorTests
             {
          expectedResult
             }
-        }.RunAsync();
+        }.RunAsync(TestContext.CancellationToken);
     }
 
     [TestMethod]
@@ -57,7 +57,7 @@ public class TestGeneratorTests
             {
                 expectedResult
             }
-        }.RunAsync();
+        }.RunAsync(TestContext.CancellationToken);
     }
 
     [TestMethod]
@@ -89,7 +89,7 @@ public class TestGeneratorTests
             {
                 expectedResult
             }
-        }.RunAsync();
+        }.RunAsync(TestContext.CancellationToken);
     }
 
     [TestMethod]
@@ -151,7 +151,65 @@ public class TestGeneratorTests
                 }
             }
 
-        }.RunAsync();
+        }.RunAsync(TestContext.CancellationToken);
+    }
+
+    [TestMethod]
+    public async Task Generation_WithPrimaryConstructor_GeneratesTest()
+    {
+        var code = """
+
+            using Moq.AutoMock;
+
+            namespace TestNamespace;
+
+            [ConstructorTests(typeof(Controller))]
+            public partial class ControllerTests
+            {
+                
+            }
+
+            public class Controller(ILogger<Controller> logger);
+
+            public interface ILogger<Controller> { }
+
+            """;
+        string expected = """
+            namespace TestNamespace
+            {
+                partial class ControllerTests
+                {
+                    partial void AutoMockerTestSetup(Moq.AutoMock.AutoMocker mocker, string testName);
+
+                    partial void ControllerConstructor_WithNullILoggerController_ThrowsArgumentNullExceptionSetup(Moq.AutoMock.AutoMocker mocker);
+
+                    public void ControllerConstructor_WithNullILoggerController_ThrowsArgumentNullException()
+                    {
+                        Moq.AutoMock.AutoMocker mocker = new Moq.AutoMock.AutoMocker();
+                        AutoMockerTestSetup(mocker, "ControllerConstructor_WithNullILoggerController_ThrowsArgumentNullException");
+                        ControllerConstructor_WithNullILoggerController_ThrowsArgumentNullExceptionSetup(mocker);
+                        using(System.IDisposable __mockerDisposable = mocker.AsDisposable())
+                        {
+                        }
+                    }
+
+                }
+            }
+
+            """;
+
+        await new VerifyCS.Test
+        {
+            TestCode = code,
+            TestState =
+            {
+                GeneratedSources =
+                {
+                    GetSourceFile(expected, "TestNamespace.ControllerTests.g.cs")
+                }
+            }
+
+        }.RunAsync(TestContext.CancellationToken);
     }
 
     [TestMethod]
@@ -199,7 +257,7 @@ public class TestGeneratorTests
                 }
             }
 
-        }.RunAsync();
+        }.RunAsync(TestContext.CancellationToken);
     }
 
     [TestMethod]
@@ -247,7 +305,7 @@ public class TestGeneratorTests
                 }
             }
 
-        }.RunAsync();
+        }.RunAsync(TestContext.CancellationToken);
     }
 
     [TestMethod]
@@ -307,7 +365,7 @@ public class TestGeneratorTests
                 }
             }
 
-        }.RunAsync();
+        }.RunAsync(TestContext.CancellationToken);
     }
 
     [TestMethod]
@@ -356,7 +414,7 @@ public class TestGeneratorTests
                 }
             }
 
-        }.RunAsync();
+        }.RunAsync(TestContext.CancellationToken);
     }
 
     [TestMethod]
@@ -405,7 +463,7 @@ public class TestGeneratorTests
                 }
             }
 
-        }.RunAsync();
+        }.RunAsync(TestContext.CancellationToken);
     }
 
     [TestMethod]
@@ -453,7 +511,7 @@ public class TestGeneratorTests
                 }
             }
 
-        }.RunAsync();
+        }.RunAsync(TestContext.CancellationToken);
     }
 
     [TestMethod]
@@ -502,7 +560,7 @@ public class TestGeneratorTests
                 }
             }
 
-        }.RunAsync();
+        }.RunAsync(TestContext.CancellationToken);
     }
 
     [TestMethod]
@@ -569,7 +627,7 @@ public class TestGeneratorTests
                 }
             }
 
-        }.RunAsync();
+        }.RunAsync(TestContext.CancellationToken);
     }
 
     [TestMethod]
@@ -671,7 +729,7 @@ public class TestGeneratorTests
                 }
             }
 
-        }.RunAsync();
+        }.RunAsync(TestContext.CancellationToken);
     }
 
     [TestMethod]
@@ -769,11 +827,13 @@ public class TestGeneratorTests
             {
                 expectedWarning
             }
-        }.RunAsync();
+        }.RunAsync(TestContext.CancellationToken);
     }
 
     private static (string FileName, SourceText SourceText) GetSourceFile(string content, string fileName)
     {
         return (Path.Combine("Moq.AutoMocker.Generators", "Moq.AutoMocker.Generators.UnitTestSourceGenerator", fileName), SourceText.From(content, Encoding.UTF8));
     }
+
+    public TestContext TestContext { get; set; }
 }

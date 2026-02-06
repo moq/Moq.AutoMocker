@@ -132,7 +132,7 @@ public class ApplicationInsightsGeneratorTests
         {
             TestCode = "",
             ReferenceApplicationInsights = false
-        }.RunAsync();
+        }.RunAsync(TestContext.CancellationToken);
     }
 
     [TestMethod]
@@ -150,7 +150,7 @@ public class ApplicationInsightsGeneratorTests
                     GetSourceFile(ExpectedApplicationInsightsGeneratedFile, "AutoMockerApplicationInsightsExtensions.g.cs")
                 }
             }
-        }.RunAsync();
+        }.RunAsync(TestContext.CancellationToken);
     }
 
     [TestMethod]
@@ -162,7 +162,7 @@ public class ApplicationInsightsGeneratorTests
             TestCode = ""
         };
         test.SetGlobalOption("build_property.EnableMoqAutoMockerApplicationInsightsGenerator", "false");
-        await test.RunAsync();
+        await test.RunAsync(TestContext.CancellationToken);
     }
 
     [TestMethod]
@@ -182,11 +182,13 @@ public class ApplicationInsightsGeneratorTests
             }
         };
         test.SetGlobalOption("build_property.EnableMoqAutoMockerApplicationInsightsGenerator", "true");
-        await test.RunAsync();
+        await test.RunAsync(TestContext.CancellationToken);
     }
 
     private static (string FileName, SourceText SourceText) GetSourceFile(string content, string fileName)
     {
         return (Path.Combine("Moq.AutoMocker.Generators", "Moq.AutoMocker.Generators.ApplicationInsightsExtensionSourceGenerator", fileName), SourceText.From(content, Encoding.UTF8));
     }
+
+    public TestContext TestContext { get; set; }
 }
