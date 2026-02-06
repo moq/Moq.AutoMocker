@@ -382,7 +382,7 @@ public void Test_CombinedGenerators()
 {
     AutoMocker mocker = new();
     
-    mocker.AddFakeLogging()
+    mocker.WithFakeLogging()
           .WithOptions<MySettings>(s => s.Timeout = 30);
     
     mocker.WithKeyedService<ICache, RedisCache>("redis");

@@ -32,7 +32,7 @@ public class FakeLoggingGeneratorTests
                 /// </summary>
                 /// <param name="mocker">The <see cref="AutoMocker"/> instance.</param>
                 /// <returns>The same <see cref="AutoMocker"/> instance passed as parameter, allowing chained calls.</returns>
-                public static AutoMocker AddFakeLogging(this AutoMocker mocker)
+                public static AutoMocker WithFakeLogging(this AutoMocker mocker)
                 {
                     if (mocker == null)
                     {
@@ -65,6 +65,18 @@ public class FakeLoggingGeneratorTests
                     mocker.Use(provider);
                     
                     return mocker;
+                }
+
+                /// <summary>
+                /// This method sets up <see cref="AutoMocker"/> with fake logging services from Microsoft.Extensions.Logging.Testing,
+                /// allowing logging interception and validation in testing scenarios.
+                /// </summary>
+                /// <param name="mocker">The <see cref="AutoMocker"/> instance.</param>
+                /// <returns>The same <see cref="AutoMocker"/> instance passed as parameter, allowing chained calls.</returns>
+                [System.Obsolete("Use WithFakeLogging() instead.")]
+                public static AutoMocker AddFakeLogging(this AutoMocker mocker)
+                {
+                    return mocker.WithFakeLogging();
                 }
 
                 private sealed class FakeLoggerResolver : IMockResolver
