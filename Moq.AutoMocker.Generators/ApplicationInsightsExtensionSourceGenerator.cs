@@ -30,6 +30,7 @@ public sealed class ApplicationInsightsExtensionSourceGenerator : IIncrementalGe
             }
             else if (appInsightsMajorVersion is > 2)
             {
+                // Also need to check for OpenTelemetry.Exporter.InMemory v1.*
                 //context.AddSource("AutoMockerApplicationInsightsExtensions.g.cs", ApplicationInsightsExtensionContentV2);
             }
         });

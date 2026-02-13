@@ -31,6 +31,8 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="MSTest" />
     <ProjectReference Include="..\Moq.AutoMock\Moq.AutoMock.csproj" />
+    <PackageReference Include="OpenTelemetry.Exporter.InMemory" />
+
 
     <ProjectReference Include="..\Moq.AutoMocker.Generators\Moq.AutoMocker.Generators.csproj">
       <OutputItemType>Analyzer</OutputItemType>

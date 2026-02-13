@@ -1,8 +1,11 @@
+using System.Diagnostics;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
 using OpenTelemetry;
 using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
 
 namespace Moq.AutoMock.Tests;
 
@@ -14,6 +17,14 @@ public class LogProcessor : BaseProcessor<LogRecord>
     {
         //TODO: Threading
         _records.Add(logRecord);
+    }
+}
+
+public class MyMetricReader : MetricReader
+{
+    protected override bool OnCollect(int timeoutMilliseconds)
+    {
+        return base.OnCollect(timeoutMilliseconds);
     }
 }
 
@@ -36,25 +47,24 @@ static partial class AutoMockerApplicationInsightsExtensions2
         // Create TelemetryConfiguration with the fake channel
         var telemetryConfiguration = new TelemetryConfiguration
         {
-            ConnectionString = "InstrumentationKey=00000000-0000-0000-0000-000000000000"
+            SamplingRatio = 1.0f,
+            ConnectionString = "InstrumentationKey=" + Guid.Empty
         };
 
-        LogProcessor logProcessor = new();
+        var logItems = new List<LogRecord>();
+        var metricItems = new List<OpenTelemetry.Metrics.Metric>();
+        var activityItems = new List<Activity>();
+        telemetryConfiguration.ConfigureOpenTelemetryBuilder(b => b
+            .WithLogging(l => l.AddInMemoryExporter(logItems))
+            .WithMetrics(m => m.AddInMemoryExporter(metricItems))
+            .WithTracing(t => t.AddInMemoryExporter(activityItems)));
 
-        telemetryConfiguration.ConfigureOpenTelemetryBuilder(builder =>
-        {
-            builder.WithLogging(loggingBuilder =>
-            {
-                loggingBuilder.AddProcessor(logProcessor);
-            });
-        });
 
         // Create TelemetryClient with the configuration
         var telemetryClient = new TelemetryClient(telemetryConfiguration);
 
         // Register the instances
         //TODO: Interface
-        mocker.Use<LogProcessor>(logProcessor);
         mocker.Use(telemetryConfiguration);
         mocker.Use(telemetryClient);
 
