@@ -1,5 +1,9 @@
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.ApplicationInsights.Extensibility;
+using OpenTelemetry;
+using OpenTelemetry.Logs;
+using static Moq.AutoMock.AutoMockerApplicationInsightsExtensions;
 
 namespace Moq.AutoMock.Tests;
 
@@ -40,16 +44,17 @@ public class DescribeApplicationInsights
 
 
         // Verify telemetry was tracked
+
         var telemetryEvents = mocker.GetSentTelemetry();
         Assert.HasCount(2, telemetryEvents);
         
         
         var metricTelemetry1 = Assert.IsInstanceOfType<MetricTelemetry>(telemetryEvents[0]);
         Assert.AreEqual("ResponseTime", metricTelemetry1.Name);
-        Assert.AreEqual(123.45, metricTelemetry1.Sum);
+        Assert.AreEqual(123.45, metricTelemetry1.Value);
         var metricTelemetry2 = Assert.IsInstanceOfType<MetricTelemetry>(telemetryEvents[1]);
         Assert.AreEqual("ItemsCount", metricTelemetry2.Name);
-        Assert.AreEqual(42, metricTelemetry2.Sum);
+        Assert.AreEqual(42, metricTelemetry2.Value);
     }
 
     [TestMethod]
@@ -67,9 +72,9 @@ public class DescribeApplicationInsights
         var sentTelemetry = mocker.GetSentTelemetry();
 
         Assert.HasCount(3, sentTelemetry);
-        Assert.IsInstanceOfType(sentTelemetry[0], typeof(EventTelemetry));
-        Assert.IsInstanceOfType(sentTelemetry[1], typeof(MetricTelemetry));
-        Assert.IsInstanceOfType(sentTelemetry[2], typeof(EventTelemetry));
+        Assert.IsInstanceOfType<EventTelemetry>(sentTelemetry[0]);
+        Assert.IsInstanceOfType<MetricTelemetry>(sentTelemetry[1]);
+        Assert.IsInstanceOfType<EventTelemetry>(sentTelemetry[2]);
     }
 
     private class ServiceWithApplicationInsights(TelemetryClient telemetryClient)
