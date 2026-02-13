@@ -3,9 +3,88 @@ using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
 using OpenTelemetry;
 using OpenTelemetry.Logs;
-using static Moq.AutoMock.AutoMockerApplicationInsightsExtensions;
 
 namespace Moq.AutoMock.Tests;
+
+public class LogProcessor : BaseProcessor<LogRecord>
+{
+    private readonly List<LogRecord> _records = [];
+    public IReadOnlyList<LogRecord> SentItems => _records.AsReadOnly();
+    public override void OnEnd(LogRecord logRecord)
+    {
+        //TODO: Threading
+        _records.Add(logRecord);
+    }
+}
+
+static partial class AutoMockerApplicationInsightsExtensions2
+{
+    /// <summary>
+    /// This method sets up <see cref="AutoMocker"/> with Application Insights services,
+    /// ensuring TelemetryClient is properly mocked and doesn't make real API calls.
+    /// This allows telemetry tracking calls to be verified in tests.
+    /// </summary>
+    /// <param name="mocker">The <see cref="AutoMocker"/> instance.</param>
+    /// <returns>The same <see cref="AutoMocker"/> instance passed as parameter, allowing chained calls.</returns>
+    public static AutoMocker WithApplicationInsights2(this AutoMocker mocker)
+    {
+        if (mocker == null)
+        {
+            throw new ArgumentNullException(nameof(mocker));
+        }
+
+        // Create TelemetryConfiguration with the fake channel
+        var telemetryConfiguration = new TelemetryConfiguration
+        {
+            ConnectionString = "InstrumentationKey=00000000-0000-0000-0000-000000000000"
+        };
+
+        LogProcessor logProcessor = new();
+
+        telemetryConfiguration.ConfigureOpenTelemetryBuilder(builder =>
+        {
+            builder.WithLogging(loggingBuilder =>
+            {
+                loggingBuilder.AddProcessor(logProcessor);
+            });
+        });
+
+        // Create TelemetryClient with the configuration
+        var telemetryClient = new TelemetryClient(telemetryConfiguration);
+
+        // Register the instances
+        //TODO: Interface
+        mocker.Use<LogProcessor>(logProcessor);
+        mocker.Use(telemetryConfiguration);
+        mocker.Use(telemetryClient);
+
+        return mocker;
+    }
+
+    /// <summary>
+    /// Gets the collection of telemetry items that have been sent through the Application Insights TelemetryClient.
+    /// This method retrieves telemetry from the <see cref="FakeTelemetryChannel"/> that was configured by <see cref="WithApplicationInsights"/>.
+    /// </summary>
+    /// <param name="mocker">The <see cref="AutoMocker"/> instance.</param>
+    /// <returns>A read-only list of telemetry items that have been sent.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="mocker"/> is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when Application Insights has not been configured using <see cref="WithApplicationInsights"/>.</exception>
+    public static IReadOnlyList<LogRecord> GetSentTelemetry2(this AutoMocker mocker)
+    {
+        if (mocker == null)
+        {
+            throw new ArgumentNullException(nameof(mocker));
+        }
+
+        var processor = mocker.Get<LogProcessor>();
+        if (processor == null)
+        {
+            throw new InvalidOperationException("Application Insights has not been configured. Call WithApplicationInsights() first.");
+        }
+
+        return processor.SentItems;
+    }
+}
 
 [TestClass]
 public class DescribeApplicationInsights
@@ -14,7 +93,7 @@ public class DescribeApplicationInsights
     public void WithApplicationInsights_AllowsVerificationOfTrackedEvents()
     {
         var mocker = new AutoMocker();
-        mocker.WithApplicationInsights();
+        mocker.WithApplicationInsights2();
 
         var service = mocker.CreateInstance<ServiceWithApplicationInsights>();
 
@@ -22,7 +101,7 @@ public class DescribeApplicationInsights
         service.TrackEvent("UserLoggedOut");
 
         // Verify telemetry was tracked
-        var telemetryEvents = mocker.GetSentTelemetry();
+        var telemetryEvents = mocker.GetSentTelemetry2();
 
         Assert.HasCount(2, telemetryEvents);
         var eventTelemetry1 = Assert.IsInstanceOfType<EventTelemetry>(telemetryEvents[0]);
@@ -35,7 +114,7 @@ public class DescribeApplicationInsights
     public void WithApplicationInsights_AllowsVerificationOfTrackedMetrics()
     {
         var mocker = new AutoMocker();
-        mocker.WithApplicationInsights();
+        mocker.WithApplicationInsights2();
 
         var service = mocker.CreateInstance<ServiceWithApplicationInsights>();
 
@@ -45,7 +124,7 @@ public class DescribeApplicationInsights
 
         // Verify telemetry was tracked
 
-        var telemetryEvents = mocker.GetSentTelemetry();
+        var telemetryEvents = mocker.GetSentTelemetry2();
         Assert.HasCount(2, telemetryEvents);
         
         
@@ -61,7 +140,7 @@ public class DescribeApplicationInsights
     public void GetSentTelemetry_ReturnsAllSentTelemetryItems()
     {
         var mocker = new AutoMocker();
-        mocker.WithApplicationInsights();
+        mocker.WithApplicationInsights2();
 
         var service = mocker.CreateInstance<ServiceWithApplicationInsights>();
 
@@ -69,7 +148,7 @@ public class DescribeApplicationInsights
         service.TrackMetric("Metric1", 42.0);
         service.TrackEvent("Event2");
 
-        var sentTelemetry = mocker.GetSentTelemetry();
+        var sentTelemetry = mocker.GetSentTelemetry2();
 
         Assert.HasCount(3, sentTelemetry);
         Assert.IsInstanceOfType<EventTelemetry>(sentTelemetry[0]);

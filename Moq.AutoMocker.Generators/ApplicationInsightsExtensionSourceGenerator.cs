@@ -30,7 +30,7 @@ public sealed class ApplicationInsightsExtensionSourceGenerator : IIncrementalGe
             }
             else if (appInsightsMajorVersion is > 2)
             {
-                context.AddSource("AutoMockerApplicationInsightsExtensions.g.cs", ApplicationInsightsExtensionContentV2);
+                //context.AddSource("AutoMockerApplicationInsightsExtensions.g.cs", ApplicationInsightsExtensionContentV2);
             }
         });
     }
