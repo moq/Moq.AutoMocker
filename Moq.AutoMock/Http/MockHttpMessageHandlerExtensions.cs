@@ -24,30 +24,6 @@ public static partial class MockHttpMessageHandlerExtensions
         return new HttpClient(handler.Object, false);
     }
 
-    // <summary>
-    // <para>
-    //   Creates an <see cref="IHttpClientFactory" /> that returns new
-    //   <see cref="HttpClient" /> instances backed by this handler.
-    // </para>
-    // <para>
-    //   To configure a named client, use <see cref="Mock.Get{T}(T)" />
-    //   to retrieve the mock and add additional setups.
-    // </para>
-    // </summary>
-    // <param name="handler">The <see cref="HttpMessageHandler" /> mock.</param>
-    //public static IHttpClientFactory CreateClientFactory(this Mock<HttpMessageHandler> handler)
-    //{
-    //    if (handler == null)
-    //        throw new ArgumentNullException(nameof(handler));
-
-    //    var mock = new Mock<IHttpClientFactory>();
-
-    //    mock.Setup(x => x.CreateClient(It.IsAny<string>()))
-    //        .Returns(handler.CreateClient);
-
-    //    return mock.Object;
-    //}
-
     /// <summary>
     /// Specifies a setup on the mocked type for a call to a value-returning method.
     /// </summary>
