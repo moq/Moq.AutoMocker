@@ -11,7 +11,7 @@ internal static class CastChecker
 
         //expression is assumed to be a lambda so the cast here would cause an exception if it was not the expected format
         var lambdaExpression = (LambdaExpression)expression;
-
+        
         //Does its body Convert to System.Object?
         if (lambdaExpression.Body.NodeType == ExpressionType.Convert && lambdaExpression.Body.Type == typeof(object))
         {
