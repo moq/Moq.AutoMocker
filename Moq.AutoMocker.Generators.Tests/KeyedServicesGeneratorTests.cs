@@ -215,7 +215,7 @@ public class KeyedServicesGeneratorTests
                         return false;
                     }
         
-                    public override bool Equals([NotNullWhen(true)] object? obj)
+                    public override bool Equals(object? obj)
                     {
                         return obj is ServiceIdentifier identifier && Equals(identifier);
                     }

@@ -1,5 +1,6 @@
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
+using OpenTelemetry.Metrics;
 
 namespace Moq.AutoMock.Tests;
 
@@ -7,7 +8,25 @@ namespace Moq.AutoMock.Tests;
 public class DescribeApplicationInsights
 {
     [TestMethod]
-    public void WithApplicationInsights_AllowsVerificationOfTrackedEvents()
+    public void WithApplicationInsights_ProvidesActivityList()
+    {
+        var mocker = new AutoMocker();
+        mocker.WithApplicationInsights();
+
+        var service = mocker.CreateInstance<ServiceWithApplicationInsights>();
+
+        service.TrackRequestTelemetry("TestRequest1");
+        service.TrackRequestTelemetry("TestRequest2");
+
+
+        var activities = mocker.GetApplicationInsightsActivities();
+        Assert.HasCount(2, activities);
+        Assert.AreEqual("TestRequest1", activities[0].OperationName);
+        Assert.AreEqual("TestRequest2", activities[1].OperationName);
+    }
+
+    [TestMethod]
+    public void WithApplicationInsights_AllowsTrackingEvents()
     {
         var mocker = new AutoMocker();
         mocker.WithApplicationInsights();
@@ -17,18 +36,14 @@ public class DescribeApplicationInsights
         service.TrackEvent("UserLoggedIn");
         service.TrackEvent("UserLoggedOut");
 
-        // Verify telemetry was tracked
-        var telemetryEvents = mocker.GetSentTelemetry();
-
-        Assert.HasCount(2, telemetryEvents);
-        var eventTelemetry1 = Assert.IsInstanceOfType<EventTelemetry>(telemetryEvents[0]);
-        Assert.AreEqual("UserLoggedIn", eventTelemetry1.Name);
-        var eventTelemetry2 = Assert.IsInstanceOfType<EventTelemetry>(telemetryEvents[1]);
-        Assert.AreEqual("UserLoggedOut", eventTelemetry2.Name);
+        var logRecords = mocker.GetApplicationInsightsLogRecords();
+        Assert.HasCount(2, logRecords);
+        Assert.AreEqual("UserLoggedIn", logRecords[0].Attributes?[0].Value);
+        Assert.AreEqual("UserLoggedOut", logRecords[1].Attributes?[0].Value);
     }
 
     [TestMethod]
-    public void WithApplicationInsights_AllowsVerificationOfTrackedMetrics()
+    public void WithApplicationInsights_AllowsTrackingMetrics()
     {
         var mocker = new AutoMocker();
         mocker.WithApplicationInsights();
@@ -38,38 +53,12 @@ public class DescribeApplicationInsights
         service.TrackMetric("ResponseTime", 123.45);
         service.TrackMetric("ItemsCount", 42);
 
-
-        // Verify telemetry was tracked
-        var telemetryEvents = mocker.GetSentTelemetry();
-        Assert.HasCount(2, telemetryEvents);
-        
-        
-        var metricTelemetry1 = Assert.IsInstanceOfType<MetricTelemetry>(telemetryEvents[0]);
-        Assert.AreEqual("ResponseTime", metricTelemetry1.Name);
-        Assert.AreEqual(123.45, metricTelemetry1.Sum);
-        var metricTelemetry2 = Assert.IsInstanceOfType<MetricTelemetry>(telemetryEvents[1]);
-        Assert.AreEqual("ItemsCount", metricTelemetry2.Name);
-        Assert.AreEqual(42, metricTelemetry2.Sum);
-    }
-
-    [TestMethod]
-    public void GetSentTelemetry_ReturnsAllSentTelemetryItems()
-    {
-        var mocker = new AutoMocker();
-        mocker.WithApplicationInsights();
-
-        var service = mocker.CreateInstance<ServiceWithApplicationInsights>();
-
-        service.TrackEvent("Event1");
-        service.TrackMetric("Metric1", 42.0);
-        service.TrackEvent("Event2");
-
-        var sentTelemetry = mocker.GetSentTelemetry();
-
-        Assert.HasCount(3, sentTelemetry);
-        Assert.IsInstanceOfType(sentTelemetry[0], typeof(EventTelemetry));
-        Assert.IsInstanceOfType(sentTelemetry[1], typeof(MetricTelemetry));
-        Assert.IsInstanceOfType(sentTelemetry[2], typeof(EventTelemetry));
+        //Flush the metrics
+        mocker.Get<TelemetryClient>().Flush();
+        var metrics = mocker.GetApplicationInsightsMetrics().Select(x => new MetricSnapshot(x)).ToList();
+        Assert.HasCount(2, metrics);
+        Assert.AreEqual(123.45, metrics[0].MetricPoints[^1].GetHistogramSum());
+        Assert.AreEqual(42, metrics[1].MetricPoints[^1].GetHistogramSum());
     }
 
     private class ServiceWithApplicationInsights(TelemetryClient telemetryClient)
@@ -82,6 +71,11 @@ public class DescribeApplicationInsights
         public void TrackMetric(string name, double value)
         {
             telemetryClient.TrackMetric(name, value);
+        }
+
+        public void TrackRequestTelemetry(string name)
+        {
+            using var operation = telemetryClient.StartOperation<RequestTelemetry>(name);
         }
     }
 }
