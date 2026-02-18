@@ -71,18 +71,20 @@ Assert.IsTrue(logs.Any(log => log.Message == "Expected message"));
 
 ### 4. [Application Insights Extension Generator](SourceGenerators/ApplicationInsightsExtensionGenerator.md)
 
-Generates `WithApplicationInsights()` extension method when `Microsoft.ApplicationInsights` is referenced.
+Generates `WithApplicationInsights()` and related extension methods when `Microsoft.ApplicationInsights` is referenced. Supports both 2.x and 3.x versions of Application Insights.
 
 **Key Features:**
-- Provides `TelemetryClient` that doesn't make real API calls
-- Enables testing of telemetry tracking code
-- No cloud dependencies in unit tests
+- **Application Insights 2.x**: Uses a `FakeTelemetryChannel` with `GetSentTelemetry()` to capture `ITelemetry` items
+- **Application Insights 3.x**: Uses OpenTelemetry in-memory exporters with `GetApplicationInsightsLogRecords()`, `GetApplicationInsightsMetrics()`, and `GetApplicationInsightsActivities()`
 
-**Quick Example:**
+**Quick Example (3.x):**
 ```csharp
 mocker.WithApplicationInsights();
 var service = mocker.CreateInstance<MyService>();
-service.DoWork(); // TelemetryClient calls won't hit the cloud
+service.DoWork();
+
+var logRecords = mocker.GetApplicationInsightsLogRecords();
+Assert.HasCount(2, logRecords);
 ```
 
 [Learn more →](SourceGenerators/ApplicationInsightsExtensionGenerator.md)
