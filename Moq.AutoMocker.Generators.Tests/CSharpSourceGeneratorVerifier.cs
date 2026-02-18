@@ -18,6 +18,7 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
         public bool ReferenceOptionsAbstractions { get; set; }
         public bool ReferenceFakeLogging { get; set; }
         public bool ReferenceApplicationInsights { get; set; }
+        public bool ReferenceOpenTelemetryInMemoryExporter { get; set; }
         public bool ReferenceDependencyInjection { get; set; }
 
         public void SetGlobalOption(string key, string value)
@@ -49,7 +50,7 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
         protected override Project ApplyCompilationOptions(Project project)
         {
             //project.AnalyzerOptions.WithAdditionalFiles();
-            if (ReferenceAutoMocker || ReferenceOptionsAbstractions || ReferenceFakeLogging || ReferenceApplicationInsights || ReferenceDependencyInjection)
+            if (ReferenceAutoMocker || ReferenceOptionsAbstractions || ReferenceFakeLogging || ReferenceApplicationInsights || ReferenceDependencyInjection || ReferenceOpenTelemetryInMemoryExporter)
             {
                 string fullPath = Path.GetFullPath($"{AutoMock.AssemblyName}.dll");
                 project = project.AddMetadataReference(MetadataReference.CreateFromFile(fullPath));
@@ -85,6 +86,20 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
                 {
                     var appInsightsAssembly = typeof(Microsoft.ApplicationInsights.TelemetryClient).Assembly;
                     project = project.AddMetadataReference(MetadataReference.CreateFromFile(appInsightsAssembly.Location));
+                }
+                catch
+                {
+                    // If we can't find the assembly, the test will fail, which is appropriate
+                }
+            }
+
+            if (ReferenceOpenTelemetryInMemoryExporter)
+            {
+                // Add reference to OpenTelemetry.Exporter.InMemory
+                try
+                {
+                    var inMemoryAssembly = typeof(OpenTelemetry.Exporter.InMemoryExporter<>).Assembly;
+                    project = project.AddMetadataReference(MetadataReference.CreateFromFile(inMemoryAssembly.Location));
                 }
                 catch
                 {
