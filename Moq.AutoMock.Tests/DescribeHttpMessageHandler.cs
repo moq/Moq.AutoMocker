@@ -17,7 +17,7 @@ public class DescribeHttpMessageHandler
         // Setup the mock handler to return a specific response using Protected() API
         mocker.GetMock<HttpMessageHandler>()
             .SetupHttp(x => x.SendAsync(It.IsAny<HttpRequestMessage>(), It.IsAny<CancellationToken>()))
-            .ReturnsResponse(HttpStatusCode.OK, "Hello, World!");
+            .ReturnsHttpResponse(HttpStatusCode.OK, "Hello, World!");
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 
@@ -45,7 +45,7 @@ public class DescribeHttpMessageHandler
 
         mocker.GetMock<HttpMessageHandler>()
             .SetupHttp(x => x.SendAsync(It.IsAny<HttpRequestMessage>(), It.IsAny<CancellationToken>()))
-            .ReturnsResponse(HttpStatusCode.OK);
+            .ReturnsHttpResponse(HttpStatusCode.OK);
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 
@@ -70,8 +70,8 @@ public class DescribeHttpMessageHandler
 
         mocker.GetMock<HttpMessageHandler>()
             .SetupSequence(x => x.SendAsync(It.IsAny<HttpRequestMessage>(), It.IsAny<CancellationToken>()))
-            .ReturnsResponse(HttpStatusCode.ServiceUnavailable)
-            .ReturnsResponse(HttpStatusCode.OK, "Success");
+            .ReturnsHttpResponse(HttpStatusCode.ServiceUnavailable)
+            .ReturnsHttpResponse(HttpStatusCode.OK, "Success");
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 
