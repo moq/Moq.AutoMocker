@@ -16,10 +16,10 @@ public class DescribeHttpClient
         var mocker = new AutoMocker();
 
         mocker.SetupHttpGet("/users")
-            .ReturnsResponse(HttpStatusCode.OK, """{"users": []}""");
+            .ReturnsHttpResponse(HttpStatusCode.OK, """{"users": []}""");
 
         mocker.SetupHttpGet("/products")
-            .ReturnsResponse(HttpStatusCode.OK, """{"products": []}""");
+            .ReturnsHttpResponse(HttpStatusCode.OK, """{"products": []}""");
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 
@@ -39,8 +39,8 @@ public class DescribeHttpClient
         var mocker = new AutoMocker();
 
         mocker.SetupHttpSequence(x => x.SendAsync(It.IsAny<HttpRequestMessage>(), It.IsAny<CancellationToken>()))
-            .ReturnsResponse(HttpStatusCode.ServiceUnavailable)
-            .ReturnsResponse(HttpStatusCode.OK, "Success");
+            .ReturnsHttpResponse(HttpStatusCode.ServiceUnavailable)
+            .ReturnsHttpResponse(HttpStatusCode.OK, "Success");
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 
@@ -79,7 +79,7 @@ public class DescribeHttpClient
         var mocker = new AutoMocker();
         string content = """[{name: "test"}]""";
         mocker.SetupHttpGet("/people")
-            .ReturnsResponse(HttpStatusCode.OK, content);
+            .ReturnsHttpResponse(HttpStatusCode.OK, content);
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 
@@ -96,7 +96,7 @@ public class DescribeHttpClient
         var mocker = new AutoMocker();
         string content = """[{name: "test"}]""";
         mocker.SetupHttpGet(r => r.RequestUri!.AbsoluteUri.EndsWith("/people"))
-            .ReturnsResponse(HttpStatusCode.OK, content);
+            .ReturnsHttpResponse(HttpStatusCode.OK, content);
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 
@@ -113,7 +113,7 @@ public class DescribeHttpClient
         var mocker = new AutoMocker(MockBehavior.Strict);
         string content = """[{name: "test"}]""";
         mocker.SetupHttpGet("/people")
-            .ReturnsResponse(HttpStatusCode.OK, content);
+            .ReturnsHttpResponse(HttpStatusCode.OK, content);
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 
         await Assert.ThrowsAsync<MockException>(() => service.PostAsync("https://example.com/people", "data"));
@@ -125,7 +125,7 @@ public class DescribeHttpClient
         var mocker = new AutoMocker();
 
         mocker.SetupHttpGet()
-            .ReturnsResponse(HttpStatusCode.InternalServerError, "Server Error");
+            .ReturnsHttpResponse(HttpStatusCode.InternalServerError, "Server Error");
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 
@@ -158,7 +158,7 @@ public class DescribeHttpClient
         var mocker = new AutoMocker();
 
         mocker.SetupHttpGet()
-            .ReturnsResponse(HttpStatusCode.OK, "Response with headers", configure: response =>
+            .ReturnsHttpResponse(HttpStatusCode.OK, "Response with headers", configure: response =>
             {
                 response.Headers.Add("X-Custom-Header", "CustomValue");
             });
@@ -178,7 +178,7 @@ public class DescribeHttpClient
         var mocker = new AutoMocker();
         string content = """[{name: "test"}]""";
         mocker.SetupHttpPost("/people", "data")
-            .ReturnsResponse(HttpStatusCode.OK, content);
+            .ReturnsHttpResponse(HttpStatusCode.OK, content);
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 
@@ -195,7 +195,7 @@ public class DescribeHttpClient
         var mocker = new AutoMocker();
         string content = """[{name: "test"}]""";
         mocker.SetupHttpPost(r => r.RequestUri!.AbsoluteUri.EndsWith("/people"))
-            .ReturnsResponse(HttpStatusCode.OK, content);
+            .ReturnsHttpResponse(HttpStatusCode.OK, content);
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 
@@ -212,7 +212,7 @@ public class DescribeHttpClient
         var mocker = new AutoMocker(MockBehavior.Strict);
         string content = """[{name: "test"}]""";
         mocker.SetupHttpPost("/people")
-            .ReturnsResponse(HttpStatusCode.OK, content);
+            .ReturnsHttpResponse(HttpStatusCode.OK, content);
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 
         await Assert.ThrowsAsync<MockException>(() => service.GetAsync("https://example.com/people"));
@@ -236,7 +236,7 @@ public class DescribeHttpClient
         var mocker = new AutoMocker();
 
         mocker.SetupHttpPost()
-            .ReturnsResponse(HttpStatusCode.InternalServerError, "Server Error");
+            .ReturnsHttpResponse(HttpStatusCode.InternalServerError, "Server Error");
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 
@@ -251,7 +251,7 @@ public class DescribeHttpClient
         var mocker = new AutoMocker();
         string content = """[{name: "test"}]""";
         mocker.SetupHttpPut("/people", "data")
-            .ReturnsResponse(HttpStatusCode.OK, content);
+            .ReturnsHttpResponse(HttpStatusCode.OK, content);
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 
@@ -268,7 +268,7 @@ public class DescribeHttpClient
         var mocker = new AutoMocker();
         string content = """[{name: "test"}]""";
         mocker.SetupHttpPut(r => r.RequestUri!.AbsoluteUri.EndsWith("/people"))
-            .ReturnsResponse(HttpStatusCode.OK, content);
+            .ReturnsHttpResponse(HttpStatusCode.OK, content);
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 
@@ -285,7 +285,7 @@ public class DescribeHttpClient
         var mocker = new AutoMocker(MockBehavior.Strict);
         string content = """[{name: "test"}]""";
         mocker.SetupHttpPut("/people")
-            .ReturnsResponse(HttpStatusCode.OK, content);
+            .ReturnsHttpResponse(HttpStatusCode.OK, content);
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 
         await Assert.ThrowsAsync<MockException>(() => service.GetAsync("https://example.com/people"));
@@ -309,7 +309,7 @@ public class DescribeHttpClient
         var mocker = new AutoMocker();
 
         mocker.SetupHttpPut()
-            .ReturnsResponse(HttpStatusCode.InternalServerError, "Server Error");
+            .ReturnsHttpResponse(HttpStatusCode.InternalServerError, "Server Error");
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 
@@ -324,7 +324,7 @@ public class DescribeHttpClient
         var mocker = new AutoMocker();
         string content = """[{name: "test"}]""";
         mocker.SetupHttpDelete("/people")
-            .ReturnsResponse(HttpStatusCode.OK, content);
+            .ReturnsHttpResponse(HttpStatusCode.OK, content);
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 
@@ -341,7 +341,7 @@ public class DescribeHttpClient
         var mocker = new AutoMocker();
         string content = """[{name: "test"}]""";
         mocker.SetupHttpDelete(r => r.RequestUri!.AbsoluteUri.EndsWith("/people"))
-            .ReturnsResponse(HttpStatusCode.OK, content);
+            .ReturnsHttpResponse(HttpStatusCode.OK, content);
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 
@@ -358,7 +358,7 @@ public class DescribeHttpClient
         var mocker = new AutoMocker(MockBehavior.Strict);
         string content = """[{name: "test"}]""";
         mocker.SetupHttpDelete("/people")
-            .ReturnsResponse(HttpStatusCode.OK, content);
+            .ReturnsHttpResponse(HttpStatusCode.OK, content);
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 
         await Assert.ThrowsAsync<MockException>(() => service.GetAsync("https://example.com/people"));
@@ -382,7 +382,7 @@ public class DescribeHttpClient
         var mocker = new AutoMocker();
 
         mocker.SetupHttpDelete()
-            .ReturnsResponse(HttpStatusCode.InternalServerError, "Server Error");
+            .ReturnsHttpResponse(HttpStatusCode.InternalServerError, "Server Error");
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 
@@ -397,7 +397,7 @@ public class DescribeHttpClient
         var mocker = new AutoMocker();
         string content = """[{name: "test"}]""";
         mocker.SetupHttpHead("/people")
-            .ReturnsResponse(HttpStatusCode.OK, content);
+            .ReturnsHttpResponse(HttpStatusCode.OK, content);
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 
@@ -414,7 +414,7 @@ public class DescribeHttpClient
         var mocker = new AutoMocker();
         string content = """[{name: "test"}]""";
         mocker.SetupHttpHead(r => r.RequestUri!.AbsoluteUri.EndsWith("/people"))
-            .ReturnsResponse(HttpStatusCode.OK, content);
+            .ReturnsHttpResponse(HttpStatusCode.OK, content);
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 
@@ -431,7 +431,7 @@ public class DescribeHttpClient
         var mocker = new AutoMocker(MockBehavior.Strict);
         string content = """[{name: "test"}]""";
         mocker.SetupHttpHead("/people")
-            .ReturnsResponse(HttpStatusCode.OK, content);
+            .ReturnsHttpResponse(HttpStatusCode.OK, content);
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 
         await Assert.ThrowsAsync<MockException>(() => service.GetAsync("https://example.com/people"));
@@ -455,7 +455,7 @@ public class DescribeHttpClient
         var mocker = new AutoMocker();
 
         mocker.SetupHttpHead()
-            .ReturnsResponse(HttpStatusCode.InternalServerError, "Server Error");
+            .ReturnsHttpResponse(HttpStatusCode.InternalServerError, "Server Error");
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 

@@ -2,10 +2,11 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using Moq.AutoMock.Http;
 using Moq.Language;
 using Moq.Language.Flow;
 
-namespace Moq.AutoMock.Http;
+namespace Moq.AutoMock;
 
 /// <summary>
 /// Provides extension methods for configuring mocked HTTP responses in unit tests using Moq and HttpMessageHandler.
@@ -42,24 +43,12 @@ public static partial class MockHttpMessageHandlerExtensions
     }
 
     /// <summary>
-    /// Specifies the response is an HTTP OK (200).
-    /// </summary>
-    /// <param name="setup">The setup.</param>
-    /// <param name="configure">An action to configure the response headers.</param>
-    public static IReturnsResult<HttpMessageHandler> ReturnsOK(
-        this ISetup<HttpMessageHandler, Task<HttpResponseMessage>> setup,
-        Action<HttpResponseMessage>? configure = null)
-    {
-        return setup.ReturnsResponse(HttpStatusCode.OK, configure);
-    }
-
-    /// <summary>
     /// Specifies the response to return.
     /// </summary>
     /// <param name="setup">The setup.</param>
     /// <param name="statusCode">The status code.</param>
     /// <param name="configure">An action to configure the response headers.</param>
-    public static IReturnsResult<HttpMessageHandler> ReturnsResponse(
+    public static IReturnsResult<HttpMessageHandler> ReturnsHttpResponse(
         this ISetup<HttpMessageHandler, Task<HttpResponseMessage>> setup,
         HttpStatusCode statusCode,
         Action<HttpResponseMessage>? configure = null)
@@ -77,7 +66,7 @@ public static partial class MockHttpMessageHandlerExtensions
     /// <param name="setup">The setup.</param>
     /// <param name="statusCode">The status code.</param>
     /// <param name="configure">An action to configure the response headers.</param>
-    public static ISetupSequentialResult<Task<HttpResponseMessage>> ReturnsResponse(
+    public static ISetupSequentialResult<Task<HttpResponseMessage>> ReturnsHttpResponse(
         this ISetupSequentialResult<Task<HttpResponseMessage>> setup,
         HttpStatusCode statusCode,
         Action<HttpResponseMessage>? configure = null)
@@ -95,7 +84,7 @@ public static partial class MockHttpMessageHandlerExtensions
     /// <param name="content">The response content.</param>
     /// <param name="configure">An action to configure the response headers.</param>
     /// <exception cref="ArgumentNullException"><paramref name="content" /> is null.</exception>
-    public static IReturnsResult<HttpMessageHandler> ReturnsResponse(
+    public static IReturnsResult<HttpMessageHandler> ReturnsHttpResponse(
         this ISetup<HttpMessageHandler, Task<HttpResponseMessage>> setup,
         HttpStatusCode statusCode,
         HttpContent content,
@@ -123,7 +112,7 @@ public static partial class MockHttpMessageHandlerExtensions
     /// <param name="content">The response content.</param>
     /// <param name="configure">An action to configure the response headers.</param>
     /// <exception cref="ArgumentNullException"><paramref name="content" /> is null.</exception>
-    public static ISetupSequentialResult<Task<HttpResponseMessage>> ReturnsResponse(
+    public static ISetupSequentialResult<Task<HttpResponseMessage>> ReturnsHttpResponse(
         this ISetupSequentialResult<Task<HttpResponseMessage>> setup,
         HttpStatusCode statusCode,
         HttpContent content,
@@ -150,7 +139,7 @@ public static partial class MockHttpMessageHandlerExtensions
     /// <param name="encoding">The character encoding. Defaults to <see cref="Encoding.UTF8" />.</param>
     /// <param name="configure">An action to configure the response headers.</param>
     /// <exception cref="ArgumentNullException"><paramref name="content" /> is null.</exception>
-    public static IReturnsResult<HttpMessageHandler> ReturnsResponse(
+    public static IReturnsResult<HttpMessageHandler> ReturnsHttpResponse(
         this ISetup<HttpMessageHandler, Task<HttpResponseMessage>> setup,
         HttpStatusCode statusCode,
         string content,
@@ -182,7 +171,7 @@ public static partial class MockHttpMessageHandlerExtensions
     /// <param name="encoding">The character encoding. Defaults to <see cref="Encoding.UTF8" />.</param>
     /// <param name="configure">An action to configure the response headers.</param>
     /// <exception cref="ArgumentNullException"><paramref name="content" /> is null.</exception>
-    public static ISetupSequentialResult<Task<HttpResponseMessage>> ReturnsResponse(
+    public static ISetupSequentialResult<Task<HttpResponseMessage>> ReturnsHttpResponse(
         this ISetupSequentialResult<Task<HttpResponseMessage>> setup,
         HttpStatusCode statusCode,
         string content,
@@ -210,7 +199,7 @@ public static partial class MockHttpMessageHandlerExtensions
     /// <param name="encoding">The character encoding. Defaults to <see cref="Encoding.UTF8" />.</param>
     /// <param name="configure">An action to configure the response headers.</param>
     /// <exception cref="ArgumentNullException"><paramref name="content" /> is null.</exception>
-    public static IReturnsResult<HttpMessageHandler> ReturnsResponse(
+    public static IReturnsResult<HttpMessageHandler> ReturnsHttpResponse(
         this ISetup<HttpMessageHandler, Task<HttpResponseMessage>> setup,
         string content,
         string? mediaType = null,

@@ -1,15 +1,14 @@
-﻿using System.ComponentModel;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using System.Reflection;
 using Moq.Language;
 using Moq.Language.Flow;
 using Moq.Protected;
 
-namespace Moq.AutoMock.Http;
+namespace Moq.AutoMock;
 
 using System.Net.Http;
+using Moq.AutoMock.Http;
 
-[EditorBrowsable(EditorBrowsableState.Never)]
 public static partial class MockHttpMessageHandlerExtensions
 {
     /// <summary>
