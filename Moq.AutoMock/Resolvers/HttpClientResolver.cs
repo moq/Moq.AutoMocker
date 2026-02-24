@@ -7,17 +7,14 @@ namespace Moq.AutoMock.Resolvers;
 /// <summary>
 /// A resolver that can provide HttpClients with mocked HttpMessageHandler. 
 /// </summary>
-public class HttpClientResolver : IMockResolver
+public class HttpClientResolver : SimpleTypeResolver<HttpClient>
 {
     /// <inheritdoc />
-    public void Resolve(MockResolutionContext context)
+    protected override HttpClient GetValue(MockResolutionContext context)
     {
-        if (context.RequestType == typeof(HttpClient))
-        {
-            var messageHandler = context.AutoMocker.GetMock<HttpMessageHandler>();
-            messageHandler.DefaultValueProvider = HttpMessageHandlerDefaultValueProvider.Instance;
-            context.Value = messageHandler.CreateClient();
-        }
+        var messageHandler = context.AutoMocker.GetMock<HttpMessageHandler>();
+        messageHandler.DefaultValueProvider = HttpMessageHandlerDefaultValueProvider.Instance;
+        return messageHandler.CreateClient();
     }
 
     /// <summary>
