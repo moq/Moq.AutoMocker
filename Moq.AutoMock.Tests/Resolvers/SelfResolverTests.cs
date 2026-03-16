@@ -26,4 +26,15 @@ public class SelfResolverTests : BaseResolverTests<SelfResolver>
         Assert.IsTrue(context.ValueProvided);
         Assert.AreSame(mocker, context.Value);
     }
+
+    [TestMethod]
+    [Description("Issue 450")]
+    public void WhenServiceProviderIsRequestedAsMockThenItReturnsMockedServiceProvider()
+    {
+        var mocker = new AutoMocker();
+
+        var serviceProvider = mocker.GetMock<IServiceProvider>();
+
+        Assert.IsNotNull(serviceProvider);
+    }
 }

@@ -6,6 +6,16 @@
 public class SelfResolver : SimpleTypeResolver<AutoMocker>
 {
     /// <inheritdoc />
-    protected override AutoMocker GetValue(MockResolutionContext context)
+    public override void Resolve(MockResolutionContext context)
+    {
+        if (context.ObjectGraphContext.IsMockCreation)
+        {
+            return;
+        }
+        base.Resolve(context);
+    }
+
+    /// <inheritdoc />
+    protected override AutoMocker GetValue(MockResolutionContext context) 
         => context.AutoMocker;
 }
