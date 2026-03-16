@@ -784,7 +784,7 @@ public partial class AutoMocker : IServiceProvider
 
     private Mock GetMockImplementation(Type serviceType, bool enablePrivate)
     {
-        if (TryResolve(serviceType, new ObjectGraphContext(enablePrivate), out IInstance? instance, out bool noCache) &&
+        if (TryResolve(serviceType, new ObjectGraphContext(enablePrivate, isMockCreation:true), out IInstance? instance, out bool noCache) &&
             instance.IsMock)
         {
             if (!noCache && TypeMap is { } typeMap && !typeMap.ContainsKey(serviceType))

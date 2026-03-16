@@ -12,11 +12,22 @@ public class ObjectGraphContext
     /// <summary>
     /// Creates an instance with binding flags set according to `enablePrivate`.
     /// </summary>
-    /// <param name="enablePrivate"></param>
+    /// <param name="enablePrivate">Enable private members</param>
     public ObjectGraphContext(bool enablePrivate)
     {
         BindingFlags = GetBindingFlags(enablePrivate);
         VisitedTypes = [];
+    }
+
+    /// <summary>
+    /// Creates an instance with binding flags set according to `enablePrivate`.
+    /// </summary>
+    /// <param name="enablePrivate">Enable private members</param>
+    /// <param name="isMockCreation">Indicates if the object is for a mock instance.</param>
+    public ObjectGraphContext(bool enablePrivate, bool isMockCreation)
+        : this(enablePrivate)
+    {
+        IsMockCreation = isMockCreation;
     }
 
     /// <summary>
@@ -45,6 +56,12 @@ public class ObjectGraphContext
     {
         ParameterInfo = targetParameter ?? throw new ArgumentNullException(nameof(targetParameter));
     }
+
+    /// <summary>
+    /// Indicates if the requested operation is for creating a Mock instance.
+    /// This will will only be true for types requested through AutoMocker.GetMock methods.
+    /// </summary>
+    public bool IsMockCreation { get; }
 
     /// <summary>
     /// Flags passed to Mock constructor.

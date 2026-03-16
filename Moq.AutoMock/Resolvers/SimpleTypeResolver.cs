@@ -19,7 +19,7 @@ public abstract class SimpleTypeResolver<T> : IMockResolver
     protected bool IncludeInterfaces { get; set; } = true;
 
     /// <inheritdoc />
-    public void Resolve(MockResolutionContext context)
+    public virtual void Resolve(MockResolutionContext context)
     {
         if (context.RequestType == typeof(T) ||
             (IncludeBaseTypes && typeof(T).IsAssignableFrom(context.RequestType)) ||
