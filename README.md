@@ -65,10 +65,37 @@ car.Accelerate(42);
 mocker.VerifyAll();
 ```
 
+HttpClient Support
+==================
+
+AutoMocker automatically resolves `HttpClient` dependencies with a mocked
+`HttpMessageHandler`. Use the built-in extension methods to set up responses
+and verify requests with minimal boilerplate.
+
+```csharp
+var mocker = new AutoMocker();
+
+mocker.SetupHttpGet("/users")
+    .ReturnsHttpResponse(HttpStatusCode.OK, """{"users": ["Alice", "Bob"]}""");
+
+var service = mocker.CreateInstance<UserService>();
+var response = await service.GetUsersAsync();
+
+Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+
+mocker.VerifyHttpGet("https://example.com/api/users", Times.Once());
+```
+
+Setup methods are available for all common HTTP verbs (`SetupHttpGet`,
+`SetupHttpPost`, `SetupHttpPut`, `SetupHttpDelete`, `SetupHttpHead`) with
+matching by URL substring or expression predicate. Sequential responses are
+supported for testing retry logic.
+
 Documentation
 =============
 
 For more detailed documentation, including information about the built-in source generators that can automatically generate test boilerplate code, see the [docs folder](docs/).
 
 - [AutoMocker API Reference](docs/Moq.AutoMock.md)
+- [HttpClient Support](docs/HttpClient.md) - Mock HTTP dependencies with fluent setup and verification
 - [Source Generators](docs/SourceGenerators.md) - Learn about automatic code generation for constructor tests, options configuration, logging, and more
