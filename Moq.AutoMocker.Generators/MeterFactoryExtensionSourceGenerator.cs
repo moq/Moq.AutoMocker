@@ -84,26 +84,7 @@ public sealed class MeterFactoryExtensionSourceGenerator : IIncrementalGenerator
                     }
         
                     var resolver = new MeterFactoryResolver();
-                    
-                    // Find the CacheResolver and insert the MeterFactoryResolver after it
-                    int cacheResolverIndex = -1;
-                    for (int i = 0; i < mocker.Resolvers.Count; i++)
-                    {
-                        if (mocker.Resolvers[i] is CacheResolver)
-                        {
-                            cacheResolverIndex = i;
-                            break;
-                        }
-                    }
-        
-                    if (cacheResolverIndex >= 0)
-                    {
-                        mocker.Resolvers.Insert(cacheResolverIndex + 1, resolver);
-                    }
-                    else
-                    {
-                        mocker.Resolvers.Insert(0, resolver);
-                    }
+                    mocker.InsertResolverAfter<CacheResolver>(resolver);
         
                     return mocker;
                 }
