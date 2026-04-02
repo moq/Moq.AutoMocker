@@ -8,5 +8,6 @@
     <CompilerVisibleProperty Include="EnableMoqAutoMockerKeyedServicesGenerator" />
     <CompilerVisibleProperty Include="EnableMoqAutoMockerFakeLoggingGenerator" />
     <CompilerVisibleProperty Include="EnableMoqAutoMockerApplicationInsightsGenerator" />
+    <CompilerVisibleProperty Include="EnableMoqAutoMockerMeterFactoryGenerator" />
   </ItemGroup>
 </Project>

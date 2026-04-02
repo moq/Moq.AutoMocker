@@ -20,6 +20,7 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
         public bool ReferenceApplicationInsights { get; set; }
         public bool ReferenceOpenTelemetryInMemoryExporter { get; set; }
         public bool ReferenceDependencyInjection { get; set; }
+        public bool ReferenceDiagnosticSource { get; set; }
 
         public void SetGlobalOption(string key, string value)
         {
@@ -50,7 +51,7 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
         protected override Project ApplyCompilationOptions(Project project)
         {
             //project.AnalyzerOptions.WithAdditionalFiles();
-            if (ReferenceAutoMocker || ReferenceOptionsAbstractions || ReferenceFakeLogging || ReferenceApplicationInsights || ReferenceDependencyInjection || ReferenceOpenTelemetryInMemoryExporter)
+            if (ReferenceAutoMocker || ReferenceOptionsAbstractions || ReferenceFakeLogging || ReferenceApplicationInsights || ReferenceDependencyInjection || ReferenceOpenTelemetryInMemoryExporter || ReferenceDiagnosticSource)
             {
                 string fullPath = Path.GetFullPath($"{AutoMock.AssemblyName}.dll");
                 project = project.AddMetadataReference(MetadataReference.CreateFromFile(fullPath));
@@ -114,6 +115,28 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
                 {
                     var diAssembly = typeof(Microsoft.Extensions.DependencyInjection.IKeyedServiceProvider).Assembly;
                     project = project.AddMetadataReference(MetadataReference.CreateFromFile(diAssembly.Location));
+                }
+                catch
+                {
+                    // If we can't find the assembly, the test will fail, which is appropriate
+                }
+            }
+
+            if (ReferenceDiagnosticSource)
+            {
+                // Add reference to System.Diagnostics.DiagnosticSource v10+
+                // The default reference assemblies may include an older version, so remove it first
+                try
+                {
+                    var existingRef = project.MetadataReferences
+                        .OfType<PortableExecutableReference>()
+                        .FirstOrDefault(r => Path.GetFileNameWithoutExtension(r.FilePath) == "System.Diagnostics.DiagnosticSource");
+                    if (existingRef != null)
+                    {
+                        project = project.RemoveMetadataReference(existingRef);
+                    }
+                    var diagnosticSourceAssembly = typeof(System.Diagnostics.Metrics.IMeterFactory).Assembly;
+                    project = project.AddMetadataReference(MetadataReference.CreateFromFile(diagnosticSourceAssembly.Location));
                 }
                 catch
                 {
