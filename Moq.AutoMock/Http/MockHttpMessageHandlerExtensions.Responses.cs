@@ -211,13 +211,10 @@ public static partial class MockHttpMessageHandlerExtensions
             throw new ArgumentNullException(nameof(content));
         }
 
-        return setup.ReturnsAsync((HttpRequestMessage request, CancellationToken _) =>
-        {
-            return CreateResponse(
+        return setup.ReturnsAsync((HttpRequestMessage request, CancellationToken _) => CreateResponse(
                 request: request,
                 content: new StringContent(content, encoding, mediaType ?? "text/plain"),
-                configure: configure);
-        });
+                configure: configure));
     }
 
     /// <summary>
@@ -359,15 +356,12 @@ public static partial class MockHttpMessageHandlerExtensions
             throw new ArgumentNullException(nameof(content));
         }
 
-        return setup.ReturnsAsync((HttpRequestMessage request, CancellationToken _) =>
-        {
-            return CreateResponse(
+        return setup.ReturnsAsync((HttpRequestMessage request, CancellationToken _) => CreateResponse(
                 request: request,
                 statusCode: statusCode,
                 content: new ByteArrayContent(content),
                 mediaType: mediaType,
-                configure: configure);
-        });
+                configure: configure));
     }
 
     /// <summary>

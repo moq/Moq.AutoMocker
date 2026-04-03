@@ -7,10 +7,7 @@ public class DescribeUsingWithCallback
     public void You_can_register_a_callback_to_configure_a_mock()
     {
         AutoMocker mocker = new();
-        mocker.Use<IService2>(mocker =>
-        {
-            return new Service2();
-        });
+        mocker.Use<IService2>(mocker => new Service2());
         
         var instance = mocker.Get<IService2>();
         Assert.IsInstanceOfType(instance, typeof(Service2));

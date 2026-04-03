@@ -158,10 +158,7 @@ public class DescribeHttpClient
         var mocker = new AutoMocker();
 
         mocker.SetupHttpGet()
-            .ReturnsHttpResponse(HttpStatusCode.OK, "Response with headers", configure: response =>
-            {
-                response.Headers.Add("X-Custom-Header", "CustomValue");
-            });
+            .ReturnsHttpResponse(HttpStatusCode.OK, "Response with headers", configure: response => response.Headers.Add("X-Custom-Header", "CustomValue"));
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 

@@ -116,14 +116,11 @@ public partial class AutoMocker : IServiceProvider
     /// </summary>
     public IReadOnlyDictionary<Type, object?> ResolvedObjects
         //NB: NonBlocking.ConcurrentDictionary GetEnumerator method returns a snapshot enumerator which is thread-safe
-        => TypeMap?.ToDictionary(kvp => kvp.Key, kvp =>
-        {
-            return kvp.Value switch
+        => TypeMap?.ToDictionary(kvp => kvp.Key, kvp => kvp.Value switch
             {
                 MockInstance mockInstance => mockInstance.Mock,
                 _ => kvp.Value.Value
-            };
-        }) ?? [];
+            }) ?? [];
 
     private NonBlocking.ConcurrentDictionary<Type, IInstance>? TypeMap
         => Resolvers.OfType<CacheResolver>().FirstOrDefault()?.TypeMap;
@@ -357,10 +354,7 @@ public partial class AutoMocker : IServiceProvider
         where T : class
     {
         Mock<T> selfMock = BuildSelfMock<T>(enablePrivate, mockBehavior ?? MockBehavior, defaultValue ?? DefaultValue, defaultValueProvider ?? DefaultValueProvider, callBase ?? CallBase);
-        WithTypeMap(typeMap =>
-        {
-            typeMap[typeof(T)] = new MockInstance(selfMock);
-        });
+        WithTypeMap(typeMap => typeMap[typeof(T)] = new MockInstance(selfMock));
         return selfMock.Object;
     }
 
@@ -426,10 +420,7 @@ public partial class AutoMocker : IServiceProvider
             defaultValue ?? DefaultValue,
             defaultValueProvider ?? DefaultValueProvider,
             callBase ?? CallBase);
-        WithTypeMap(typeMap =>
-        {
-            typeMap[implementationType] = new MockInstance(selfMock);
-        });
+        WithTypeMap(typeMap => typeMap[implementationType] = new MockInstance(selfMock));
         return selfMock.Object;
     }
 

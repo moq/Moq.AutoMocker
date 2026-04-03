@@ -110,6 +110,24 @@ var service = mocker.CreateInstance<MyService>();
 
 [Learn more →](SourceGenerators/KeyedServicesExtensionGenerator.md)
 
+### 6. [Meter Factory Extension Generator](SourceGenerators/MeterFactoryExtensionGenerator.md)
+
+Generates `WithMeterFactory()` extension method when `System.Diagnostics.DiagnosticSource` 10.0+ is referenced.
+
+**Key Features:**
+- Provides a real `IMeterFactory` implementation for metrics testing
+- Forwards `Create(MeterOptions)` directly to `new Meter(options)`
+- Tracks and disposes created meters on cleanup
+
+**Quick Example:**
+```csharp
+mocker.WithMeterFactory();
+var service = mocker.CreateInstance<MetricsService>();
+// IMeterFactory is automatically resolved with a working implementation
+```
+
+[Learn more →](SourceGenerators/MeterFactoryExtensionGenerator.md)
+
 ## Important: Generated Classes Are Internal Partials
 
 All extension classes created by these source generators are generated as **partial classes** with **internal visibility**. For example, the Keyed Services generator produces:
@@ -151,6 +169,7 @@ Each source generator can be individually disabled using MSBuild properties in y
 | Keyed Services Extension | `EnableMoqAutoMockerKeyedServicesGenerator` |
 | Fake Logging Extension | `EnableMoqAutoMockerFakeLoggingGenerator` |
 | Application Insights Extension | `EnableMoqAutoMockerApplicationInsightsGenerator` |
+| Meter Factory Extension | `EnableMoqAutoMockerMeterFactoryGenerator` |
 
 **Example: Disabling a generator**
 ```xml

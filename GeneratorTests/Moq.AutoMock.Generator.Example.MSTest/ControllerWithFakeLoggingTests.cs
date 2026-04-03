@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging.Testing;
 
-namespace Moq.AutoMock.Generator.Example.MSUnit;
+namespace Moq.AutoMock.Generator.Example.MSTest;
 
 [TestClass]
 public class ControllerWithFakeLoggingTests
@@ -32,9 +32,9 @@ public class ControllerWithFakeLoggingTests
         var logs = provider.Collector.GetSnapshot();
         Assert.IsNotNull(logs);
         CollectionAssert.AllItemsAreNotNull(logs.ToList());
-        Assert.IsTrue(logs.Any(log => log.Message == "Starting work"));
-        Assert.IsTrue(logs.Any(log => log.Message == "Debug message"));
-        Assert.IsTrue(logs.Any(log => log.Message == "Warning message"));
+        Assert.Contains(log => log.Message == "Starting work", logs);
+        Assert.Contains(log => log.Message == "Debug message", logs);
+        Assert.Contains(log => log.Message == "Warning message", logs);
     }
 
     [TestMethod]

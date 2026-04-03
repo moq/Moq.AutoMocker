@@ -1,4 +1,4 @@
-﻿namespace Moq.AutoMock.Generator.Example.MSUnit;
+﻿namespace Moq.AutoMock.Generator.Example.MSTest;
 [TestClass]
 public class ControllerWithOptionsTests
 {
