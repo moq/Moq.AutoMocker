@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging.Testing;
 using Xunit;
 
-namespace Moq.AutoMock.Generator.Example.xUnit3;
+namespace Moq.AutoMock.Generator.Example.xUnit;
 
 public class ControllerWithFakeLoggingTests
 {

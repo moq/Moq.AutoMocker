@@ -1,6 +1,6 @@
 ﻿using Xunit;
 
-namespace Moq.AutoMock.Generator.Example.xUnit3;
+namespace Moq.AutoMock.Generator.Example.xUnit;
 public class ControllerWithOptionsTests
 {
     [Fact]
