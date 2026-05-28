@@ -246,7 +246,7 @@ public class ApplicationInsightsGeneratorTests
 
     private static (string FileName, SourceText SourceText) GetSourceFile(string content, string fileName)
     {
-        return (Path.Combine("Moq.AutoMocker.Generators", "Moq.AutoMocker.Generators.ApplicationInsightsExtensionSourceGenerator", fileName), SourceText.From(content, Encoding.UTF8));
+        return (Path.Combine("Moq.AutoMocker.Generators", "Moq.AutoMocker.Generators.ApplicationInsightsExtensionSourceGenerator", fileName), SourceText.From(content, Encoding.UTF8, SourceHashAlgorithm.Sha256));
     }
 
     public TestContext TestContext { get; set; }
