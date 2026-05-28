@@ -12,6 +12,7 @@
     <EnableMoqAutoMockerKeyedServicesGenerator>false</EnableMoqAutoMockerKeyedServicesGenerator>
     <EnableMoqAutoMockerFakeLoggingGenerator>false</EnableMoqAutoMockerFakeLoggingGenerator>
     <EnableMoqAutoMockerApplicationInsightsGenerator>false</EnableMoqAutoMockerApplicationInsightsGenerator>
+    <EnableMoqAutoMockerFakeTimeProviderGenerator>false</EnableMoqAutoMockerFakeTimeProviderGenerator>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,6 +21,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
     <PackageReference Include="Microsoft.ApplicationInsights" />
+    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
     <PackageReference Include="xunit.v3" />
     <PackageReference Include="xunit.runner.visualstudio">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -56,6 +58,7 @@
     <CompilerVisibleProperty Include="EnableMoqAutoMockerKeyedServicesGenerator" />
     <CompilerVisibleProperty Include="EnableMoqAutoMockerFakeLoggingGenerator" />
     <CompilerVisibleProperty Include="EnableMoqAutoMockerApplicationInsightsGenerator" />
+    <CompilerVisibleProperty Include="EnableMoqAutoMockerFakeTimeProviderGenerator" />
   </ItemGroup>
 
 </Project>

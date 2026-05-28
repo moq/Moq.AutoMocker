@@ -17,6 +17,7 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
         public bool ReferenceAutoMocker { get; set; } = true;
         public bool ReferenceOptionsAbstractions { get; set; }
         public bool ReferenceFakeLogging { get; set; }
+        public bool ReferenceFakeTimeProvider { get; set; }
         public bool ReferenceApplicationInsights { get; set; }
         public bool ReferenceOpenTelemetryInMemoryExporter { get; set; }
         public bool ReferenceDependencyInjection { get; set; }
@@ -51,7 +52,7 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
         protected override Project ApplyCompilationOptions(Project project)
         {
             //project.AnalyzerOptions.WithAdditionalFiles();
-            if (ReferenceAutoMocker || ReferenceOptionsAbstractions || ReferenceFakeLogging || ReferenceApplicationInsights || ReferenceDependencyInjection || ReferenceOpenTelemetryInMemoryExporter || ReferenceDiagnosticSource)
+            if (ReferenceAutoMocker || ReferenceOptionsAbstractions || ReferenceFakeLogging || ReferenceFakeTimeProvider || ReferenceApplicationInsights || ReferenceDependencyInjection || ReferenceOpenTelemetryInMemoryExporter || ReferenceDiagnosticSource)
             {
                 string fullPath = Path.GetFullPath($"{AutoMock.AssemblyName}.dll");
                 project = project.AddMetadataReference(MetadataReference.CreateFromFile(fullPath));
@@ -73,6 +74,20 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
                     
                     var loggingAssembly = typeof(Microsoft.Extensions.Logging.ILogger).Assembly;
                     project = project.AddMetadataReference(MetadataReference.CreateFromFile(loggingAssembly.Location));
+                }
+                catch
+                {
+                    // If we can't find the assembly, the test will fail, which is appropriate
+                }
+            }
+
+            if (ReferenceFakeTimeProvider)
+            {
+                // Add reference to Microsoft.Extensions.TimeProvider.Testing
+                try
+                {
+                    var fakeTimeProviderAssembly = typeof(Microsoft.Extensions.Time.Testing.FakeTimeProvider).Assembly;
+                    project = project.AddMetadataReference(MetadataReference.CreateFromFile(fakeTimeProviderAssembly.Location));
                 }
                 catch
                 {

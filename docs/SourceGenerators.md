@@ -128,6 +128,28 @@ var service = mocker.CreateInstance<MetricsService>();
 
 [Learn more →](SourceGenerators/MeterFactoryExtensionGenerator.md)
 
+### 7. [Fake Time Provider Extension Generator](SourceGenerators/FakeTimeProviderExtensionGenerator.md)
+
+Generates `WithFakeTimeProvider()` extension method when `Microsoft.Extensions.TimeProvider.Testing` is referenced.
+
+**Key Features:**
+- Provides a `FakeTimeProvider` for deterministic time-based testing
+- Registers as both `TimeProvider` (for injection) and `FakeTimeProvider` (for test control)
+- Allows advancing time with `Advance()` and `SetUtcNow()`
+
+**Quick Example:**
+```csharp
+mocker.WithFakeTimeProvider();
+var fakeTime = mocker.Get<FakeTimeProvider>();
+fakeTime.SetUtcNow(new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero));
+
+var service = mocker.CreateInstance<MyTimeSensitiveService>();
+fakeTime.Advance(TimeSpan.FromHours(1));
+// Verify behavior at specific time
+```
+
+[Learn more →](SourceGenerators/FakeTimeProviderExtensionGenerator.md)
+
 ## Important: Generated Classes Are Internal Partials
 
 All extension classes created by these source generators are generated as **partial classes** with **internal visibility**. For example, the Keyed Services generator produces:
@@ -170,6 +192,7 @@ Each source generator can be individually disabled using MSBuild properties in y
 | Fake Logging Extension | `EnableMoqAutoMockerFakeLoggingGenerator` |
 | Application Insights Extension | `EnableMoqAutoMockerApplicationInsightsGenerator` |
 | Meter Factory Extension | `EnableMoqAutoMockerMeterFactoryGenerator` |
+| Fake Time Provider Extension | `EnableMoqAutoMockerFakeTimeProviderGenerator` |
 
 **Example: Disabling a generator**
 ```xml
