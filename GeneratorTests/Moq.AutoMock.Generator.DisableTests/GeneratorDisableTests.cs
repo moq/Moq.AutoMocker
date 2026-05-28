@@ -59,6 +59,17 @@ public class GeneratorDisableTests
             "WithApplicationInsights extension method should not exist when EnableMoqAutoMockerApplicationInsightsGenerator=false");
     }
 
+    [Fact]
+    public void FakeTimeProviderGenerator_WhenDisabled_ExtensionMethodDoesNotExist()
+    {
+        // When EnableMoqAutoMockerFakeTimeProviderGenerator=false, the fake time provider
+        // extension methods should not be generated
+        
+        bool hasGeneratedTimeProviderExtension = HasExtensionMethod("WithFakeTimeProvider");
+        Assert.False(hasGeneratedTimeProviderExtension,
+            "WithFakeTimeProvider extension method should not exist when EnableMoqAutoMockerFakeTimeProviderGenerator=false");
+    }
+
     /// <summary>
     /// Checks if an extension method with the given name exists for the AutoMocker type
     /// in the current assembly (generated code is added to the consuming project).
