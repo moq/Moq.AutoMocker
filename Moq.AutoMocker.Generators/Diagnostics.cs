@@ -68,4 +68,20 @@ public static class Diagnostics
         public static Diagnostic Create(Location? location, string targetTypeName)
             => Diagnostic.Create(Rule, location, targetTypeName);
     }
+
+    public static class PreferWithOverUseCreateInstance
+    {
+        public const string DiagnosticId = "AMG0005";
+        private const string Title = "Prefer With over Use(CreateInstance(...))";
+        private const string MessageFormat = "Use With(...) instead of Use(CreateInstance(...))";
+        private const string Description = "With(...) is the dedicated API for registering instances created by AutoMocker.CreateInstance(...).";
+
+        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat,
+            Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+
+        public static DiagnosticDescriptor Descriptor => Rule;
+
+        public static Diagnostic Create(Location? location)
+            => Diagnostic.Create(Rule, location);
+    }
 }
