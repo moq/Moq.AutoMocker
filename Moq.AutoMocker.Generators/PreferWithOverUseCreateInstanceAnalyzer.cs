@@ -27,7 +27,7 @@ public sealed class PreferWithOverUseCreateInstanceAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (!IsAutoMockerMethod(context.SemanticModel, useInvocation, "Use", out _))
+        if (!TryGetAutoMockerReceiver(context.SemanticModel, useInvocation, "Use", context.CancellationToken, out var useReceiver))
         {
             return;
         }
@@ -39,12 +39,12 @@ public sealed class PreferWithOverUseCreateInstanceAnalyzer : DiagnosticAnalyzer
                 continue;
             }
 
-            if (!IsAutoMockerMethod(context.SemanticModel, createInvocation, "CreateInstance", out _))
+            if (!TryGetAutoMockerReceiver(context.SemanticModel, createInvocation, "CreateInstance", context.CancellationToken, out var createReceiver))
             {
                 continue;
             }
 
-            if (!HaveSameReceiver(context.SemanticModel, useInvocation, createInvocation, context.CancellationToken))
+            if (!HaveSameReceiver(useReceiver, createReceiver))
             {
                 continue;
             }
@@ -54,41 +54,41 @@ public sealed class PreferWithOverUseCreateInstanceAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    private static bool IsAutoMockerMethod(
+    private static bool TryGetAutoMockerReceiver(
         SemanticModel semanticModel,
         InvocationExpressionSyntax invocation,
         string methodName,
-        out IMethodSymbol? methodSymbol)
+        CancellationToken cancellationToken,
+        out ExpressionSyntax receiver)
     {
-        methodSymbol = semanticModel.GetSymbolInfo(invocation).Symbol as IMethodSymbol;
-        if (methodSymbol is null)
+        receiver = null!;
+        if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
         {
             return false;
         }
 
-        return methodSymbol.Name == methodName &&
-               methodSymbol.ContainingType.ToDisplayString() == AutoMockerTypeName;
+        if (memberAccess.Name.Identifier.ValueText != methodName)
+        {
+            return false;
+        }
+
+        var receiverType = semanticModel.GetTypeInfo(memberAccess.Expression, cancellationToken).Type;
+        if (receiverType is null || receiverType.ToDisplayString() != AutoMockerTypeName)
+        {
+            return false;
+        }
+
+        receiver = Unwrap(memberAccess.Expression);
+        return true;
     }
 
     private static bool HaveSameReceiver(
-        SemanticModel semanticModel,
-        InvocationExpressionSyntax useInvocation,
-        InvocationExpressionSyntax createInvocation,
-        CancellationToken cancellationToken)
+        ExpressionSyntax useReceiver,
+        ExpressionSyntax createReceiver)
     {
-        var useReceiver = GetReceiverSymbol(semanticModel, useInvocation, cancellationToken);
-        var createReceiver = GetReceiverSymbol(semanticModel, createInvocation, cancellationToken);
-        return SymbolEqualityComparer.Default.Equals(useReceiver, createReceiver);
-    }
-
-    private static ISymbol? GetReceiverSymbol(SemanticModel semanticModel, InvocationExpressionSyntax invocation, CancellationToken cancellationToken)
-    {
-        if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
-        {
-            return null;
-        }
-
-        return semanticModel.GetSymbolInfo(memberAccess.Expression, cancellationToken).Symbol;
+        return Microsoft.CodeAnalysis.CSharp.SyntaxFactory.AreEquivalent(
+            useReceiver.WithoutTrivia(),
+            createReceiver.WithoutTrivia());
     }
 
     private static ExpressionSyntax Unwrap(ExpressionSyntax expression)
