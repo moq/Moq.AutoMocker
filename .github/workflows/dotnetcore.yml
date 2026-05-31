@@ -82,6 +82,13 @@ jobs:
           --configuration Release `
           --verbosity normal `
           /p:LocalNuGetSource=true
+
+  # Move analyzer rules to shipped docs for tag releases
+    - name: Promote Analyzer Release Docs
+      if: startsWith(github.ref, 'refs/tags/v')
+      run: |
+        $packageVersion = '${{ github.ref_name }}'.Substring(1)
+        .\.github\scripts\Promote-AnalyzerReleaseDocs.ps1 -PackageVersion $packageVersion
       
   # Update the docs
     - name: Update Docs
@@ -101,14 +108,14 @@ jobs:
       if: github.event_name == 'push'
       with:
         commit-message: |
-          [Docs update detected by Github Action].
+          [Generated updates detected by GitHub Action].
           Auto generated pull request.
         branch: docs/automated-update
         delete-branch: true
         base: master
-        title: Update Docs [GitHub Action]
+        title: Update generated docs [GitHub Action]
         body: |
-          [Docs update detected by Github Action].
+          [Generated updates detected by GitHub Action].
           Auto generated pull request.
 
   # Publish to NuGet and GitHub Packages
