@@ -4,10 +4,10 @@ param(
   [string]$PackageVersion,
 
   [Parameter()]
-  [string]$UnshippedPath = ".\Moq.AutoMocker.Generators\AnalyzerReleases.Unshipped.md",
+  [string]$UnshippedPath = "./Moq.AutoMocker.Generators/AnalyzerReleases.Unshipped.md",
 
   [Parameter()]
-  [string]$ShippedPath = ".\Moq.AutoMocker.Generators\AnalyzerReleases.Shipped.md"
+  [string]$ShippedPath = "./Moq.AutoMocker.Generators/AnalyzerReleases.Shipped.md"
 )
 
 Set-StrictMode -Version Latest
