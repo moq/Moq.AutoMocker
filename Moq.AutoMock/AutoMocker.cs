@@ -471,7 +471,7 @@ public partial class AutoMocker : IServiceProvider
         {
             if (typeMap.TryGetValue(type, out IInstance existingInstance) &&
                 existingInstance is RealInstance realInstance &&
-                Equals(realInstance.Value, service))
+                ReferenceEquals(realInstance.Value, service))
             {
                 throw new InvalidOperationException($"The service instance has already been added. You can safely remove this call to {nameof(AutoMocker)}.{nameof(Use)}");
             }
@@ -495,7 +495,7 @@ public partial class AutoMocker : IServiceProvider
             Type serviceType = typeof(TService);
             if (typeMap.TryGetValue(serviceType, out IInstance existingInstance) &&
                 existingInstance is MockInstance mockInstance &&
-                Equals(mockInstance.Mock.Object, mockedService.Object))
+                ReferenceEquals(mockInstance.Mock.Object, mockedService.Object))
             {
                 throw new InvalidOperationException("The service has already been added.");
             }

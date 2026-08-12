@@ -94,6 +94,46 @@ public class DescribeUsingExplicitObjects
     }
 
     [TestMethod]
+    public void It_does_not_throw_for_distinct_instances_that_are_value_equal()
+    {
+        // Reproduces https://github.com/moq/Moq.AutoMocker/issues/470
+        // Types like Uri override Equals to perform value equality, so two
+        // *different* instances that happen to represent the same value
+        // should not be treated as "the same instance already added".
+        AutoMocker mocker = new();
+        var uri1 = new Uri("relative", UriKind.Relative);
+        var uri2 = new Uri("relative", UriKind.Relative);
+        Assert.AreNotSame(uri1, uri2);
+        Assert.AreEqual(uri1, uri2);
+
+        mocker.Use(uri1);
+        mocker.Use(uri2);
+
+        Assert.AreSame(uri2, mocker.Get<Uri>());
+    }
+
+    [TestMethod]
+    public void It_does_not_throw_for_distinct_record_instances_that_are_value_equal()
+    {
+        // Reproduces https://github.com/moq/Moq.AutoMocker/issues/470
+        // Records generate value-based Equals overrides, so two distinct
+        // record instances with the same property values should not be
+        // treated as "the same instance already added".
+        AutoMocker mocker = new();
+        var record1 = new ExampleRecord("value");
+        var record2 = new ExampleRecord("value");
+        Assert.AreNotSame(record1, record2);
+        Assert.AreEqual(record1, record2);
+
+        mocker.Use(record1);
+        mocker.Use(record2);
+
+        Assert.AreSame(record2, mocker.Get<ExampleRecord>());
+    }
+
+    private record ExampleRecord(string Value);
+
+    [TestMethod]
     public void It_throws_if_the_service_was_created_by_mocker()
     {
         AutoMocker mocker = new();
