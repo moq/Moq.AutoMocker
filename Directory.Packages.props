@@ -27,6 +27,6 @@
     <PackageVersion Include="System.Diagnostics.DiagnosticSource" Version="10.0.9" />
     <PackageVersion Include="TUnit" Version="1.64.6" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.0" />
-    <PackageVersion Include="xunit.v3" Version="3.2.2" />
+    <PackageVersion Include="xunit.v3" Version="4.0.0" />
   </ItemGroup>
 </Project>
