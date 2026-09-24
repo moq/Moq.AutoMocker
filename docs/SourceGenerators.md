@@ -128,7 +128,7 @@ var service = mocker.CreateInstance<MetricsService>();
 
 [Learn more →](SourceGenerators/MeterFactoryExtensionGenerator.md)
 
-### 7. [Fake Time Provider Extension Generator](SourceGenerators/FakeTimeProviderExtensionGenerator.md)
+### 8. [Fake Time Provider Extension Generator](SourceGenerators/FakeTimeProviderExtensionGenerator.md)
 
 Generates `WithFakeTimeProvider()` extension method when `Microsoft.Extensions.TimeProvider.Testing` is referenced.
 
@@ -149,6 +149,25 @@ fakeTime.Advance(TimeSpan.FromHours(1));
 ```
 
 [Learn more →](SourceGenerators/FakeTimeProviderExtensionGenerator.md)
+
+### 9. [HTTP Client Factory Extension Generator](SourceGenerators/HttpClientFactoryExtensionGenerator.md)
+
+Generates `WithHttpClientFactory()` extension method when `Microsoft.Extensions.Http` is referenced.
+
+**Key Features:**
+- Provides a testable `IHttpClientFactory` implementation
+- Caches one `HttpClient` per client name — the same name returns the same instance, different names return distinct instances
+- All named clients share the same testable handler used by `HttpClientResolver`, so existing `SetupHttp*`/`VerifyHttp*` helpers apply
+
+**Quick Example:**
+```csharp
+mocker.WithHttpClientFactory();
+var factory = mocker.Get<IHttpClientFactory>();
+var client = factory.CreateClient("catalog");
+// IHttpClientFactory is automatically resolved with testable clients
+```
+
+[Learn more →](SourceGenerators/HttpClientFactoryExtensionGenerator.md)
 
 ## Important: Generated Classes Are Internal Partials
 
@@ -193,6 +212,7 @@ Each source generator can be individually disabled using MSBuild properties in y
 | Application Insights Extension | `EnableMoqAutoMockerApplicationInsightsGenerator` |
 | Meter Factory Extension | `EnableMoqAutoMockerMeterFactoryGenerator` |
 | Fake Time Provider Extension | `EnableMoqAutoMockerFakeTimeProviderGenerator` |
+| HTTP Client Factory Extension | `EnableMoqAutoMockerHttpClientFactoryGenerator` |
 
 **Example: Disabling a generator**
 ```xml

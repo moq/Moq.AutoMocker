@@ -8,15 +8,33 @@ public sealed class HttpClientFactoryResolverSourceGenerator : IIncrementalGener
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        // Check if the generator is enabled via MSBuild property
+        IncrementalValueProvider<bool> isEnabled = context.AnalyzerConfigOptionsProvider
+            .Select(static (provider, _) => IsGeneratorEnabled(provider));
+
         IncrementalValueProvider<bool> referencesHttp = context.CompilationProvider
             .Select(static (compilation, _) => compilation.ReferencedAssemblyNames
                 .Any(assembly => assembly.Name.StartsWith("Microsoft.Extensions.Http", StringComparison.Ordinal)));
 
-        context.RegisterSourceOutput(referencesHttp, static (productionContext, shouldGenerate) =>
+        // Combine both conditions
+        IncrementalValueProvider<bool> shouldGenerate = isEnabled
+            .Combine(referencesHttp)
+            .Select(static (tuple, _) => tuple.Left && tuple.Right);
+
+        context.RegisterSourceOutput(shouldGenerate, static (productionContext, shouldGenerate) =>
         {
             if (shouldGenerate)
                 productionContext.AddSource("AutoMockerHttpClientFactoryExtensions.g.cs", Source);
         });
+    }
+
+    private static bool IsGeneratorEnabled(AnalyzerConfigOptionsProvider provider)
+    {
+        if (provider.GlobalOptions.TryGetValue("build_property.EnableMoqAutoMockerHttpClientFactoryGenerator", out var value))
+        {
+            return !string.Equals(value, "false", StringComparison.OrdinalIgnoreCase);
+        }
+        return true; // Enabled by default
     }
 
     private const string Source =

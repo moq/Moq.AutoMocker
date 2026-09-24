@@ -38,6 +38,8 @@ Assert.AreSame(catalogClient, sameCatalogClient);
 Assert.AreNotSame(catalogClient, ordersClient);
 ```
 
+See the [HTTP Client Factory Extension Generator](SourceGenerators/HttpClientFactoryExtensionGenerator.md) page for advanced usage and details on disabling this generator via the `EnableMoqAutoMockerHttpClientFactoryGenerator` MSBuild property.
+
 ## Usage
 
 ### Basic Setup
