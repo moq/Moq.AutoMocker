@@ -5,7 +5,8 @@ Moq.AutoMocker provides built-in support for testing code that depends on `HttpC
 ## Features
 
 - **Automatic resolution** of `HttpClient` dependencies via `HttpClientResolver`
-- **Verb-specific setup methods** for GET, POST, PUT, DELETE, and HEAD
+- **Named `IHttpClientFactory` support** with one testable client cached per client name
+- **Verb-specific setup methods** for GET, POST, PUT, PATCH, DELETE, and HEAD
 - **Flexible request matching** by URI, expression predicate, or custom logic
 - **Fluent response builders** for string, byte array, stream, and custom content types
 - **Sequential responses** for testing retry logic and multi-call scenarios
@@ -22,6 +23,20 @@ AutoMocker registers an `HttpClientResolver` that intercepts `HttpClient` depend
 3. Wraps the handler in a new `HttpClient` instance
 
 This means you can immediately create and test classes that use `HttpClient` without any explicit setup. The extension methods on `AutoMocker` and `Mock<HttpMessageHandler>` then let you customize request matching and response behavior.
+
+When the consuming project references `Microsoft.Extensions.Http`, the source generator adds `WithHttpClientFactory()`. Call this generated extension to enable testable `IHttpClientFactory` resolution. Calling `CreateClient` with the same name returns the same `HttpClient` instance; different names receive separate instances. All named clients use the same testable handler, so the existing setup and verification helpers apply:
+
+```csharp
+var mocker = new AutoMocker()
+    .WithHttpClientFactory();
+var factory = mocker.Get<IHttpClientFactory>();
+var catalogClient = factory.CreateClient("catalog");
+var sameCatalogClient = factory.CreateClient("catalog");
+var ordersClient = factory.CreateClient("orders");
+
+Assert.AreSame(catalogClient, sameCatalogClient);
+Assert.AreNotSame(catalogClient, ordersClient);
+```
 
 ## Usage
 
@@ -62,6 +77,9 @@ mocker.SetupHttpPost("/orders", "order data")
     .ReturnsHttpResponse(HttpStatusCode.Created, """{"id": 1}""");
 
 mocker.SetupHttpPut("/users/1", "updated data")
+    .ReturnsHttpResponse(HttpStatusCode.OK, """{"updated": true}""");
+
+mocker.SetupHttpPatch("/users/1", "partial update")
     .ReturnsHttpResponse(HttpStatusCode.OK, """{"updated": true}""");
 
 mocker.SetupHttpDelete("/users/1")
@@ -205,8 +223,9 @@ mocker.VerifyHttpGet("https://example.com/api/status", Times.Once());
 // Verify a POST with specific content
 mocker.VerifyHttpPost("https://example.com/api/notify", "Hello", Times.Once());
 
-// Verify PUT, DELETE, HEAD
+// Verify PUT, PATCH, DELETE, HEAD
 mocker.VerifyHttpPut("https://example.com/api/config", "new value", Times.Once());
+mocker.VerifyHttpPatch("https://example.com/api/config", "partial value", Times.Once());
 mocker.VerifyHttpDelete("https://example.com/api/cache", Times.Once());
 mocker.VerifyHttpHead("https://example.com/api/health", Times.Once());
 ```
@@ -246,6 +265,8 @@ All setup methods are available as extension methods on both `AutoMocker` and `M
 | `SetupHttpPost(Expression)` | Setup POST requests matching an expression predicate |
 | `SetupHttpPut(string?, string?)` | Setup PUT requests with optional URL and content matching |
 | `SetupHttpPut(Expression)` | Setup PUT requests matching an expression predicate |
+| `SetupHttpPatch(string?, string?)` | Setup PATCH requests with optional URL and content matching |
+| `SetupHttpPatch(Expression)` | Setup PATCH requests matching an expression predicate |
 | `SetupHttpDelete(string?)` | Setup DELETE requests, optionally matching a URL substring |
 | `SetupHttpDelete(Expression)` | Setup DELETE requests matching an expression predicate |
 | `SetupHttpHead(string?)` | Setup HEAD requests, optionally matching a URL substring |
@@ -276,6 +297,7 @@ All response methods accept an optional `Action<HttpResponseMessage>? configure`
 | `VerifyHttpGet(string, Times?, string?)` | Verify GET requests to a URL |
 | `VerifyHttpPost(string, string?, Times?, string?)` | Verify POST requests with optional content |
 | `VerifyHttpPut(string, string?, Times?, string?)` | Verify PUT requests with optional content |
+| `VerifyHttpPatch(string, string?, Times?, string?)` | Verify PATCH requests with optional content |
 | `VerifyHttpDelete(string, Times?, string?)` | Verify DELETE requests to a URL |
 | `VerifyHttpHead(string, Times?, string?)` | Verify HEAD requests to a URL |
 | `VerifyHttp(Expression, Times?, string?)` | Verify with a custom expression predicate |

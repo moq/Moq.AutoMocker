@@ -21,6 +21,17 @@ public class ServiceWithHttpClient(HttpClient httpClient)
     public Task<HttpResponseMessage> PutAsync(string url, HttpContent content)
         => httpClient.PutAsync(url, content);
 
+    public Task<HttpResponseMessage> PatchAsync(string url, string content)
+        => PatchAsync(url, new StringContent(content));
+
+    public Task<HttpResponseMessage> PatchAsync(string url, HttpContent content)
+        => httpClient.SendAsync(new HttpRequestMessage
+        {
+            Method = new HttpMethod("PATCH"),
+            RequestUri = new Uri(url),
+            Content = content
+        });
+
     public Task<HttpResponseMessage> DeleteAsync(string url)
         => httpClient.DeleteAsync(url);
 
