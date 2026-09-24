@@ -128,7 +128,7 @@ var service = mocker.CreateInstance<MetricsService>();
 
 [Learn more →](SourceGenerators/MeterFactoryExtensionGenerator.md)
 
-### 8. [Fake Time Provider Extension Generator](SourceGenerators/FakeTimeProviderExtensionGenerator.md)
+### 7. [Fake Time Provider Extension Generator](SourceGenerators/FakeTimeProviderExtensionGenerator.md)
 
 Generates `WithFakeTimeProvider()` extension method when `Microsoft.Extensions.TimeProvider.Testing` is referenced.
 
@@ -150,7 +150,7 @@ fakeTime.Advance(TimeSpan.FromHours(1));
 
 [Learn more →](SourceGenerators/FakeTimeProviderExtensionGenerator.md)
 
-### 9. [HTTP Client Factory Extension Generator](SourceGenerators/HttpClientFactoryExtensionGenerator.md)
+### 8. [HTTP Client Factory Extension Generator](SourceGenerators/HttpClientFactoryExtensionGenerator.md)
 
 Generates `WithHttpClientFactory()` extension method when `Microsoft.Extensions.Http` is referenced.
 
