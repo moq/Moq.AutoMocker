@@ -70,6 +70,17 @@ public class GeneratorDisableTests
             "WithFakeTimeProvider extension method should not exist when EnableMoqAutoMockerFakeTimeProviderGenerator=false");
     }
 
+    [Fact]
+    public void HttpClientFactoryGenerator_WhenDisabled_ExtensionMethodDoesNotExist()
+    {
+        // When EnableMoqAutoMockerHttpClientFactoryGenerator=false, the HTTP client factory
+        // extension methods should not be generated
+
+        bool hasGeneratedHttpClientFactoryExtension = HasExtensionMethod("WithHttpClientFactory");
+        Assert.False(hasGeneratedHttpClientFactoryExtension,
+            "WithHttpClientFactory extension method should not exist when EnableMoqAutoMockerHttpClientFactoryGenerator=false");
+    }
+
     /// <summary>
     /// Checks if an extension method with the given name exists for the AutoMocker type
     /// in the current assembly (generated code is added to the consuming project).

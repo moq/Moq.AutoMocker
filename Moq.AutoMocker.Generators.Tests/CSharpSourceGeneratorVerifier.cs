@@ -22,6 +22,7 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
         public bool ReferenceOpenTelemetryInMemoryExporter { get; set; }
         public bool ReferenceDependencyInjection { get; set; }
         public bool ReferenceDiagnosticSource { get; set; }
+        public bool ReferenceHttp { get; set; }
 
         public void SetGlobalOption(string key, string value)
         {
@@ -52,7 +53,7 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
         protected override Project ApplyCompilationOptions(Project project)
         {
             //project.AnalyzerOptions.WithAdditionalFiles();
-            if (ReferenceAutoMocker || ReferenceOptionsAbstractions || ReferenceFakeLogging || ReferenceFakeTimeProvider || ReferenceApplicationInsights || ReferenceDependencyInjection || ReferenceOpenTelemetryInMemoryExporter || ReferenceDiagnosticSource)
+            if (ReferenceAutoMocker || ReferenceOptionsAbstractions || ReferenceFakeLogging || ReferenceFakeTimeProvider || ReferenceApplicationInsights || ReferenceDependencyInjection || ReferenceOpenTelemetryInMemoryExporter || ReferenceDiagnosticSource || ReferenceHttp)
             {
                 string fullPath = Path.GetFullPath($"{AutoMock.AssemblyName}.dll");
                 project = project.AddMetadataReference(MetadataReference.CreateFromFile(fullPath));
@@ -152,6 +153,20 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
                     }
                     var diagnosticSourceAssembly = typeof(System.Diagnostics.Metrics.IMeterFactory).Assembly;
                     project = project.AddMetadataReference(MetadataReference.CreateFromFile(diagnosticSourceAssembly.Location));
+                }
+                catch
+                {
+                    // If we can't find the assembly, the test will fail, which is appropriate
+                }
+            }
+
+            if (ReferenceHttp)
+            {
+                // Add reference to Microsoft.Extensions.Http
+                try
+                {
+                    var httpAssembly = typeof(Microsoft.Extensions.Http.HttpMessageHandlerBuilder).Assembly;
+                    project = project.AddMetadataReference(MetadataReference.CreateFromFile(httpAssembly.Location));
                 }
                 catch
                 {

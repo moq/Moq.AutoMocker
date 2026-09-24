@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http;
+using Microsoft.Extensions.Http;
 using Moq.AutoMock.Http;
 using Moq.Protected;
 
@@ -9,6 +10,47 @@ namespace Moq.AutoMock.Tests;
 public class DescribeHttpClient
 {
     public TestContext TestContext { get; set; }
+
+    [TestMethod]
+    public void HttpClientFactory_ReturnsTheSameClientForTheSameName()
+    {
+        var mocker = new AutoMocker();
+        mocker.WithHttpClientFactory();
+        var factory = mocker.Get<IHttpClientFactory>();
+
+        var first = factory.CreateClient("catalog");
+        var second = factory.CreateClient("catalog");
+
+        Assert.AreSame(first, second);
+    }
+
+    [TestMethod]
+    public void HttpClientFactory_ReturnsDifferentClientsForDifferentNames()
+    {
+        var mocker = new AutoMocker();
+        mocker.WithHttpClientFactory();
+        var factory = mocker.Get<IHttpClientFactory>();
+
+        var catalog = factory.CreateClient("catalog");
+        var orders = factory.CreateClient("orders");
+
+        Assert.AreNotSame(catalog, orders);
+    }
+
+    [TestMethod]
+    public async Task HttpClientFactory_ReturnsTestableClients()
+    {
+        var mocker = new AutoMocker();
+        mocker.WithHttpClientFactory();
+        mocker.SetupHttpGet("/people")
+            .ReturnsHttpResponse(HttpStatusCode.OK, "content");
+        var client = mocker.Get<IHttpClientFactory>().CreateClient("catalog");
+
+        var response = await client.GetAsync("https://example.com/people");
+
+        Assert.AreEqual("content", await response.Content.ReadAsStringAsync(TestContext.CancellationToken));
+        mocker.VerifyHttpGet("https://example.com/people", Times.Once());
+    }
 
     [TestMethod]
     public async Task HttpClient_CanSetupDifferentResponsesForDifferentUrls()
@@ -311,6 +353,78 @@ public class DescribeHttpClient
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
 
         var response = await service.PutAsync("https://example.com/api/test", "Stuff");
+
+        Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
+    }
+
+    [TestMethod]
+    public async Task HttpClient_CanSetupHttpPatchByUrl()
+    {
+        var mocker = new AutoMocker();
+        string content = """[{name: "test"}]""";
+        mocker.SetupHttpPatch("/people", "data")
+            .ReturnsHttpResponse(HttpStatusCode.OK, content);
+
+        var service = mocker.CreateInstance<ServiceWithHttpClient>();
+
+        var response = await service.PatchAsync("https://example.com/people", "data");
+        var receivedContent = await response.Content.ReadAsStringAsync(TestContext.CancellationToken);
+
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        Assert.AreEqual(content, receivedContent);
+    }
+
+    [TestMethod]
+    public async Task HttpClient_CanSetupHttpPatchByExpression()
+    {
+        var mocker = new AutoMocker();
+        string content = """[{name: "test"}]""";
+        mocker.SetupHttpPatch(r => r.RequestUri!.AbsoluteUri.EndsWith("/people"))
+            .ReturnsHttpResponse(HttpStatusCode.OK, content);
+
+        var service = mocker.CreateInstance<ServiceWithHttpClient>();
+
+        var response = await service.PatchAsync("https://example.com/people", "data");
+        var receivedContent = await response.Content.ReadAsStringAsync(TestContext.CancellationToken);
+
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        Assert.AreEqual(content, receivedContent);
+    }
+
+    [TestMethod]
+    public async Task HttpClient_SetupHttpPatchDoesNotMatchOtherVerbs()
+    {
+        var mocker = new AutoMocker(MockBehavior.Strict);
+        mocker.SetupHttpPatch("/people")
+            .ReturnsHttpResponse(HttpStatusCode.OK, "content");
+        var service = mocker.CreateInstance<ServiceWithHttpClient>();
+
+        await Assert.ThrowsAsync<MockException>(() => service.PutAsync("https://example.com/people", "data"));
+    }
+
+    [TestMethod]
+    public async Task HttpClient_CanVerifyHttpPatchRequestsWereMade()
+    {
+        var mocker = new AutoMocker();
+
+        var service = mocker.CreateInstance<ServiceWithHttpClient>();
+
+        await service.PatchAsync("https://example.com/api/test", "Some content");
+
+        mocker.VerifyHttpPatch("https://example.com/api/test", "Some content", Times.Once());
+    }
+
+    [TestMethod]
+    public async Task HttpClient_CanSetupHttpPatchErrorResponses()
+    {
+        var mocker = new AutoMocker();
+
+        mocker.SetupHttpPatch()
+            .ReturnsHttpResponse(HttpStatusCode.InternalServerError, "Server Error");
+
+        var service = mocker.CreateInstance<ServiceWithHttpClient>();
+
+        var response = await service.PatchAsync("https://example.com/api/test", "Stuff");
 
         Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
     }

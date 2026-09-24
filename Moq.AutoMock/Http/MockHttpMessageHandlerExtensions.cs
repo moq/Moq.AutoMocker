@@ -174,6 +174,56 @@ public static partial class MockHttpMessageHandlerExtensions
     /// </summary>
     /// <param name="mocker">The <see cref="AutoMocker" /> instance.</param>
     /// <param name="requestUri">The requested Uri</param>
+    /// <param name="content">Optional request content content to match.</param>
+    public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpPatch(this AutoMocker mocker,
+        string? requestUri = null, string? content = null)
+    {
+        if (mocker is null)
+            throw new ArgumentNullException(nameof(mocker));
+        return mocker.GetMock<HttpMessageHandler>().SetupHttpPatch(requestUri, content);
+    }
+
+    /// <summary>
+    /// Specifies a setup on the mocked type for a call to a value-returning method.
+    /// </summary>
+    /// <param name="mocker">The <see cref="AutoMocker" /> instance.</param>
+    /// <param name="match">The predicate used to match the <see cref="HttpRequestMessage"/>.</param>
+    public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpPatch(this AutoMocker mocker, Expression<Func<HttpRequestMessage, bool>> match)
+    {
+        if (mocker is null)
+            throw new ArgumentNullException(nameof(mocker));
+        return mocker.GetMock<HttpMessageHandler>().SetupHttpPatch(match);
+    }
+
+    /// <summary>
+    /// Specifies a setup on the mocked type for a call to a value-returning method.
+    /// </summary>
+    /// <param name="handler">The <see cref="HttpMessageHandler" /> mock.</param>
+    /// <param name="requestUri">The requested Uri</param>
+    /// <param name="content">Optional request content content to match.</param>
+    public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpPatch(this Mock<HttpMessageHandler> handler,
+        string? requestUri = null, string? content = null)
+    {
+        return handler.SetupHttpPatch(r => MatchesRequestUri(r.RequestUri, requestUri) && ContentEquals(r.Content, content));
+    }
+
+    /// <summary>
+    /// Specifies a setup on the mocked type for a call to a value-returning method.
+    /// </summary>
+    /// <param name="handler">The <see cref="HttpMessageHandler" /> mock.</param>
+    /// <param name="match">The predicate used to match the <see cref="HttpRequestMessage"/>.</param>
+    public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpPatch(this Mock<HttpMessageHandler> handler, Expression<Func<HttpRequestMessage, bool>> match)
+    {
+        return SetupHttp(handler, x => x.SendAsync(
+                It.Is(CombineHttpMethod(match, new HttpMethod("PATCH"))),
+                It.IsAny<CancellationToken>()));
+    }
+
+    /// <summary>
+    /// Specifies a setup on the mocked type for a call to a value-returning method.
+    /// </summary>
+    /// <param name="mocker">The <see cref="AutoMocker" /> instance.</param>
+    /// <param name="requestUri">The requested Uri</param>
     public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpDelete(this AutoMocker mocker, string? requestUri = null)
     {
         if (mocker is null)
@@ -541,6 +591,32 @@ public static partial class MockHttpMessageHandlerExtensions
             throw new ArgumentNullException(nameof(handler));
 
         handler.VerifyHttp(r => r.Method == HttpMethod.Put &&
+                           MatchesRequestUri(r.RequestUri, requestUri) &&
+                           ContentEquals(r.Content, content),
+                           times, failMessage);
+    }
+
+    /// <summary>
+    /// Verifies that a specific PATCH invocation matching the given URI and content was performed.
+    /// </summary>
+    public static void VerifyHttpPatch(this AutoMocker mocker, string requestUri, string? content = null, Times? times = null, string? failMessage = null)
+    {
+        if (mocker is null)
+            throw new ArgumentNullException(nameof(mocker));
+
+        mocker.GetMock<HttpMessageHandler>()
+            .VerifyHttpPatch(requestUri, content, times, failMessage);
+    }
+
+    /// <summary>
+    /// Verifies that a specific PATCH invocation matching the given URI and content was performed.
+    /// </summary>
+    public static void VerifyHttpPatch(this Mock<HttpMessageHandler> handler, string requestUri, string? content = null, Times? times = null, string? failMessage = null)
+    {
+        if (handler is null)
+            throw new ArgumentNullException(nameof(handler));
+
+        handler.VerifyHttp(r => r.Method == new HttpMethod("PATCH") &&
                            MatchesRequestUri(r.RequestUri, requestUri) &&
                            ContentEquals(r.Content, content),
                            times, failMessage);
