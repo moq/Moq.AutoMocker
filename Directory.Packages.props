@@ -18,7 +18,7 @@
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.401" />
     <PackageVersion Include="Moq" Version="4.21.0" />
-    <PackageVersion Include="MSTest" Version="4.4.1" />
+    <PackageVersion Include="MSTest" Version="4.5.1" />
     <PackageVersion Include="NonBlocking" Version="2.1.2" />
     <PackageVersion Include="NUnit" Version="5.0.0" />
     <PackageVersion Include="NUnit3TestAdapter" Version="6.3.0" />
