@@ -126,3 +126,8 @@ You can disable this generator using an MSBuild property in your test project's 
 1. Make sure you're calling `WithOptions<T>()` before creating your instance
 2. Verify the configuration delegate is setting the properties correctly
 3. Check that you're using `Settings.Value` to access the configured options
+
+
+## Analyzer: AMA0001
+
+Calls to `AutoMocker.Use` that pass an `IOptions<T>` instance (for example `mocker.Use(Options.Create(new MyOptions()))`) report the informational diagnostic `AMA0001`, suggesting the generated `WithOptions<T>()` extension instead. The diagnostic is only reported when the generated extension is available. Suppress it with `dotnet_diagnostic.AMA0001.severity = none` in an `.editorconfig`.
