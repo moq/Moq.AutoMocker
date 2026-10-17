@@ -2,3 +2,4 @@
 
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
+AMA0001 | AutoMocker.Usage | Info | PreferWithOptions
