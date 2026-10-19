@@ -52,10 +52,13 @@ public class CatalogServiceTests
 The generator creates:
 
 ```csharp
-public static AutoMocker WithHttpClientFactory(this AutoMocker mocker)
+internal static class AutoMockerHttpClientFactoryExtensions
 {
-    // Registers a resolver that provides IHttpClientFactory
-    // Returns mocker for fluent chaining
+    public static AutoMocker WithHttpClientFactory(this AutoMocker mocker)
+    {
+        // Registers a resolver that provides IHttpClientFactory
+        // Returns mocker for fluent chaining
+    }
 }
 ```
 
