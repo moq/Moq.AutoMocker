@@ -21,7 +21,7 @@ public class HttpClientFactoryGeneratorTests
 
         namespace Moq.AutoMock;
 
-        public static class AutoMockerHttpClientFactoryExtensions
+        internal static class AutoMockerHttpClientFactoryExtensions
         {
             public static AutoMocker WithHttpClientFactory(this AutoMocker mocker)
             {

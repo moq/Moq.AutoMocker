@@ -49,7 +49,7 @@ public sealed class HttpClientFactoryResolverSourceGenerator : IIncrementalGener
 
         namespace Moq.AutoMock;
 
-        public static class AutoMockerHttpClientFactoryExtensions
+        internal static class AutoMockerHttpClientFactoryExtensions
         {
             public static AutoMocker WithHttpClientFactory(this AutoMocker mocker)
             {
