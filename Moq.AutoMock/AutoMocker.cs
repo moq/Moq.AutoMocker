@@ -446,6 +446,58 @@ public partial class AutoMocker : IServiceProvider
     #region Use
 
     /// <summary>
+    /// Creates a fresh mock using this container's services and registers it with Use,
+    /// replacing any existing registration for <typeparamref name="T"/>.
+    /// </summary>
+    /// <typeparam name="T">The service type to mock and register.</typeparam>
+    /// <param name="enablePrivate">When true, non-public constructors will also be considered.</param>
+    /// <param name="mockBehavior">The mock behavior, or the container's behavior when omitted.</param>
+    /// <param name="defaultValue">The default value mode, or the container's mode when omitted.</param>
+    /// <param name="defaultValueProvider">The default value provider, or the container's provider when omitted.</param>
+    /// <param name="callBase">Whether to call base implementations, or the container's setting when omitted.</param>
+    /// <returns>The registered mock, ready for configuration.</returns>
+    public Mock<T> WithMock<T>(
+        bool enablePrivate = false,
+        MockBehavior? mockBehavior = null,
+        DefaultValue? defaultValue = null,
+        DefaultValueProvider? defaultValueProvider = null,
+        bool? callBase = null)
+        where T : class
+    {
+        Mock<T> mock = BuildSelfMock<T>(enablePrivate, mockBehavior ?? MockBehavior,
+            defaultValue ?? DefaultValue, defaultValueProvider ?? DefaultValueProvider, callBase ?? CallBase);
+        Use(mock);
+        return mock;
+    }
+
+    /// <summary>
+    /// Creates a fresh mock using this container's services and registers it,
+    /// replacing any existing registration for <paramref name="serviceType"/>.
+    /// </summary>
+    /// <param name="serviceType">The service type to mock and register.</param>
+    /// <param name="enablePrivate">When true, non-public constructors will also be considered.</param>
+    /// <param name="mockBehavior">The mock behavior, or the container's behavior when omitted.</param>
+    /// <param name="defaultValue">The default value mode, or the container's mode when omitted.</param>
+    /// <param name="defaultValueProvider">The default value provider, or the container's provider when omitted.</param>
+    /// <param name="callBase">Whether to call base implementations, or the container's setting when omitted.</param>
+    /// <returns>The registered mock, ready for configuration.</returns>
+    public Mock WithMock(
+        Type serviceType,
+        bool enablePrivate = false,
+        MockBehavior? mockBehavior = null,
+        DefaultValue? defaultValue = null,
+        DefaultValueProvider? defaultValueProvider = null,
+        bool? callBase = null)
+    {
+        if (serviceType is null) throw new ArgumentNullException(nameof(serviceType));
+
+        Mock mock = BuildSelfMock(serviceType, enablePrivate, mockBehavior ?? MockBehavior,
+            defaultValue ?? DefaultValue, defaultValueProvider ?? DefaultValueProvider, callBase ?? CallBase);
+        WithTypeMap(typeMap => typeMap[serviceType] = new MockInstance(mock));
+        return mock;
+    }
+
+    /// <summary>
     /// Adds an instance to the container.
     /// </summary>
     /// <typeparam name="TService">The type that the instance will be registered as</typeparam>
