@@ -40,6 +40,18 @@ var analyzer = new UseOptionsAnalyzer();
 var descriptor = analyzer.SupportedDiagnostics[0];
 ```
 
+`RedundantUseAnalyzer()` derives from `DiagnosticAnalyzer`.
+`SupportedDiagnostics` is an `ImmutableArray<DiagnosticDescriptor>` containing
+`AMA0003`. `void Initialize(AnalysisContext context)` registers analysis of
+unconfigured interface mocks passed to `Use`, suggesting `WithMock`, and mocks
+returned by the same container's `GetMock`, whose `Use` call is redundant.
+Class targets are excluded. See the [usage rules and examples](SourceGenerators.md#analyzer-unnecessary-test-double-registration-ama0003).
+
+```csharp
+var redundantUseAnalyzer = new RedundantUseAnalyzer();
+var redundantUseDescriptor = redundantUseAnalyzer.SupportedDiagnostics[0];
+```
+
 ## Diagnostics
 
 `Diagnostics` contains static nested classes exposing `const string DiagnosticId` and a `Diagnostic Create(...)` factory:
@@ -51,11 +63,20 @@ var descriptor = analyzer.SupportedDiagnostics[0];
 | `MustSpecifyTargetType` | `AMG0003` | Error | `Create(Location? location, string className)` |
 | `DuplicateTargetType` | `AMG0004` | Warning | `Create(Location? location, string targetTypeName)` |
 | `PreferWithOptions` | `AMA0001` | Info | `Create(Location? location, string optionsTypeName)` |
+| `RedundantUse` | `AMA0003` | Info | `Create(Location? location, bool retained)` |
 
 ```csharp
 Diagnostic diagnostic = Diagnostics.MustSpecifyTargetType.Create(
     Location.None, "OrderServiceTests");
 string id = Diagnostics.MustSpecifyTargetType.DiagnosticId;
+```
+
+`Diagnostics.RedundantUse.Create` accepts `retained: true` for a mock already
+returned by the same container, or `false` to suggest `WithMock<T>()`.
+
+```csharp
+Diagnostic redundantUse = Diagnostics.RedundantUse.Create(Location.None, retained: false);
+string redundantUseId = Diagnostics.RedundantUse.DiagnosticId;
 ```
 
 ## Generator models

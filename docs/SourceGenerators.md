@@ -171,6 +171,46 @@ var client = factory.CreateClient("catalog");
 
 [Learn more →](SourceGenerators/HttpClientFactoryExtensionGenerator.md)
 
+## Analyzer: Unnecessary Test Double Registration (AMA0003)
+
+The informational diagnostic `AMA0003` flags `Use` calls that register a plain,
+unconfigured mock or re-register a mock returned by the same AutoMocker.
+AutoMocker creates mocks on demand and retains the mocks returned by `GetMock`.
+Class targets, including abstract classes, are excluded even when retrieved with
+`GetMock`; the diagnostic still applies to interface targets.
+
+```csharp
+// Unnecessary registrations:
+mocker.Use(new Mock<IService>());
+mocker.Use(new Mock<IService>().Object);
+mocker.Use(mocker.GetMock<IService>());
+
+// Create and register a fresh mock in one call instead:
+var freshMock = mocker.WithMock<IService>();
+freshMock.Setup(x => x.GetValue()).Returns(42);
+
+// Or retrieve the existing mock without re-registering it:
+var mock = mocker.GetMock<IService>();
+mock.Setup(x => x.GetValue()).Returns(42);
+// No mocker.Use(mock) is needed, even after configuration.
+```
+
+Direct registrations suggest `WithMock<T>()`, which creates and registers a fresh
+mock. For mocks already returned by `GetMock`, remove the redundant `Use` instead
+of creating a replacement.
+
+The analyzer also recognizes parameterless `Mock.Of<T>()`, simple local variables,
+and the `Use(typeof(T), instance)` overload. It preserves explicitly configured
+mocks (including constructor arguments and object initializers). For separately
+created mocks stored in locals, it skips the diagnostic if the local is used
+elsewhere, including later setup, verification, or sharing with other code.
+Re-registration diagnostics require the same container and service type; property
+or method receivers, reassigned locals, and intervening container accesses are
+conservatively skipped.
+
+Suppress the diagnostic with `dotnet_diagnostic.AMA0003.severity = none` in an
+`.editorconfig`.
+
 ## Important: Generated Classes Are Internal Partials
 
 Most extension classes created by these source generators are **internal partial classes**. The HTTP client factory extension class is public. For example, the Keyed Services generator produces:

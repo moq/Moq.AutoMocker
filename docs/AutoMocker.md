@@ -98,6 +98,48 @@ store.Setup(x => x.Find(42)).Returns("item");
 IStore dependency = store.Object;
 ```
 
+## WithMock
+
+```csharp
+Mock<T> WithMock<T>(
+    bool enablePrivate = false, MockBehavior? mockBehavior = null,
+    DefaultValue? defaultValue = null,
+    DefaultValueProvider? defaultValueProvider = null, bool? callBase = null)
+    where T : class
+Mock WithMock(
+    Type serviceType,
+    bool enablePrivate = false, MockBehavior? mockBehavior = null,
+    DefaultValue? defaultValue = null,
+    DefaultValueProvider? defaultValueProvider = null, bool? callBase = null)
+```
+
+Creates a fresh mock, registers it under the requested service type, and returns
+the `Mock` wrapper for configuration. Supports interfaces and mockable classes;
+class constructor dependencies are resolved from the container. Each call
+replaces an existing registration, discarding that mock's setups and invocation
+history from the container. Use `GetMock` to reuse the current mock instead.
+Both overloads retain the wrapper, so `GetMock` and container verification work
+for the new registration.
+
+`enablePrivate` defaults to `false`; `true` includes non-public constructors but
+does not bypass proxy accessibility restrictions. Unspecified mock settings
+inherit the container's settings. A custom `defaultValueProvider` is used when
+the effective `defaultValue` is `DefaultValue.Custom`.
+
+Throws `ArgumentNullException` for a null runtime type or
+`InvalidOperationException` when AutoMocker cannot build the mock. Proxy creation
+errors can also propagate.
+
+```csharp
+Mock<IStore> store = mocker.WithMock<IStore>();
+store.Setup(x => x.Find(42)).Returns("item");
+IStore sameStore = mocker.Get<IStore>();
+
+Mock clock = mocker.WithMock(typeof(IClock), mockBehavior: MockBehavior.Strict);
+var worker = mocker.WithMock<Worker>(callBase: true);
+worker.Setup(x => x.Load()).Returns("test");
+```
+
 ## Use
 
 All overloads return the same `AutoMocker` for chaining.
