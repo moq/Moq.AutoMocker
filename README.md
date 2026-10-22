@@ -96,6 +96,10 @@ Documentation
 
 For more detailed documentation, including information about the built-in source generators that can automatically generate test boilerplate code, see the [docs folder](docs/).
 
-- [AutoMocker API Reference](docs/Moq.AutoMock.md)
+- [Public API documentation](docs/README.md) - Concise reference with examples and overloads grouped by method
+- [AutoMocker](docs/AutoMocker.md)
+- [Setup and verification](docs/SetupAndVerification.md)
+- [Resolvers and contexts](docs/Resolvers.md)
+- [Diagnostics and constructor tests](docs/Diagnostics.md)
 - [HttpClient Support](docs/HttpClient.md) - Mock HTTP dependencies with fluent setup and verification
 - [Source Generators](docs/SourceGenerators.md) - Learn about automatic code generation for constructor tests, options configuration, logging, and more

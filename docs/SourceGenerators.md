@@ -1,5 +1,7 @@
 # Moq.AutoMocker Source Generators
 
+For concise signatures with overloads grouped together, see [Generated extensions](GeneratedExtensions.md). See the [documentation index](README.md) for the core API.
+
 Moq.AutoMock includes built-in source generators that provide compile-time code generation to enhance your testing experience. These generators automatically create boilerplate test code and extension methods, saving you time and reducing repetitive testing code.
 
 ## Available Generators
@@ -171,7 +173,7 @@ var client = factory.CreateClient("catalog");
 
 ## Important: Generated Classes Are Internal Partials
 
-All extension classes created by these source generators are generated as **partial classes** with **internal visibility**. For example, the Keyed Services generator produces:
+Most extension classes created by these source generators are **internal partial classes**. The HTTP client factory extension class is public. For example, the Keyed Services generator produces:
 
 ```csharp
 internal static partial class AutoMockerKeyedServicesExtensions
