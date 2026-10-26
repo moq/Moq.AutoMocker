@@ -29,7 +29,7 @@
     <PackageVersion Include="System.Diagnostics.DiagnosticSource" Version="10.0.9" />
     <!-- Pinned to fix transitive vulnerabilities (NU1902/NU1903) -->
     <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
-    <PackageVersion Include="TUnit" Version="1.75.0" />
+    <PackageVersion Include="TUnit" Version="1.76.28" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.1" />
     <PackageVersion Include="xunit.v3" Version="4.0.2" />
   </ItemGroup>
