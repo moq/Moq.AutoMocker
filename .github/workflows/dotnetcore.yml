@@ -26,6 +26,10 @@ defaults:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      pull-requests: write
     steps:
     - uses: actions/checkout@v7
 
@@ -119,10 +123,19 @@ jobs:
           Auto generated pull request.
 
   # Publish to NuGet and GitHub Packages
+    - name: NuGet login
+      if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+      uses: NuGet/login@v1
+      id: login
+      with:
+        user: ${{ secrets.NUGET_USER }}
+
     - name: Publish
       if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+      env:
+        NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
       run: |
-        dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN }} --skip-duplicate
+        dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key $env:NUGET_API_KEY --skip-duplicate
         dotnet nuget push *.nupkg `
           --source 'https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json' `
           --api-key '${{ github.token }}' `
