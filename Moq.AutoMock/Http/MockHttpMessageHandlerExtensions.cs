@@ -50,6 +50,18 @@ public static partial class MockHttpMessageHandlerExtensions
     /// <summary>
     /// Specifies a setup on the mocked type for a call to a value-returning method.
     /// </summary>
+    /// <param name="mocker">The <see cref="AutoMocker" /> instance.</param>
+    /// <param name="match">The asynchronous predicate used to match the <see cref="HttpRequestMessage"/>.</param>
+    public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpGet(this AutoMocker mocker, Func<HttpRequestMessage, Task<bool>> match)
+    {
+        if (mocker is null)
+            throw new ArgumentNullException(nameof(mocker));
+        return mocker.GetMock<HttpMessageHandler>().SetupHttpGet(match);
+    }
+
+    /// <summary>
+    /// Specifies a setup on the mocked type for a call to a value-returning method.
+    /// </summary>
     /// <param name="handler">The <see cref="HttpMessageHandler" /> mock.</param>
     /// <param name="requestUri">The requested Uri</param>
     public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpGet(this Mock<HttpMessageHandler> handler, string? requestUri = null)
@@ -72,6 +84,16 @@ public static partial class MockHttpMessageHandlerExtensions
     /// <summary>
     /// Specifies a setup on the mocked type for a call to a value-returning method.
     /// </summary>
+    /// <param name="handler">The <see cref="HttpMessageHandler" /> mock.</param>
+    /// <param name="match">The asynchronous predicate used to match the <see cref="HttpRequestMessage"/>.</param>
+    public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpGet(this Mock<HttpMessageHandler> handler, Func<HttpRequestMessage, Task<bool>> match)
+    {
+        return SetupHttp(handler, HttpMethod.Get, match);
+    }
+
+    /// <summary>
+    /// Specifies a setup on the mocked type for a call to a value-returning method.
+    /// </summary>
     /// <param name="mocker">The <see cref="AutoMocker" /> instance.</param>
     /// <param name="requestUri">The requested Uri</param>
     /// <param name="content">Optional request content content to match.</param>
@@ -89,6 +111,18 @@ public static partial class MockHttpMessageHandlerExtensions
     /// <param name="mocker">The <see cref="AutoMocker" /> instance.</param>
     /// <param name="match">The predicate used to match the <see cref="HttpRequestMessage"/>.</param>
     public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpPost(this AutoMocker mocker, Expression<Func<HttpRequestMessage, bool>> match)
+    {
+        if (mocker is null)
+            throw new ArgumentNullException(nameof(mocker));
+        return mocker.GetMock<HttpMessageHandler>().SetupHttpPost(match);
+    }
+
+    /// <summary>
+    /// Specifies a setup on the mocked type for a call to a value-returning method.
+    /// </summary>
+    /// <param name="mocker">The <see cref="AutoMocker" /> instance.</param>
+    /// <param name="match">The asynchronous predicate used to match the <see cref="HttpRequestMessage"/>.</param>
+    public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpPost(this AutoMocker mocker, Func<HttpRequestMessage, Task<bool>> match)
     {
         if (mocker is null)
             throw new ArgumentNullException(nameof(mocker));
@@ -122,6 +156,16 @@ public static partial class MockHttpMessageHandlerExtensions
     /// <summary>
     /// Specifies a setup on the mocked type for a call to a value-returning method.
     /// </summary>
+    /// <param name="handler">The <see cref="HttpMessageHandler" /> mock.</param>
+    /// <param name="match">The asynchronous predicate used to match the <see cref="HttpRequestMessage"/>.</param>
+    public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpPost(this Mock<HttpMessageHandler> handler, Func<HttpRequestMessage, Task<bool>> match)
+    {
+        return SetupHttp(handler, HttpMethod.Post, match);
+    }
+
+    /// <summary>
+    /// Specifies a setup on the mocked type for a call to a value-returning method.
+    /// </summary>
     /// <param name="mocker">The <see cref="AutoMocker" /> instance.</param>
     /// <param name="requestUri">The requested Uri</param>
     /// <param name="content">Optional request content content to match.</param>
@@ -139,6 +183,18 @@ public static partial class MockHttpMessageHandlerExtensions
     /// <param name="mocker">The <see cref="AutoMocker" /> instance.</param>
     /// <param name="match">The predicate used to match the <see cref="HttpRequestMessage"/>.</param>
     public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpPut(this AutoMocker mocker, Expression<Func<HttpRequestMessage, bool>> match)
+    {
+        if (mocker is null)
+            throw new ArgumentNullException(nameof(mocker));
+        return mocker.GetMock<HttpMessageHandler>().SetupHttpPut(match);
+    }
+
+    /// <summary>
+    /// Specifies a setup on the mocked type for a call to a value-returning method.
+    /// </summary>
+    /// <param name="mocker">The <see cref="AutoMocker" /> instance.</param>
+    /// <param name="match">The asynchronous predicate used to match the <see cref="HttpRequestMessage"/>.</param>
+    public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpPut(this AutoMocker mocker, Func<HttpRequestMessage, Task<bool>> match)
     {
         if (mocker is null)
             throw new ArgumentNullException(nameof(mocker));
@@ -172,6 +228,16 @@ public static partial class MockHttpMessageHandlerExtensions
     /// <summary>
     /// Specifies a setup on the mocked type for a call to a value-returning method.
     /// </summary>
+    /// <param name="handler">The <see cref="HttpMessageHandler" /> mock.</param>
+    /// <param name="match">The asynchronous predicate used to match the <see cref="HttpRequestMessage"/>.</param>
+    public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpPut(this Mock<HttpMessageHandler> handler, Func<HttpRequestMessage, Task<bool>> match)
+    {
+        return SetupHttp(handler, HttpMethod.Put, match);
+    }
+
+    /// <summary>
+    /// Specifies a setup on the mocked type for a call to a value-returning method.
+    /// </summary>
     /// <param name="mocker">The <see cref="AutoMocker" /> instance.</param>
     /// <param name="requestUri">The requested Uri</param>
     /// <param name="content">Optional request content content to match.</param>
@@ -189,6 +255,18 @@ public static partial class MockHttpMessageHandlerExtensions
     /// <param name="mocker">The <see cref="AutoMocker" /> instance.</param>
     /// <param name="match">The predicate used to match the <see cref="HttpRequestMessage"/>.</param>
     public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpPatch(this AutoMocker mocker, Expression<Func<HttpRequestMessage, bool>> match)
+    {
+        if (mocker is null)
+            throw new ArgumentNullException(nameof(mocker));
+        return mocker.GetMock<HttpMessageHandler>().SetupHttpPatch(match);
+    }
+
+    /// <summary>
+    /// Specifies a setup on the mocked type for a call to a value-returning method.
+    /// </summary>
+    /// <param name="mocker">The <see cref="AutoMocker" /> instance.</param>
+    /// <param name="match">The asynchronous predicate used to match the <see cref="HttpRequestMessage"/>.</param>
+    public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpPatch(this AutoMocker mocker, Func<HttpRequestMessage, Task<bool>> match)
     {
         if (mocker is null)
             throw new ArgumentNullException(nameof(mocker));
@@ -222,6 +300,16 @@ public static partial class MockHttpMessageHandlerExtensions
     /// <summary>
     /// Specifies a setup on the mocked type for a call to a value-returning method.
     /// </summary>
+    /// <param name="handler">The <see cref="HttpMessageHandler" /> mock.</param>
+    /// <param name="match">The asynchronous predicate used to match the <see cref="HttpRequestMessage"/>.</param>
+    public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpPatch(this Mock<HttpMessageHandler> handler, Func<HttpRequestMessage, Task<bool>> match)
+    {
+        return SetupHttp(handler, new HttpMethod("PATCH"), match);
+    }
+
+    /// <summary>
+    /// Specifies a setup on the mocked type for a call to a value-returning method.
+    /// </summary>
     /// <param name="mocker">The <see cref="AutoMocker" /> instance.</param>
     /// <param name="requestUri">The requested Uri</param>
     public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpDelete(this AutoMocker mocker, string? requestUri = null)
@@ -237,6 +325,18 @@ public static partial class MockHttpMessageHandlerExtensions
     /// <param name="mocker">The <see cref="AutoMocker" /> instance.</param>
     /// <param name="match">The predicate used to match the <see cref="HttpRequestMessage"/>.</param>
     public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpDelete(this AutoMocker mocker, Expression<Func<HttpRequestMessage, bool>> match)
+    {
+        if (mocker is null)
+            throw new ArgumentNullException(nameof(mocker));
+        return mocker.GetMock<HttpMessageHandler>().SetupHttpDelete(match);
+    }
+
+    /// <summary>
+    /// Specifies a setup on the mocked type for a call to a value-returning method.
+    /// </summary>
+    /// <param name="mocker">The <see cref="AutoMocker" /> instance.</param>
+    /// <param name="match">The asynchronous predicate used to match the <see cref="HttpRequestMessage"/>.</param>
+    public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpDelete(this AutoMocker mocker, Func<HttpRequestMessage, Task<bool>> match)
     {
         if (mocker is null)
             throw new ArgumentNullException(nameof(mocker));
@@ -272,6 +372,16 @@ public static partial class MockHttpMessageHandlerExtensions
     /// <summary>
     /// Specifies a setup on the mocked type for a call to a value-returning method.
     /// </summary>
+    /// <param name="handler">The <see cref="HttpMessageHandler" /> mock.</param>
+    /// <param name="match">The asynchronous predicate used to match the <see cref="HttpRequestMessage"/>.</param>
+    public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpDelete(this Mock<HttpMessageHandler> handler, Func<HttpRequestMessage, Task<bool>> match)
+    {
+        return SetupHttp(handler, HttpMethod.Delete, match);
+    }
+
+    /// <summary>
+    /// Specifies a setup on the mocked type for a call to a value-returning method.
+    /// </summary>
     /// <param name="mocker">The <see cref="AutoMocker" /> instance.</param>
     /// <param name="requestUri">The requested Uri</param>
     public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpHead(this AutoMocker mocker, string? requestUri = null)
@@ -287,6 +397,18 @@ public static partial class MockHttpMessageHandlerExtensions
     /// <param name="mocker">The <see cref="AutoMocker" /> instance.</param>
     /// <param name="match">The predicate used to match the <see cref="HttpRequestMessage"/>.</param>
     public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpHead(this AutoMocker mocker, Expression<Func<HttpRequestMessage, bool>> match)
+    {
+        if (mocker is null)
+            throw new ArgumentNullException(nameof(mocker));
+        return mocker.GetMock<HttpMessageHandler>().SetupHttpHead(match);
+    }
+
+    /// <summary>
+    /// Specifies a setup on the mocked type for a call to a value-returning method.
+    /// </summary>
+    /// <param name="mocker">The <see cref="AutoMocker" /> instance.</param>
+    /// <param name="match">The asynchronous predicate used to match the <see cref="HttpRequestMessage"/>.</param>
+    public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpHead(this AutoMocker mocker, Func<HttpRequestMessage, Task<bool>> match)
     {
         if (mocker is null)
             throw new ArgumentNullException(nameof(mocker));
@@ -316,6 +438,16 @@ public static partial class MockHttpMessageHandlerExtensions
         return SetupHttp(handler, x => x.SendAsync(
                 It.Is(CombineHttpMethod(match, HttpMethod.Head)),
                 It.IsAny<CancellationToken>()));
+    }
+
+    /// <summary>
+    /// Specifies a setup on the mocked type for a call to a value-returning method.
+    /// </summary>
+    /// <param name="handler">The <see cref="HttpMessageHandler" /> mock.</param>
+    /// <param name="match">The asynchronous predicate used to match the <see cref="HttpRequestMessage"/>.</param>
+    public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttpHead(this Mock<HttpMessageHandler> handler, Func<HttpRequestMessage, Task<bool>> match)
+    {
+        return SetupHttp(handler, HttpMethod.Head, match);
     }
 
     /// <summary>
@@ -754,6 +886,23 @@ public static partial class MockHttpMessageHandlerExtensions
         handler.Protected().As<IHttpMessageHandler>().Verify(expression, times, failMessage!);
     }
 
+    private static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupHttp(
+        Mock<HttpMessageHandler> handler,
+        HttpMethod method,
+        Func<HttpRequestMessage, Task<bool>> match)
+    {
+        if (handler is null)
+            throw new ArgumentNullException(nameof(handler));
+        if (method is null)
+            throw new ArgumentNullException(nameof(method));
+        if (match is null)
+            throw new ArgumentNullException(nameof(match));
+
+        return SetupHttp(handler, x => x.SendAsync(
+            It.Is<HttpRequestMessage>(r => r.Method == method && AsyncPredicateMatches(match, r)),
+            It.IsAny<CancellationToken>()));
+    }
+
     private static bool ContentEquals(HttpContent? actual, string? expected)
     {
         //NB: In this case no expectation was provided so match everything
@@ -784,4 +933,7 @@ public static partial class MockHttpMessageHandlerExtensions
         );
         return Expression.Lambda<Func<HttpRequestMessage, bool>>(combinedBody, parameter);
     }
+
+    private static bool AsyncPredicateMatches(Func<HttpRequestMessage, Task<bool>> match, HttpRequestMessage request)
+        => match(request).ConfigureAwait(false).GetAwaiter().GetResult();
 }
