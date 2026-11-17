@@ -37,7 +37,6 @@ Generates `WithOptions<T>()` extension method when `Microsoft.Extensions.Options
 - Fluent API for configuring options in tests
 - Sets up complete options infrastructure (`IOptionsMonitor`, `IOptionsSnapshot`, etc.)
 - Simplifies testing of classes that depend on `IOptions<T>`
-- Matches generic constraints to the resolved `Microsoft.Extensions.Options` version
 
 **Quick Example:**
 ```csharp
