@@ -14,8 +14,11 @@ updates:
         patterns:
           - "*"
     ignore:
+      # Keep Roslyn compiler/workspace packages aligned with the SDK in global.json.
+      - dependency-name: "Microsoft.CodeAnalysis"
       - dependency-name: "Microsoft.CodeAnalysis.Common"
       - dependency-name: "Microsoft.CodeAnalysis.CSharp"
+      - dependency-name: "Microsoft.CodeAnalysis.CSharp.Workspaces"
 
   - package-ecosystem: "github-actions" # See documentation for possible values
     directory: "/" # Location of package manifests
