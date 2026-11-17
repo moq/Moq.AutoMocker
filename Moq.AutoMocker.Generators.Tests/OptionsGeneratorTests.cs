@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.Text;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -82,6 +83,45 @@ public class OptionsGeneratorTests
                 }
             }
 
+        }.RunAsync(TestContext.CancellationToken);
+    }
+
+    [TestMethod]
+    [DataRow("2.1.1", true)]
+    [DataRow("3.1.0", true)]
+    [DataRow("5.0.0", false)]
+    [DataRow("10.0.9", false)]
+    public async Task WithOptions_CompilesAgainstReferencedOptionsVersion(string optionsVersion, bool requiresConstructor)
+    {
+        string constraint = requiresConstructor ? "class, new()" : "class";
+        string expectedSource = ExpectedOptionsGeneratedFile.Replace("where TClass : class", $"where TClass : {constraint}");
+        await new VerifyCS.Test
+        {
+            ReferenceAssemblies = ReferenceAssemblies.NetStandard.NetStandard20
+                .AddPackages([new PackageIdentity("Microsoft.Extensions.Options", optionsVersion)]),
+            TestCode = $$"""
+                using Moq.AutoMock;
+
+                public static class OptionsTests
+                {
+                    public static void Configure<TOptions>(AutoMocker mocker)
+                        where TOptions : {{constraint}}
+                    {
+                        mocker.WithOptions<TOptions>();
+                    }
+                }
+                """,
+            TestState =
+            {
+                AdditionalReferences =
+                {
+                    MetadataReference.CreateFromFile(typeof(Mock).Assembly.Location)
+                },
+                GeneratedSources =
+                {
+                    GetSourceFile(expectedSource, "AutoMockerOptionsExtensions.g.cs")
+                }
+            }
         }.RunAsync(TestContext.CancellationToken);
     }
 
