@@ -88,7 +88,7 @@ mocker.VerifyHttpGet("https://example.com/api/users", Times.Once());
 
 Setup methods are available for all common HTTP verbs (`SetupHttpGet`,
 `SetupHttpPost`, `SetupHttpPut`, `SetupHttpDelete`, `SetupHttpHead`) with
-matching by URL substring or expression predicate. Sequential responses are
+matching by URL substring, expression predicate, or asynchronous predicate (`Func<HttpRequestMessage, Task<bool>>`). Sequential responses are
 supported for testing retry logic.
 
 Documentation

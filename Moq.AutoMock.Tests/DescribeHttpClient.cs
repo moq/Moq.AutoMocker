@@ -150,6 +150,24 @@ public class DescribeHttpClient
     }
 
     [TestMethod]
+    public async Task HttpClient_CanSetupHttpGetByAsyncPredicate()
+    {
+        var mocker = new AutoMocker();
+        string content = """[{name: "test"}]""";
+        mocker.SetupHttpGet(async r =>
+            await Task.FromResult(r.RequestUri!.AbsoluteUri.EndsWith("/people")))
+            .ReturnsHttpResponse(HttpStatusCode.OK, content);
+
+        var service = mocker.CreateInstance<ServiceWithHttpClient>();
+
+        var response = await service.GetAsync("https://example.com/people");
+        var receivedContent = await response.Content.ReadAsStringAsync(TestContext.CancellationToken);
+
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        Assert.AreEqual(content, receivedContent);
+    }
+
+    [TestMethod]
     public async Task HttpClient_SetupHttpGetDoesNotMatchOtherVerbs()
     {
         var mocker = new AutoMocker(MockBehavior.Strict);
@@ -234,6 +252,25 @@ public class DescribeHttpClient
         var mocker = new AutoMocker();
         string content = """[{name: "test"}]""";
         mocker.SetupHttpPost(r => r.RequestUri!.AbsoluteUri.EndsWith("/people"))
+            .ReturnsHttpResponse(HttpStatusCode.OK, content);
+
+        var service = mocker.CreateInstance<ServiceWithHttpClient>();
+
+        var response = await service.PostAsync("https://example.com/people", "data");
+        var receivedContent = await response.Content.ReadAsStringAsync(TestContext.CancellationToken);
+
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        Assert.AreEqual(content, receivedContent);
+    }
+
+    [TestMethod]
+    public async Task HttpClient_CanSetupHttpPostByAsyncPredicate()
+    {
+        var mocker = new AutoMocker();
+        string content = """[{name: "test"}]""";
+        mocker.SetupHttpPost(async request =>
+            request.RequestUri!.AbsoluteUri.EndsWith("/people") &&
+            await request.Content!.ReadAsStringAsync(TestContext.CancellationToken) == "data")
             .ReturnsHttpResponse(HttpStatusCode.OK, content);
 
         var service = mocker.CreateInstance<ServiceWithHttpClient>();
