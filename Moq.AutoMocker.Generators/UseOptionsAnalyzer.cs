@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis.Operations;
 namespace Moq.AutoMocker.Generators;
 
 /// <summary>
-/// Reports calls to AutoMocker.Use that pass an IOptions&lt;T&gt; instance, suggesting the
+/// Reports calls to AutoMocker.Use or AutoMocker.With that register IOptions&lt;T&gt;, suggesting the
 /// source generated WithOptions extension method instead.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
@@ -47,7 +47,7 @@ public sealed class UseOptionsAnalyzer : DiagnosticAnalyzer
     {
         var invocation = (IInvocationOperation)context.Operation;
         IMethodSymbol method = invocation.TargetMethod;
-        if (method.Name != "Use"
+        if (method.Name is not ("Use" or "With")
             || !SymbolEqualityComparer.Default.Equals(method.ContainingType, autoMocker))
         {
             return;
@@ -69,7 +69,12 @@ public sealed class UseOptionsAnalyzer : DiagnosticAnalyzer
                 {
                     value = conversion.Operand;
                 }
-                if (value.Type is { } type && GetOptionsValueType(type, optionsType) is { } found)
+                ITypeSymbol? type = !method.IsGenericMethod
+                    && (method.Name == "With" || argument.Parameter?.Ordinal == 0)
+                    && value is ITypeOfOperation typeOf
+                    ? typeOf.TypeOperand
+                    : value.Type;
+                if (type is not null && GetOptionsValueType(type, optionsType) is { } found)
                 {
                     optionValueType = found;
                     break;
@@ -82,7 +87,8 @@ public sealed class UseOptionsAnalyzer : DiagnosticAnalyzer
         Location location = invocation.Syntax is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax memberAccess }
             ? memberAccess.Name.GetLocation()
             : invocation.Syntax.GetLocation();
-        context.ReportDiagnostic(Diagnostics.PreferWithOptions.Create(location, optionValueType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)));
+        context.ReportDiagnostic(Diagnostics.PreferWithOptions.Create(location,
+            optionValueType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat), method.Name));
     }
 
     private static ITypeSymbol? GetOptionsValueType(ITypeSymbol type, INamedTypeSymbol optionsType)
