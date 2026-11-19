@@ -58,16 +58,16 @@ public static class Diagnostics
         public const string DiagnosticId = "AMA0001";
         private const string UsageCategory = "AutoMocker.Usage";
         private const string HelpLink = "https://github.com/moq/Moq.AutoMocker/blob/master/docs/SourceGenerators/OptionsExtensionGenerator.md";
-        private const string Title = "Use WithOptions instead of Use with IOptions";
-        private const string MessageFormat = "Use the source generated 'WithOptions<{0}>()' extension method instead of passing an IOptions<{0}> instance to 'Use' (see {1})";
+        private const string Title = "Use WithOptions instead of Use or With with IOptions";
+        private const string MessageFormat = "Use the source generated 'WithOptions<{0}>()' extension method instead of registering IOptions<{0}> with '{1}' (see {2})";
         private const string Description = "The generated WithOptions extension registers IOptions<T>, IOptionsSnapshot<T>, IOptionsMonitor<T> and the options value consistently, instead of only a single IOptions<T> instance.";
 
         //NB: Do not make a property or use target-typed new expression
         internal static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat,
             UsageCategory, DiagnosticSeverity.Info, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLink);
 
-        public static Diagnostic Create(Location? location, string optionsTypeName)
-            => Diagnostic.Create(Rule, location, optionsTypeName, HelpLink);
+        public static Diagnostic Create(Location? location, string optionsTypeName, string methodName)
+            => Diagnostic.Create(Rule, location, optionsTypeName, methodName, HelpLink);
     }
 
     public static class PreferWith
